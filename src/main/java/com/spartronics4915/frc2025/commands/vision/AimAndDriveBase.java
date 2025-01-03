@@ -30,6 +30,8 @@ public class AimAndDriveBase extends Command {
         this.pidController = new PIDController(kP, 0, 0);
         this.maxRotVelocity = maxRotVelocity;
         this.driverController = driverController;
+
+        addRequirements(swerveSubsystem);
     }
 
     @Override
