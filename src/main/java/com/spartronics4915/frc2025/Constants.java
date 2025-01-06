@@ -4,6 +4,8 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.util.Structures.*;
+
 import edu.wpi.first.math.util.Units;
 
 /**
