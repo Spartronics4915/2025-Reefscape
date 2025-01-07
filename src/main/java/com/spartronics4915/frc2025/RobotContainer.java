@@ -8,6 +8,7 @@ import com.spartronics4915.frc2025.Constants.OperatorConstants;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.commands.vision.AimAndDriveBase;
+import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
@@ -43,6 +44,8 @@ public class RobotContainer {
 
   public final TargetDetectorInterface noteDetector;
 
+  public final MotorSimulationSubsystem mSim;
+
   public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(swerveSubsystem, driverController);
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
@@ -58,6 +61,7 @@ public class RobotContainer {
       noteDetector = null;
     }
 
+    mSim = new MotorSimulationSubsystem();
     ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
 
     // Configure the trigger bindings
@@ -66,6 +70,7 @@ public class RobotContainer {
     // Need to initialize this here after vision is configured.
     // Need to clean up initialization flow to make it more clear
     autoChooser = buildAutoChooser();
+    
 
   }
 
