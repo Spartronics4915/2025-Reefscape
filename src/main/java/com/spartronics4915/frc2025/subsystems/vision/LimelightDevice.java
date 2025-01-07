@@ -8,7 +8,7 @@ public class LimelightDevice extends SubsystemBase {
     private final String name;
 
     public LimelightDevice(String name) {
-        this.name = name;
+        this.name = "limelight-" + name;
     }
 
     public double getTx() {
