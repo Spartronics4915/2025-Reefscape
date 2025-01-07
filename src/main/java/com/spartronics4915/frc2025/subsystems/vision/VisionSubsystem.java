@@ -1,11 +1,14 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasurement;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import swervelib.SwerveDrive;
 
 public class VisionSubsystem extends SubsystemBase {
     private static VisionSubsystem instance;
@@ -21,6 +24,15 @@ public class VisionSubsystem extends SubsystemBase {
     public static VisionSubsystem getInstance() {
         if (instance == null) instance = new VisionSubsystem();
         return instance;
+    }
+
+    public void addVisionMeasurements(SwerveDrive swerve) {
+        limelights.forEach((limelight) -> {
+            Optional<VisionMeasurement> measurement = limelight.getVisionMeasurement(swerve);
+            if (measurement.isPresent()) {
+                swerve.addVisionMeasurement(measurement.get().pose(), measurement.get().timestamp());
+            }
+        });
     }
 
 
