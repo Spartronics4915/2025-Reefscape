@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,9 +19,18 @@ import static edu.wpi.first.units.Units.Meter;
 
 public class SwerveSubsystem extends SubsystemBase {
 
+    private static SwerveSubsystem mInstance = null;
+
+    public static SwerveSubsystem getInstance(){
+        if (mInstance == null) {
+            mInstance = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/neo"));
+        }
+        return mInstance;
+    }
+
     private final SwerveDrive swerveDrive;
 
-    public SwerveSubsystem(File directory) {
+    private SwerveSubsystem(File directory) {
 
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,

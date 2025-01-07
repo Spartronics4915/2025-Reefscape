@@ -7,7 +7,8 @@ package com.spartronics4915.frc2025;
 import com.spartronics4915.frc2025.Constants.OperatorConstants;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.DriveCommands.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.commands.DriveCommands.AimAndDriveBase;
+import com.spartronics4915.frc2025.commands.DriveCommands.ChassisSpeedSuppliers;
+import com.spartronics4915.frc2025.commands.DriveCommands.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
@@ -36,8 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-      "swerve/neo"));
+  public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
@@ -46,7 +46,7 @@ public class RobotContainer {
 
   public final MotorSimulationSubsystem mSim;
 
-  public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(swerveSubsystem, driverController);
+  public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   private final SendableChooser<Command> autoChooser;
@@ -90,8 +90,13 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    driverController.a().whileTrue(new AimAndDriveBase(noteDetector, swerveSubsystem,
-        driverController.getHID(), 16, 360));
+    driverController.a().whileTrue(
+      new RotationIndependentControlCommand(
+        ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
+        () -> {
+          return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
+        }
+      ));
 
     swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
   }
