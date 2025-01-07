@@ -11,6 +11,7 @@ import com.spartronics4915.frc2025.commands.vision.AimAndDriveBase;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
 import java.io.File;
 
@@ -56,6 +57,8 @@ public class RobotContainer {
     } else {
       noteDetector = null;
     }
+
+    ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
 
     // Configure the trigger bindings
     configureBindings();

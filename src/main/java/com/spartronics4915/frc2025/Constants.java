@@ -4,6 +4,8 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.util.Structures.*;
+
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -19,28 +21,28 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final class OI {
-    public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 1;
+    public static final class OI {
+        public static final int kDriverControllerPort = 0;
+        public static final int kOperatorControllerPort = 1;
 
-    public static final double kStickDeadband = 0.05;
+        public static final double kStickDeadband = 0.05;
 
-    public static final double kDriverTriggerDeadband = 0.3;
-    public static final double kOperatorTriggerDeadband = 0.3;
-  }
+        public static final double kDriverTriggerDeadband = 0.3;
+        public static final double kOperatorTriggerDeadband = 0.3;
+    }
 
-  public static final class Drive {
-    public static final double kTrackWidth = Units.inchesToMeters(22.475);
-    public static final double kWheelbase = Units.inchesToMeters(22.475);
-    public static final double kChassisRadius = Math.hypot(
-        kTrackWidth / 2, kWheelbase / 2);
+    public static final class Drive {
+        public static final double kTrackWidth = Units.inchesToMeters(22.475);
+        public static final double kWheelbase = Units.inchesToMeters(22.475);
+        public static final double kChassisRadius = Math.hypot(
+                kTrackWidth / 2, kWheelbase / 2);
 
-    public static final double kMaxSpeed = Units.feetToMeters(15.1);
-    public static final double kMaxAngularSpeed = kMaxSpeed *  Math.PI / kChassisRadius;
+        public static final double kMaxSpeed = Units.feetToMeters(15.1);
+        public static final double kMaxAngularSpeed = kMaxSpeed * Math.PI / kChassisRadius;
 
-  }
+    }
 
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
+    public static class OperatorConstants {
+        public static final int kDriverControllerPort = 0;
+    }
 }
