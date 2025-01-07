@@ -6,8 +6,8 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.Constants.OperatorConstants;
 import com.spartronics4915.frc2025.commands.Autos;
-import com.spartronics4915.frc2025.commands.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.commands.vision.AimAndDriveBase;
+import com.spartronics4915.frc2025.commands.DriveCommands.SwerveTeleopCommand;
+import com.spartronics4915.frc2025.commands.DriveCommands.AimAndDriveBase;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;

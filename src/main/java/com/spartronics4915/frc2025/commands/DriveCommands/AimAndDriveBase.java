@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.commands.vision;
+package com.spartronics4915.frc2025.commands.DriveCommands;
 
 import java.util.Optional;
 
@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import com.spartronics4915.frc2025.commands.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface.Detection;
