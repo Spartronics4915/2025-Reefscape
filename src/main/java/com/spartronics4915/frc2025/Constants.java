@@ -32,6 +32,17 @@ public final class Constants {
     }
 
     public static final class Drive {
+        public enum SwerveDirectories{
+            NEO("swerve/neo"),
+            PROGRAMMER_CHASSIS("swerve/programmer-chassis");
+
+            public String directory;
+
+            private SwerveDirectories(String directory) {
+                this.directory = directory;
+            }
+        }
+
         public static final double kTrackWidth = Units.inchesToMeters(22.475);
         public static final double kWheelbase = Units.inchesToMeters(22.475);
         public static final double kChassisRadius = Math.hypot(

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import com.spartronics4915.frc2025.Constants.Drive;
+import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 
 import static edu.wpi.first.units.Units.Meter;
 
@@ -23,7 +24,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public static SwerveSubsystem getInstance(){
         if (mInstance == null) {
-            mInstance = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/neo"));
+            mInstance = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),SwerveDirectories.NEO.directory));
         }
         return mInstance;
     }
