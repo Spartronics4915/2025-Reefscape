@@ -53,8 +53,7 @@ public class NoteLocatorSim implements TargetDetectorInterface {
 
             if (dist < minDist) {
 
-                bestNote = Optional
-                        .of(new Detection(viewCenterNoteAngle.getDegrees(), vertAngle.getDegrees(), dist));
+                bestNote = Optional.of(new Detection(viewCenterNoteAngle.getDegrees(), vertAngle.getDegrees(), dist));
                 minDist = dist;
             }
             // System.out.println("view center: " + viewCenterNoteAngle.getDegrees() + " " +

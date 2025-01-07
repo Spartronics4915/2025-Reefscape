@@ -45,8 +45,4 @@ public final class Constants {
     public static final class DriveCommandConstants {
         public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
     }
-
-    public static class OperatorConstants {
-        public static final int kDriverControllerPort = 0;
-    }
 }

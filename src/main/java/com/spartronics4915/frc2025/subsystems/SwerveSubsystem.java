@@ -34,34 +34,25 @@ public class SwerveSubsystem extends SubsystemBase {
 
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,
-                    new Pose2d(new Translation2d(Meter.of(2),
-                            Meter.of(5)),
-                            Rotation2d.fromDegrees(180)));
+                new Pose2d(new Translation2d(Meter.of(2),
+                    Meter.of(5)),
+                    Rotation2d.fromDegrees(180)
+                )
+            );
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot
-                                                 // via angle.
-        swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation
-                                                // for simulations since it causes discrepancies not seen in real life.
-        swerveDrive.setAngularVelocityCompensation(true,
-                true,
-                0.1); // Correct for skew that gets worse as angular velocity increases. Start with a
-                      // coefficient of 0.1.
-        swerveDrive.setModuleEncoderAutoSynchronize(false,
-                1); // Enable if you want to resynchronize your absolute encoders and motor encoders
-                    // periodically when they are not moving.
-        swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push
-                                             // the offsets onto it. Throws warning if not possible
-
+        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+        swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+        swerveDrive.setAngularVelocityCompensation(true, true, 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
+        swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
+        swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
         swerveDrive.resetOdometry(new Pose2d(1.5, 5, Rotation2d.fromDegrees(45)));
-
     }
 
     // External API for sending explicit driving commands to the swerve drive
     public void drive(ChassisSpeeds chassisSpeeds) {
-
         swerveDrive.drive(chassisSpeeds);
     }
 
@@ -70,22 +61,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-
         return swerveDrive.getPose();
     }
 
     public ChassisSpeeds getFieldVelocity() {
-
         return swerveDrive.getFieldVelocity();
     }
 
     public void stopChassis() {
-
         drive(new ChassisSpeeds());
     }
 
     public Command stopChassisCommand() {
-
         return Commands.runOnce(() -> stopChassis(), this);
     }
 
