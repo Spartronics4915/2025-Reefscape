@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Units;
@@ -13,11 +14,17 @@ import swervelib.SwerveDrive;
 public class LimelightDevice extends SubsystemBase {
 
     public static record VisionMeasurement(Pose2d pose, double timestamp) {}
+    public enum LimelightModel {
+        LIMELIGHT_3,
+        LIMELIGHT_3G
+    }
 
     private final String name;
+    private final LimelightModel model;
 
-    public LimelightDevice(String name) {
-        this.name = "limelight-" + name;
+    public LimelightDevice(LimelightConstants constants) {
+        this.name = "limelight-" + constants.name();
+        this.model = constants.model();
     }
 
     public double getTx() {
