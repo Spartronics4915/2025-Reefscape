@@ -22,18 +22,21 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public static VisionSubsystem getInstance() {
-        if (instance == null) instance = new VisionSubsystem();
+        if (instance == null) {
+            instance = new VisionSubsystem();
+        }
         return instance;
     }
 
-    public void addVisionMeasurements(SwerveDrive swerve) {
+    public ArrayList<VisionMeasurement> getVisionMeasurements(SwerveDrive swerve) {
+        ArrayList<VisionMeasurement> measurements = new ArrayList<>();
         limelights.forEach((limelight) -> {
             Optional<VisionMeasurement> measurement = limelight.getVisionMeasurement(swerve);
             if (measurement.isPresent()) {
-                swerve.addVisionMeasurement(measurement.get().pose(), measurement.get().timestamp());
+                measurements.add(measurement.get());
             }
         });
+        return measurements;
     }
-
 
 }

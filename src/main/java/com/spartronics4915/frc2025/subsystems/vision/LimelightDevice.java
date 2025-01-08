@@ -14,9 +14,9 @@ import swervelib.SwerveDrive;
 public class LimelightDevice extends SubsystemBase {
 
     public static record VisionMeasurement(Pose2d pose, double timestamp) {}
+
     public enum LimelightModel {
-        LIMELIGHT_3,
-        LIMELIGHT_3G
+        LIMELIGHT_3, LIMELIGHT_3G
     }
 
     private final String name;
