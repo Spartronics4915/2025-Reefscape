@@ -38,7 +38,8 @@ public final class Structures {
 
     public final record LimelightConstants(
         String name,
-        LimelightModel model
+        LimelightModel model,
+        int id
     ) {}
 
 

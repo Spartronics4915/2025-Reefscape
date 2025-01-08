@@ -21,10 +21,12 @@ public class LimelightDevice extends SubsystemBase {
 
     private final String name;
     private final LimelightModel model;
+    private final int id;
 
     public LimelightDevice(LimelightConstants constants) {
         this.name = "limelight-" + constants.name();
         this.model = constants.model();
+        this.id = constants.id();
     }
 
     public double getTx() {
