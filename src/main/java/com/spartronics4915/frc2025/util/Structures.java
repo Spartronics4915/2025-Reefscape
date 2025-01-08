@@ -3,6 +3,7 @@ package com.spartronics4915.frc2025.util;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightModel;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 
 /**
  * this stores all of the records used in the Constants file
@@ -39,7 +40,8 @@ public final class Structures {
     public final record LimelightConstants(
         String name,
         LimelightModel model,
-        int id
+        int id,
+        LimelightRole role
     ) {}
 
 

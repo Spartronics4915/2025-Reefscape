@@ -19,14 +19,20 @@ public class LimelightDevice extends SubsystemBase {
         LIMELIGHT_3, LIMELIGHT_3G
     }
 
+    public enum LimelightRole {
+        NOTHING, PLACEHOLDER
+    }
+
     private final String name;
     private final LimelightModel model;
     private final int id;
+    private final LimelightRole role;
 
     public LimelightDevice(LimelightConstants constants) {
         this.name = "limelight-" + constants.name();
         this.model = constants.model();
         this.id = constants.id();
+        this.role = constants.role();
     }
 
     public double getTx() {
@@ -42,6 +48,9 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveDrive swerve) {
+        if (role == LimelightRole.NOTHING) {
+            return Optional.empty();
+        }
         boolean rejectUpdate = false;
         LimelightHelpers.SetRobotOrientation(name, swerve.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate megaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
@@ -56,6 +65,5 @@ public class LimelightDevice extends SubsystemBase {
         } else {
             return Optional.of(new VisionMeasurement(megaTag2.pose, megaTag2.timestampSeconds));
         }
-
     }
 }

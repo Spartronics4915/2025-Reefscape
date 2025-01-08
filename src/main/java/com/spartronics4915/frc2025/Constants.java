@@ -5,6 +5,7 @@
 package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightModel;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.math.util.Units;
@@ -50,7 +51,7 @@ public final class Constants {
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
         public static final LimelightConstants kLimelights[] = {
-            new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11)
+                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.PLACEHOLDER)
         };
     }
 }
