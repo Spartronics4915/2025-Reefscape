@@ -2,11 +2,12 @@ package com.spartronics4915.frc2025.subsystems.vision;
 
 import java.util.Optional;
 
-import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
@@ -33,6 +34,13 @@ public class LimelightDevice extends SubsystemBase {
         this.model = constants.model();
         this.id = constants.id();
         this.role = constants.role();
+
+        int portOffset = (id - 11) * 10; // limelight 11 will have 5800-5809, limelight 12 will have 5810-5819, etc.
+
+        // ports are forwarded to http://roborio-4915-FRC.local and are accessed while tethered to the roborio over USB
+        for (int port = 5800; port <= 5809; port++) {
+            PortForwarder.add(port + portOffset, name + ".local", port); 
+        }
     }
 
     public double getTx() {
