@@ -23,7 +23,7 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public enum LimelightRole {
-        NOTHING, PLACEHOLDER
+        NOTHING, REEF, STATION, OBSERVER
     }
 
     private final String name;
@@ -58,7 +58,7 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveDrive swerve) {
-        if (role == LimelightRole.NOTHING) {
+        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
             return Optional.empty();
         }
         boolean rejectUpdate = false;
@@ -78,6 +78,9 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public ArrayList<Integer> getVisibleTags() {
+        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
+            return new ArrayList<Integer>();
+        }
         RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(name);
         ArrayList<Integer> visibleTags = new ArrayList<>();
         for (RawFiducial raw : fiducials) {

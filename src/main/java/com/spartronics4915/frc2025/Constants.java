@@ -51,7 +51,9 @@ public final class Constants {
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
         public static final LimelightConstants kLimelights[] = {
-                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.PLACEHOLDER)
+                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
+                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.OBSERVER),
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
         };
     }
 }
