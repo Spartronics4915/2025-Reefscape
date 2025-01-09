@@ -1,7 +1,9 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasurement;
@@ -39,4 +41,12 @@ public class VisionSubsystem extends SubsystemBase {
         return measurements;
     }
 
+    public ArrayList<Integer> getVisibleTags() {
+        Set<Integer> set = new HashSet<>();
+        limelights.forEach((limelight) -> {
+            ArrayList<Integer> results = limelight.getVisibleTags();
+            set.addAll(results);
+        });
+        return new ArrayList<Integer>(set);
+    }
 }

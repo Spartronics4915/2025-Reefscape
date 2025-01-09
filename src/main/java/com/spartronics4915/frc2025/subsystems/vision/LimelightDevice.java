@@ -1,9 +1,11 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.LimelightHelpers;
+import com.spartronics4915.frc2025.LimelightHelpers.RawFiducial;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -73,5 +75,14 @@ public class LimelightDevice extends SubsystemBase {
         } else {
             return Optional.of(new VisionMeasurement(megaTag2.pose, megaTag2.timestampSeconds));
         }
+    }
+
+    public ArrayList<Integer> getVisibleTags() {
+        RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(name);
+        ArrayList<Integer> visibleTags = new ArrayList<>();
+        for (RawFiducial raw : fiducials) {
+            visibleTags.add(raw.id);
+        }
+        return visibleTags;
     }
 }
