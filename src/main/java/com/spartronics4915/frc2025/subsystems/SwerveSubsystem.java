@@ -84,4 +84,8 @@ public class SwerveSubsystem extends SubsystemBase {
         return Commands.runOnce(() -> stopChassis(), this);
     }
 
+    public SwerveDrive getInternalSwerve() {
+        return swerveDrive;
+    }
+
 }

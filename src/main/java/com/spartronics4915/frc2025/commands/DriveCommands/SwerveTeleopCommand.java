@@ -30,7 +30,7 @@ public class SwerveTeleopCommand extends Command {
     @Override
     public void execute() {
 
-        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem);
+        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem).get();
 
         swerveSubsystem.drive(cs);
     }
