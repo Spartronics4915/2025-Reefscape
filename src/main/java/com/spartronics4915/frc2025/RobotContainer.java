@@ -100,23 +100,23 @@ public class RobotContainer {
         //     ));
 
         driverController.povUp().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.driveFieldOriented(new ChassisSpeeds(0.25,0,0));
+            swerveSubsystem.drive(new ChassisSpeeds(0.25,0,0));
         }, () -> {
             swerveSubsystem.stopChassis();
         }, swerveSubsystem).withTimeout(10));
 
         driverController.povDown().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.driveFieldOriented(new ChassisSpeeds(-0.25,0,0));
+            swerveSubsystem.drive(new ChassisSpeeds(-0.25,0,0));
         }, () -> {
             swerveSubsystem.stopChassis();
         }, swerveSubsystem).withTimeout(10));
         driverController.povLeft().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.driveFieldOriented(new ChassisSpeeds(0,-0.25,0));
+            swerveSubsystem.drive(new ChassisSpeeds(0,-0.25,0));
         }, () -> {
             swerveSubsystem.stopChassis();
         }, swerveSubsystem).withTimeout(10));
         driverController.povRight().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.driveFieldOriented(new ChassisSpeeds(0,0.25,0));
+            swerveSubsystem.drive(new ChassisSpeeds(0,0.25,0));
         }, () -> {
             swerveSubsystem.stopChassis();
         }, swerveSubsystem).withTimeout(10));
