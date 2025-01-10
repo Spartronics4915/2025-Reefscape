@@ -22,6 +22,14 @@ public class RotationIndependentControlCommand extends Command {
 
         addRequirements(mSwerve);
     }
+    public RotationIndependentControlCommand(
+        Supplier<ChassisSpeeds> cSSupplier
+    ) {
+        this.rotationalCSSupplier = cSSupplier;
+        this.linearCSSupplier = cSSupplier;
+
+        addRequirements(mSwerve);
+    }
 
     @Override
     public void execute() {
