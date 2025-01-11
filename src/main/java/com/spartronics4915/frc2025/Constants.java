@@ -48,7 +48,7 @@ public final class Constants {
         public static final double kChassisRadius = Math.hypot(
                 kTrackWidth / 2, kWheelbase / 2);
 
-        public static final double kMaxSpeed = 3;
+        public static final double kMaxSpeed = 5;
         public static final double kMaxAngularSpeed = kMaxSpeed * Math.PI / kChassisRadius;
 
     }

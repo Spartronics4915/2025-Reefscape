@@ -42,7 +42,7 @@ public final class ChassisSpeedSuppliers {
             if (RobotBase.isSimulation()) {
                 inputomegaraw = driverController.getRawAxis(3) * -1.0;
             } else {
-                inputomegaraw = driverController.getRightY() * -1.0; // consider changing from angular velocity
+                inputomegaraw = driverController.getRightY() * 1.0; // consider changing from angular velocity
                 // control to direct angle control
             }
             
@@ -63,8 +63,8 @@ public final class ChassisSpeedSuppliers {
 
         return () -> {
             var cs = swerveController.getTargetSpeeds(
-                driverController.getLeftY(), 
-                driverController.getLeftX(), 
+                -driverController.getLeftY(), 
+                -driverController.getLeftX(), 
                 driverController.getRightX(), 
                 driverController.getRightX(), 
                 internalSwerve.getOdometryHeading().getRadians(), 

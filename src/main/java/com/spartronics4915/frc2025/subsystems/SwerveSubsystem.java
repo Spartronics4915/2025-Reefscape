@@ -37,16 +37,23 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveSubsystem(File directory) {
 
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,
-                new Pose2d(new Translation2d(Meter.of(2),
-                    Meter.of(5)),
-                    Rotation2d.fromDegrees(180)
-                )
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed//,
+                // new Pose2d(new Translation2d(Meter.of(2),
+                //     Meter.of(5)),
+                //     Rotation2d.fromDegrees(180)
+                // )
             );
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        Shuffleboard.getTab("logging").addNumber("yaw", () -> getPose().getRotation().getDegrees());
+        Shuffleboard.getTab("logging").addNumber("x", () -> getPose().getX());
+        Shuffleboard.getTab("logging").addNumber("y", () -> getPose().getY());
+
+
+
         // swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
         // swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
         // swerveDrive.setAngularVelocityCompensation(true, true, 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
