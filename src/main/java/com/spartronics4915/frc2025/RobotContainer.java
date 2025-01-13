@@ -37,17 +37,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem mSwerveSubsystem = SwerveSubsystem.getInstance();
+    public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
-    private static final CommandXboxController mDriverController = new CommandXboxController(OI.kDriverControllerPort);
+    private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
-    private static final CommandXboxController mOperatorController = new CommandXboxController(OI.kOperatorControllerPort);
+    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
     
-    private static final CommandXboxController mDebugController = new CommandXboxController(OI.kDebugControllerPort);
+    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
-    public final TargetDetectorInterface mNoteDetector; //FIXME this never gets initalized
+    public final TargetDetectorInterface noteDetector;
 
     public final MotorSimulationSubsystem mSim;
+
+    public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
+    // Replace with CommandPS4Controller or CommandJoystick if needed
 
     private final SendableChooser<Command> autoChooser;
     /**
@@ -56,9 +59,9 @@ public class RobotContainer {
     public RobotContainer() {
 
         if (RobotBase.isSimulation()) {
-            mNoteDetector = new NoteLocatorSim(mSwerveSubsystem);
+            noteDetector = new NoteLocatorSim(swerveSubsystem);
         } else {
-            mNoteDetector = null;
+            noteDetector = null;
         }
 
         mSim = new MotorSimulationSubsystem();
@@ -88,18 +91,16 @@ public class RobotContainer {
      * joysticks}.
      */
     private void configureBindings() {
-        final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(mDriverController);
 
-
-        mDriverController.a().whileTrue(
+        driverController.a().whileTrue(
             new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.targetDetector(mNoteDetector::getClosestVisibleTarget, 360),
+                ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
                 () -> {
-                    return ChassisSpeedSuppliers.computeVelocitiesFromController(mDriverController.getHID(), true, mSwerveSubsystem);
+                    return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
                 }
             ));
 
-        mSwerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+        swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }
 
     /**
@@ -118,15 +119,15 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         chooser.setDefaultOption("None", Commands.none());
-        chooser.addOption("DriveToNote", Autos.driveToNote(mSwerveSubsystem, mNoteDetector));
+        chooser.addOption("DriveToNote", Autos.driveToNote(swerveSubsystem, noteDetector));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
     }
 
-    public static CommandXboxController getDriveController(){return mDriverController;}
-    public static CommandXboxController getOperatorController(){return mOperatorController;}
-    public static CommandXboxController getDebugController(){return mDebugController;}
+    public static CommandXboxController getDriveController(){return driverController;}
+    public static CommandXboxController getOperatorController(){return operatorController;}
+    public static CommandXboxController getDebugController(){return debugController;}
 
     
 }
