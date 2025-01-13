@@ -40,6 +40,8 @@ public class RobotContainer {
     public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
     private final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+    
+    private final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
     public final TargetDetectorInterface noteDetector;
 
