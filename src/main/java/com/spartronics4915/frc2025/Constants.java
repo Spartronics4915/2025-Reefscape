@@ -8,6 +8,8 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightMo
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 import com.spartronics4915.frc2025.util.Structures.*;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -50,6 +52,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
+        public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.OBSERVER),
