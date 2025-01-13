@@ -39,9 +39,11 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
-    private final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+    private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+
+    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
     
-    private final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
     public final TargetDetectorInterface noteDetector;
 
@@ -123,4 +125,9 @@ public class RobotContainer {
         return chooser;
     }
 
+    public static CommandXboxController getDriveController(){return driverController;}
+    public static CommandXboxController getOperatorController(){return operatorController;}
+    public static CommandXboxController getDebugController(){return debugController;}
+
+    
 }
