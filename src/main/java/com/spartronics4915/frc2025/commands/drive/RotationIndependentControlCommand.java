@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.commands.DriveCommands;
+package com.spartronics4915.frc2025.commands.drive;
 
 import java.util.function.Supplier;
 
@@ -19,6 +19,14 @@ public class RotationIndependentControlCommand extends Command {
     ) {
         this.rotationalCSSupplier = rotationalCSSupplier;
         this.linearCSSupplier = linearCSSupplier;
+
+        addRequirements(mSwerve);
+    }
+    public RotationIndependentControlCommand(
+        Supplier<ChassisSpeeds> cSSupplier
+    ) {
+        this.rotationalCSSupplier = cSSupplier;
+        this.linearCSSupplier = cSSupplier;
 
         addRequirements(mSwerve);
     }

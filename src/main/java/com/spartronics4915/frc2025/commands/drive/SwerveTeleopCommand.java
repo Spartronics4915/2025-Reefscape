@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.commands.DriveCommands;
+package com.spartronics4915.frc2025.commands.drive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.*;
+
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import static com.spartronics4915.frc2025.commands.DriveCommands.ChassisSpeedSuppliers.*;
 
 public class SwerveTeleopCommand extends Command {
 
@@ -23,14 +25,14 @@ public class SwerveTeleopCommand extends Command {
 
         this.driverController = driverController;
 
-        setFieldRelative(true);
+        setFieldRelative(false);
         addRequirements(swerveSubsystem);
     }
 
     @Override
     public void execute() {
 
-        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem);
+        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem).get();
 
         swerveSubsystem.drive(cs);
     }

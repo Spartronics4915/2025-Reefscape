@@ -6,9 +6,9 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
-import com.spartronics4915.frc2025.commands.DriveCommands.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.commands.DriveCommands.ChassisSpeedSuppliers;
-import com.spartronics4915.frc2025.commands.DriveCommands.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
+import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
@@ -16,7 +16,10 @@ import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -39,11 +42,13 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
-    private final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+    private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
-    public final TargetDetectorInterface noteDetector;
+    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
+    
+    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
-    public final MotorSimulationSubsystem mSim;
+    public final MotorSimulationSubsystem mechanismSim;
 
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
     // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -54,13 +59,7 @@ public class RobotContainer {
     */
     public RobotContainer() {
 
-        if (RobotBase.isSimulation()) {
-            noteDetector = new NoteLocatorSim(swerveSubsystem);
-        } else {
-            noteDetector = null;
-        }
-
-        mSim = new MotorSimulationSubsystem();
+        mechanismSim = new MotorSimulationSubsystem();
         ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
@@ -88,15 +87,12 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        driverController.a().whileTrue(
-            new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
-                () -> {
-                    return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
-                }
-            ));
+        // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
-        swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+        swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
+            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
+            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem)
+        ));
     }
 
     /**
@@ -115,10 +111,14 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         chooser.setDefaultOption("None", Commands.none());
-        chooser.addOption("DriveToNote", Autos.driveToNote(swerveSubsystem, noteDetector));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
     }
 
+    public static CommandXboxController getDriveController(){return driverController;}
+    public static CommandXboxController getOperatorController(){return operatorController;}
+    public static CommandXboxController getDebugController(){return debugController;}
+
+    
 }
