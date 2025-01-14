@@ -6,9 +6,9 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
-import com.spartronics4915.frc2025.commands.DriveCommands.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.commands.DriveCommands.ChassisSpeedSuppliers;
-import com.spartronics4915.frc2025.commands.DriveCommands.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.driveCommands.ChassisSpeedSuppliers;
+import com.spartronics4915.frc2025.commands.driveCommands.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.driveCommands.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
