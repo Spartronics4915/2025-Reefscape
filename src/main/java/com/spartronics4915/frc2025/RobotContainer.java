@@ -48,7 +48,7 @@ public class RobotContainer {
     
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
-    public final MotorSimulationSubsystem mSim;
+    public final MotorSimulationSubsystem mechanismSim;
 
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
     // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -59,7 +59,7 @@ public class RobotContainer {
     */
     public RobotContainer() {
 
-        mSim = new MotorSimulationSubsystem();
+        mechanismSim = new MotorSimulationSubsystem();
         ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
