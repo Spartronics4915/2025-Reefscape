@@ -60,7 +60,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         mechanismSim = new MotorSimulationSubsystem();
-        ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
+        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); //TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
         configureBindings();
