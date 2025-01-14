@@ -5,6 +5,8 @@
 package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.util.Structures.*;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.util.Units;
 
@@ -53,9 +55,15 @@ public final class Constants {
         public static final double kMaxSpeed = 5;
         public static final double kMaxAngularSpeed = kMaxSpeed * Math.PI / kChassisRadius;
 
+        public static final class AutoConstants {
+            public static final PIDConstants kTranslationPID = new PIDConstants(5.0,0,0);
+            public static final PIDConstants kRotationPID = new PIDConstants(5.0,0,0);
+            public static final RobotConfig kRobotConfig = null;//new RobotConfig(null, null, null, null);
+        }
+
     }
 
     public static final class DriveCommandConstants {
-        public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(16, 0, 0, 0);
     }
 }
