@@ -12,10 +12,13 @@ import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
+import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
+import com.spartronics4915.frc2025.subsystems.vision.VisionSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,31 +47,46 @@ public class RobotContainer {
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
-    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
-    
-    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+    private static final CommandXboxController operatorController = new CommandXboxController(
+            OI.kOperatorControllerPort);
 
+    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+    private final VisionSubystem visionSubystem;
+
+    // ******** Simulation entries
     public final MotorSimulationSubsystem mechanismSim;
+    // ********
 
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
     private final SendableChooser<Command> autoChooser;
+
     /**
-    * The container for the robot. Contains subsystems, OI devices, and commands.
-    */
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
     public RobotContainer() {
 
-        mechanismSim = new MotorSimulationSubsystem();
-        ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
+        if (RobotBase.isSimulation()) {
+            mechanismSim = new MotorSimulationSubsystem();
+            visionSubystem = new SimVisionSubsystem(swerveSubsystem);
+        }
+        else {
+            mechanismSim = null;
+            visionSubystem = null;
+        }
+
+        ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
         configureBindings();
 
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
-        autoChooser = buildAutoChooser();
-        
+        autoChooser =
+
+                buildAutoChooser();
+
     }
 
     /**
@@ -90,9 +108,10 @@ public class RobotContainer {
         // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
-            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
-            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem)
-        ));
+                ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(),
+                        swerveSubsystem),
+                ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false,
+                        swerveSubsystem)));
     }
 
     /**
@@ -116,9 +135,16 @@ public class RobotContainer {
         return chooser;
     }
 
-    public static CommandXboxController getDriveController(){return driverController;}
-    public static CommandXboxController getOperatorController(){return operatorController;}
-    public static CommandXboxController getDebugController(){return debugController;}
+    public static CommandXboxController getDriveController() {
+        return driverController;
+    }
 
-    
+    public static CommandXboxController getOperatorController() {
+        return operatorController;
+    }
+
+    public static CommandXboxController getDebugController() {
+        return debugController;
+    }
+
 }

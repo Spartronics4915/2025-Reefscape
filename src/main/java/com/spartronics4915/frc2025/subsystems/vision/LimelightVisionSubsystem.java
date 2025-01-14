@@ -14,20 +14,20 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 
-public class VisionSubsystem extends SubsystemBase {
-    private static VisionSubsystem instance;
+public class LimelightVisionSubsystem extends SubsystemBase implements VisionSubystem{
+    private static LimelightVisionSubsystem instance;
     private final ArrayList<LimelightDevice> limelights;
 
-    private VisionSubsystem() {
+    private LimelightVisionSubsystem() {
         limelights = new ArrayList<>();
         for (LimelightConstants limelight : VisionConstants.kLimelights) {
             limelights.add(new LimelightDevice(limelight));
         }
     }
 
-    public static VisionSubsystem getInstance() {
+    public static LimelightVisionSubsystem getInstance() {
         if (instance == null) {
-            instance = new VisionSubsystem();
+            instance = new LimelightVisionSubsystem();
         }
         return instance;
     }
