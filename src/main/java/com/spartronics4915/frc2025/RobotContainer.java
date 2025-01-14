@@ -6,9 +6,9 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
-import com.spartronics4915.frc2025.commands.DriveCommands.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.commands.DriveCommands.ChassisSpeedSuppliers;
-import com.spartronics4915.frc2025.commands.DriveCommands.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.driveCommands.ChassisSpeedSuppliers;
+import com.spartronics4915.frc2025.commands.driveCommands.RotationIndependentControlCommand;
+import com.spartronics4915.frc2025.commands.driveCommands.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
@@ -42,7 +42,11 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
 
-    private final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+    private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
+
+    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
+    
+    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
     public final TargetDetectorInterface noteDetector;
 
@@ -153,4 +157,9 @@ public class RobotContainer {
         return chooser;
     }
 
+    public static CommandXboxController getDriveController(){return driverController;}
+    public static CommandXboxController getOperatorController(){return operatorController;}
+    public static CommandXboxController getDebugController(){return debugController;}
+
+    
 }
