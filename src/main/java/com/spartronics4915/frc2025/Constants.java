@@ -58,4 +58,8 @@ public final class Constants {
     public static final class DriveCommandConstants {
         public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
     }
+
+    public static final class ArmSubsystem {
+        
+    }
 }
