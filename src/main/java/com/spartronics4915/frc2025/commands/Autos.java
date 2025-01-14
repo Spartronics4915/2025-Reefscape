@@ -4,7 +4,7 @@
 
 package com.spartronics4915.frc2025.commands;
 
-import com.spartronics4915.frc2025.commands.driveCommands.AimDriveToTargetWIthTimeout;
+import com.spartronics4915.frc2025.commands.drive.AimDriveToTargetWIthTimeout;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import edu.wpi.first.math.geometry.Translation2d;
