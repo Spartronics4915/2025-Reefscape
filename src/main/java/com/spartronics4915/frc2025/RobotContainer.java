@@ -103,30 +103,6 @@ public class RobotContainer {
         //         }
         //     ));
 
-        driverController.povUp().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.drive(new ChassisSpeeds(1,0,0));
-        }, () -> {
-            swerveSubsystem.stopChassis();
-        }, swerveSubsystem).withTimeout(10));
-
-        driverController.povDown().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.drive(new ChassisSpeeds(-1,0,0));
-        }, () -> {
-            swerveSubsystem.stopChassis();
-        }, swerveSubsystem).withTimeout(10));
-        driverController.povLeft().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.drive(new ChassisSpeeds(0,-1,0));
-        }, () -> {
-            swerveSubsystem.stopChassis();
-        }, swerveSubsystem).withTimeout(10));
-        driverController.povRight().whileTrue(Commands.startEnd(() -> {
-            swerveSubsystem.drive(new ChassisSpeeds(0,1,0));
-        }, () -> {
-            swerveSubsystem.stopChassis();
-        }, swerveSubsystem).withTimeout(10));
-
-        driverController.a().whileTrue(swerveSubsystem.stopChassisCommand().withTimeout(10));
-
         // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
