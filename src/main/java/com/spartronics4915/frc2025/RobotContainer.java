@@ -16,7 +16,10 @@ import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -92,15 +95,44 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        driverController.a().whileTrue(
-            new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
-                () -> {
-                    return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
-                }
-            ));
+        // driverController.a().whileTrue(
+        //     new RotationIndependentControlCommand(
+        //         ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
+        //         () -> {
+        //             return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
+        //         }
+        //     ));
 
-        swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+        driverController.povUp().whileTrue(Commands.startEnd(() -> {
+            swerveSubsystem.drive(new ChassisSpeeds(1,0,0));
+        }, () -> {
+            swerveSubsystem.stopChassis();
+        }, swerveSubsystem).withTimeout(10));
+
+        driverController.povDown().whileTrue(Commands.startEnd(() -> {
+            swerveSubsystem.drive(new ChassisSpeeds(-1,0,0));
+        }, () -> {
+            swerveSubsystem.stopChassis();
+        }, swerveSubsystem).withTimeout(10));
+        driverController.povLeft().whileTrue(Commands.startEnd(() -> {
+            swerveSubsystem.drive(new ChassisSpeeds(0,-1,0));
+        }, () -> {
+            swerveSubsystem.stopChassis();
+        }, swerveSubsystem).withTimeout(10));
+        driverController.povRight().whileTrue(Commands.startEnd(() -> {
+            swerveSubsystem.drive(new ChassisSpeeds(0,1,0));
+        }, () -> {
+            swerveSubsystem.stopChassis();
+        }, swerveSubsystem).withTimeout(10));
+
+        driverController.a().whileTrue(swerveSubsystem.stopChassisCommand().withTimeout(10));
+
+        // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
+
+        swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
+            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
+            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem)
+        ));
     }
 
     /**

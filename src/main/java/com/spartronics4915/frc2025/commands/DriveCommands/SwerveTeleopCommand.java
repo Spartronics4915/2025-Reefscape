@@ -25,14 +25,14 @@ public class SwerveTeleopCommand extends Command {
 
         this.driverController = driverController;
 
-        setFieldRelative(true);
+        setFieldRelative(false);
         addRequirements(swerveSubsystem);
     }
 
     @Override
     public void execute() {
 
-        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem);
+        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem).get();
 
         swerveSubsystem.drive(cs);
     }

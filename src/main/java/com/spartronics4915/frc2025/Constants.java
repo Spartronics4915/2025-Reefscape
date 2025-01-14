@@ -34,12 +34,23 @@ public final class Constants {
     }
 
     public static final class Drive {
+        public enum SwerveDirectories{
+            NEO("swerve/neo"),
+            PROGRAMMER_CHASSIS("swerve/programmer-chassis");
+
+            public String directory;
+
+            private SwerveDirectories(String directory) {
+                this.directory = directory;
+            }
+        }
+
         public static final double kTrackWidth = Units.inchesToMeters(22.475);
         public static final double kWheelbase = Units.inchesToMeters(22.475);
         public static final double kChassisRadius = Math.hypot(
                 kTrackWidth / 2, kWheelbase / 2);
 
-        public static final double kMaxSpeed = Units.feetToMeters(15.1);
+        public static final double kMaxSpeed = 5;
         public static final double kMaxAngularSpeed = kMaxSpeed * Math.PI / kChassisRadius;
 
     }
