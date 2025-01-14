@@ -48,8 +48,6 @@ public class RobotContainer {
     
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
-    public final TargetDetectorInterface noteDetector;
-
     public final MotorSimulationSubsystem mSim;
 
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
@@ -60,12 +58,6 @@ public class RobotContainer {
     * The container for the robot. Contains subsystems, OI devices, and commands.
     */
     public RobotContainer() {
-
-        if (RobotBase.isSimulation()) {
-            noteDetector = new NoteLocatorSim(swerveSubsystem);
-        } else {
-            noteDetector = null;
-        }
 
         mSim = new MotorSimulationSubsystem();
         ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
@@ -95,14 +87,6 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        // driverController.a().whileTrue(
-        //     new RotationIndependentControlCommand(
-        //         ChassisSpeedSuppliers.targetDetector(noteDetector::getClosestVisibleTarget, 360),
-        //         () -> {
-        //             return ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), true, swerveSubsystem);
-        //         }
-        //     ));
-
         // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
@@ -127,7 +111,6 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         chooser.setDefaultOption("None", Commands.none());
-        chooser.addOption("DriveToNote", Autos.driveToNote(swerveSubsystem, noteDetector));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
