@@ -51,7 +51,7 @@ public class RobotContainer {
             OI.kOperatorControllerPort);
 
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
-    private final VisionSubystem visionSubystem;
+    private final VisionSubystem visionSubsystem;
 
     // ******** Simulation entries
     public final MotorSimulationSubsystem mechanismSim;
@@ -69,11 +69,11 @@ public class RobotContainer {
 
         if (RobotBase.isSimulation()) {
             mechanismSim = new MotorSimulationSubsystem();
-            visionSubystem = new SimVisionSubsystem(swerveSubsystem);
+            visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
         }
         else {
             mechanismSim = null;
-            visionSubystem = null;
+            visionSubsystem = null;
         }
 
         ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface
