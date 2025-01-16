@@ -11,6 +11,7 @@ import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlComm
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
@@ -73,7 +74,7 @@ public class RobotContainer {
         }
         else {
             mechanismSim = null;
-            visionSubsystem = null;
+            visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem);
         }
 
         ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface

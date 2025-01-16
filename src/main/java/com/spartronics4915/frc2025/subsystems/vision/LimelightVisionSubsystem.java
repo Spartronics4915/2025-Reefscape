@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasurement;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
@@ -19,26 +20,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionSubystem{
-    private static LimelightVisionSubsystem instance;
     private final ArrayList<LimelightDevice> limelights;
+    private final SwerveSubsystem swerveSubsystem;
     private final StructArrayPublisher<Pose3d> visionTargetPublisher;
 
-    private LimelightVisionSubsystem() {
+    public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem) {
         limelights = new ArrayList<>();
         for (LimelightConstants limelight : VisionConstants.kLimelights) {
             limelights.add(new LimelightDevice(limelight));
         }
+
+        this.swerveSubsystem = swerveSubsystem;
+
         NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
         StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets", Pose3d.struct);
         visionTargetPublisher = visionTargetTopic.publish();
         Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
-    }
-
-    public static LimelightVisionSubsystem getInstance() {
-        if (instance == null) {
-            instance = new LimelightVisionSubsystem();
-        }
-        return instance;
     }
 
     public ArrayList<VisionMeasurement> getVisionMeasurements(SwerveDrive swerve) {
