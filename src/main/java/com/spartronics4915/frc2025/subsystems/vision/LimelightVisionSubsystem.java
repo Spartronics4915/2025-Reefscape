@@ -11,18 +11,27 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasu
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructArrayTopic;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionSubystem{
     private static LimelightVisionSubsystem instance;
     private final ArrayList<LimelightDevice> limelights;
+    private final StructArrayPublisher<Pose3d> visionTargetPublisher;
 
     private LimelightVisionSubsystem() {
         limelights = new ArrayList<>();
         for (LimelightConstants limelight : VisionConstants.kLimelights) {
             limelights.add(new LimelightDevice(limelight));
         }
+        NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets", Pose3d.struct);
+        visionTargetPublisher = visionTargetTopic.publish();
+        Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
     }
 
     public static LimelightVisionSubsystem getInstance() {
@@ -64,5 +73,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionSub
             }
         });
         return visibleTagPoses;
+    }
+
+    @Override
+    public void periodic() {
+        visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 }
