@@ -23,31 +23,30 @@ public class ArmSubsystem extends SubsystemBase {
             return mEncoder.getPosition();
         }
 
-        /*private void initPID() {
-        PIDController mPIDController = mMotor.getPIDController();
-        mPIDController.setP()
-        mPIDController.setI()
-        mPIDController.setD()
-        }*/
+            private double mCurrentSetPoint = 0.0;
 
-        public class WPILibProfileSubsystem {
-            private TrapazoidProfile mProfile;
-            private PIDController mPidController;
-
-            public WPILibProfileSubsystem() {
-                super();
-
-                //initPID();
-                //initProfile();
+                private void initPID() {
+                PIDController mPidController = new PIDController(ArmConstants.kPIDConstants.kP, ArmConstants.kPIDConstants.kI, ArmConstants.kPIDConstants.kD);
+                mPidController.setIZone(ArmConstants.kIZone);
+            
             }
-            
-        }
 
-        public class TrapazoidProfile {
-            private double mCurrentSetPoint = 0.2;
+            public void setSetpoint(double newPOS) {
+                //add saftey
+
+                mCurrentSetPoint = newPOS;
+            }
+
+            @Override
+            public void periodic() {
+                //add trapazoid motion profile
+
+               // setVoltage(
+                    //mPidController.calculate(getPosition(), mCurrentSetPoint)
+                //);
+            }
+
             
-        }
-        
             
         
 

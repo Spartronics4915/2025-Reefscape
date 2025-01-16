@@ -60,8 +60,14 @@ public final class Constants {
     }
 
     public static final class ArmConstants {
-        //I dont know the conversion factor yet so 42 is a place holder
+        //I dont know the numbers yet so 42 is a place holder
         public static final double kPositionConversionFactor = 42;
-        public static final double kPIDConstants = 42;
+        public static final double kIZone = 42;
+        
+        public static final class kPIDConstants {
+            public static final double kP = 42;
+            public static final double kI = 42;
+            public static final double kD = 42;
+        }
     }
 }
