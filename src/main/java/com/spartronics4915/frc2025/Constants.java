@@ -21,6 +21,13 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+    public static final class IntakeConstants {
+        public static final int kMotorID1 = 0;
+        public static final int kMotorID2 = 0;
+        public static final int kSensorID = 0;
+    }
+
     public static final class OI {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
