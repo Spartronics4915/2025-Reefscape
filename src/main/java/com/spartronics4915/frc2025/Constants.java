@@ -59,7 +59,9 @@ public final class Constants {
         public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
     }
 
-    public static final class ArmSubsystem {
-        
+    public static final class ArmConstants {
+        //I dont know the conversion factor yet so 42 is a place holder
+        public static final double kPositionConversionFactor = 42;
+        public static final double kPIDConstants = 42;
     }
 }
