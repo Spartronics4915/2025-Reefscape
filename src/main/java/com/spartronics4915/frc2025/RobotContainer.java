@@ -6,6 +6,8 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
+import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -15,13 +17,15 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
-import com.spartronics4915.frc2025.subsystems.vision.VisionSubystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.ejml.data.ElementLocation;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -52,7 +56,9 @@ public class RobotContainer {
             OI.kOperatorControllerPort);
 
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
-    private final VisionSubystem visionSubsystem;
+
+    private final ElementLocator elementLocator = new ElementLocator();
+    private final VisionDeviceSubystem visionSubsystem;
 
     // ******** Simulation entries
     public final MotorSimulationSubsystem mechanismSim;
@@ -71,10 +77,9 @@ public class RobotContainer {
         if (RobotBase.isSimulation()) {
             mechanismSim = new MotorSimulationSubsystem();
             visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
-        }
-        else {
+        } else {
             mechanismSim = null;
-            visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem);
+            visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
         }
 
         ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface
@@ -123,7 +128,8 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
-        return autoChooser.getSelected();
+        return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        // return autoChooser.getSelected();
 
     }
 

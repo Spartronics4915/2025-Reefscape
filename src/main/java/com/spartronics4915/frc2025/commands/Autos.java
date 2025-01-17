@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2025.commands;
 
+import com.spartronics4915.frc2025.commands.autos.DriveToPointCommand;
 import com.spartronics4915.frc2025.commands.drive.AimDriveToTargetWIthTimeout;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 public final class Autos {
     /** Example static factory for an autonomous command. */
     public static Command moveToPointAuto(SwerveSubsystem swerve) {
-
         Translation2d targetPose = new Translation2d(2.9, 7);
         Constraints driveConstraints = new Constraints(2, 2);
         return new DriveToPointCommand(targetPose, driveConstraints, 0.2, 0.1, swerve);

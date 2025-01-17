@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.commands;
+package com.spartronics4915.frc2025.commands.autos;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -52,6 +52,7 @@ public class DriveToPointCommand extends Command {
         Pose2d currPose = swerve.getPose();
         Translation2d translationToTarget = targetPoint.minus(currPose.getTranslation());
         double distanceRemaining = translationToTarget.getNorm();
+        //System.out.println(currPose + " " + targetPoint + " " + translationToTarget + " " + distanceRemaining);
 
         if((distanceRemaining < closeEnoughThreshold) || nearGoal) {
 

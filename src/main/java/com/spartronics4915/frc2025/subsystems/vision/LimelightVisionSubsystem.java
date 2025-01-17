@@ -1,6 +1,7 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -12,6 +13,8 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasu
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
@@ -19,21 +22,24 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 
-public class LimelightVisionSubsystem extends SubsystemBase implements VisionSubystem{
+public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
     private final ArrayList<LimelightDevice> limelights;
     private final SwerveSubsystem swerveSubsystem;
     private final StructArrayPublisher<Pose3d> visionTargetPublisher;
+    private final AprilTagFieldLayout fieldLayout;
 
-    public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem) {
+    public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem, AprilTagFieldLayout fieldLayout) {
         limelights = new ArrayList<>();
         for (LimelightConstants limelight : VisionConstants.kLimelights) {
             limelights.add(new LimelightDevice(limelight));
         }
 
+        this.fieldLayout = fieldLayout;
         this.swerveSubsystem = swerveSubsystem;
 
         NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets", Pose3d.struct);
+        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets",
+                Pose3d.struct);
         visionTargetPublisher = visionTargetTopic.publish();
         Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
     }
@@ -62,9 +68,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionSub
         ArrayList<Integer> visibleTagIDs = getVisibleTagIDs();
         ArrayList<Pose3d> visibleTagPoses = new ArrayList<>();
         visibleTagIDs.forEach((Integer tagID) -> {
-            Optional<Pose3d> tagPose = VisionConstants.kFieldLayout.getTagPose(tagID);
+            Optional<Pose3d> tagPose = fieldLayout.getTagPose(tagID);
             if (tagPose.isEmpty()) {
-                Logger.getLogger(this.getClass().getName()).warning("Tag ID " + tagID + " not found in field layout " + VisionConstants.kFieldLayout);
+                Logger.getLogger(this.getClass().getName())
+                        .warning("Tag ID " + tagID + " not found in field layout ");
             } else {
                 visibleTagPoses.add(tagPose.get());
             }
@@ -75,5 +82,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionSub
     @Override
     public void periodic() {
         visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
+    }
+
+    public Optional<Pose2d> getBotPose2dFromReefCamera() {
+        return Optional.empty();
     }
 }

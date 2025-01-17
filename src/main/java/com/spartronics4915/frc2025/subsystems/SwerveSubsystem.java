@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,11 +35,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveSubsystem(File directory) {
 
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed//,
-                // new Pose2d(new Translation2d(Meter.of(2),
-                //     Meter.of(5)),
-                //     Rotation2d.fromDegrees(180)
-                // )
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,
+                guessStartingPosition()
             );
 
         } catch (IOException e) {
@@ -60,6 +61,20 @@ public class SwerveSubsystem extends SubsystemBase {
 
     }
 
+    private static Pose2d guessStartingPosition() {
+
+        if  (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
+
+            return new Pose2d(8,6, Rotation2d.fromDegrees(0));
+        }
+        else {
+
+            return new Pose2d(10,2, Rotation2d.fromDegrees(90));
+
+        }
+
+    }
+
     // External API for sending explicit driving commands to the swerve drive
     public void drive(ChassisSpeeds chassisSpeeds) {
         swerveDrive.drive(chassisSpeeds);
@@ -71,6 +86,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    public void setPose(Pose2d pose) {
+        swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
+        if(RobotBase.isSimulation()) {
+            swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
+        }
     }
 
     public ChassisSpeeds getFieldVelocity() {
