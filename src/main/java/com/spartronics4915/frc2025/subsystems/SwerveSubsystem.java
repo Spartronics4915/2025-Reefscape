@@ -68,21 +68,21 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
         // Shuffleboard.getTab("swerveLogging").add
 
-        AutoBuilder.configure(
-            this::getPose, 
-            swerveDrive::resetOdometry, 
-            swerveDrive::getRobotVelocity, 
-            (speeds, FF) -> drive(speeds), 
-            new PPHolonomicDriveController(
-                Drive.AutoConstants.kTranslationPID, 
-                Drive.AutoConstants.kRotationPID), 
-            Drive.AutoConstants.kRobotConfig, 
-            () -> {
-                Optional<Alliance> temp = DriverStation.getAlliance();
-                if(temp.isEmpty()) return false;
-                if (temp.get() == Alliance.Red) {return true;}
-                return false;
-            }, this);
+        // AutoBuilder.configure(
+        //     this::getPose, 
+        //     swerveDrive::resetOdometry, 
+        //     swerveDrive::getRobotVelocity, 
+        //     (speeds, FF) -> drive(speeds), 
+        //     new PPHolonomicDriveController(
+        //         Drive.AutoConstants.kTranslationPID, 
+        //         Drive.AutoConstants.kRotationPID), 
+        //     Drive.AutoConstants.kRobotConfig, 
+        //     () -> {
+        //         Optional<Alliance> temp = DriverStation.getAlliance();
+        //         if(temp.isEmpty()) return false;
+        //         if (temp.get() == Alliance.Red) {return true;}
+        //         return false;
+        //     }, this);
 
     }
 
