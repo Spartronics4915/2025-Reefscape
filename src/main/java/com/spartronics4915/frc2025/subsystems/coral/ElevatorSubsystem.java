@@ -1,6 +1,6 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
-import com.spartronics4915.frc2025.Constants.Elevator.ElevatorSubsystemState;
+import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

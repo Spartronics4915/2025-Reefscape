@@ -60,7 +60,7 @@ public final class Constants {
         public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
     }
 
-    public static final class Elevator {
+    public static final class ElevatorConstants {
 
         public enum ElevatorSubsystemState {
 
