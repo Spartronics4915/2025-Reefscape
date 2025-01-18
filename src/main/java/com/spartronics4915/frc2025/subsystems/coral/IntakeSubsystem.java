@@ -28,7 +28,7 @@ public class IntakeSubsystem {
     }
 
     public void intakeMotors (IntakeSpeed preset) {
-        mMotor1.set(IntakeSpeed.preset);
-        mMotor2.set(IntakeSpeed.preset);
+        mMotor1.set(preset.intakeSpeed);
+        mMotor2.set(preset.intakeSpeed);
     }
 }

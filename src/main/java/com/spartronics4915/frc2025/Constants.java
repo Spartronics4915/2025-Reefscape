@@ -32,8 +32,9 @@ public final class Constants {
             NEURTRAL (0.0),
             OUT (-0.4);
 
-            private final double intakeSpeed;
-            IntakeSpeed(double intakeSpeed) {
+            public final double intakeSpeed;
+            
+            private IntakeSpeed(double intakeSpeed) {
                 this.intakeSpeed = intakeSpeed;
             }
         }
