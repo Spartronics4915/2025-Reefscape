@@ -21,42 +21,65 @@ public class CalibrateCommands {
     public final VisionDeviceSubystem vision;
     public Field2d field;
 
+    private boolean gotInitialPose;
+
     Pose2d startVision;
 
     public CalibrateCommands(SwerveSubsystem swerve, VisionDeviceSubystem vision) {
         this.swerve = swerve;
         this.vision = vision;
+        SmartDashboard.putNumber("calibrate/visionDist", 0);
+        SmartDashboard.putNumber("calibrate/ratio", 0);
+        field = new Field2d();
+        SmartDashboard.putData("calibrate", field);
+        field.getObject("start").setPose(Pose2d.kZero);
+        field.getObject("vision").setPose(Pose2d.kZero);
+        field.getObject("odom").setPose(Pose2d.kZero);
     }
 
+    private boolean gotStartPose() {
+
+        var poseVal = vision.getBotPose2dFromReefCamera();
+        if (poseVal.isEmpty()) {
+            return false;
+        }
+        startVision = poseVal.get();
+        return true;
+    }
 
     private void start() {
 
-        field = new Field2d();
-        SmartDashboard.putData("calibrate", field);
-        startVision = vision.getBotPose2dFromReefCamera().get();
         field.getObject("start").setPose(startVision);
+        swerve.setPose(startVision);
 
     }
 
     private void monitor() {
         Pose2d currOdometryPose = swerve.getPose();
-        Pose2d currVisionPose = vision.getBotPose2dFromReefCamera().get();
+        var visionVal = vision.getBotPose2dFromReefCamera();
 
         field.getObject("odom").setPose(currOdometryPose);
-        field.getObject("vision").setPose(currVisionPose);
-
-        double visionDist = currVisionPose.getTranslation().getDistance(startVision.getTranslation());
         double odomDist = currOdometryPose.getTranslation().getDistance(startVision.getTranslation());
-
         SmartDashboard.putNumber("odomDist", odomDist);
-        SmartDashboard.putNumber("visionDist", visionDist);
-        SmartDashboard.putNumber("Ratio", odomDist/visionDist);
+
+        if(visionVal.isPresent())
+        {
+            Pose2d currVisionPose = visionVal.get();
+            field.getObject("vision").setPose(currVisionPose);
+
+            double visionDist = currVisionPose.getTranslation().getDistance(startVision.getTranslation());
+    
+            SmartDashboard.putNumber("calibrate/visionDist", visionDist);
+            SmartDashboard.putNumber("calibrate/ratio", odomDist/visionDist);
+            }
 
     }
     public Command getCommand() {
 
-        Command command = Commands.runOnce(()->{start();});
-        Command runCommand = Autos.reverseForSeconds(swerve, 5);
+        Command command = Commands.waitUntil(()->{return gotStartPose();});
+        
+        command = command.andThen(Commands.runOnce(()->{start();}));
+        Command runCommand = Autos.reverseForSeconds(swerve, 10);
         Command monitorCommand = Commands.run(()->{monitor();});
         Command finalCommand = Commands.race(runCommand, monitorCommand);
 

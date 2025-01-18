@@ -76,6 +76,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private final Command calibrateCommand;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -99,6 +100,9 @@ public class RobotContainer {
         autoChooser =
 
                 buildAutoChooser();
+
+        calibrateCommand = new CalibrateCommands(swerveSubsystem, visionSubsystem).getCommand();
+        
 
     }
 
@@ -136,8 +140,7 @@ public class RobotContainer {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         //return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        return new CalibrateCommands(swerveSubsystem, visionSubsystem).getCommand();
-        // return autoChooser.getSelected();
+        return calibrateCommand;// return autoChooser.getSelected();
 
     }
 

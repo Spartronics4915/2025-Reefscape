@@ -26,11 +26,11 @@ import swervelib.SwerveDrive;
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
     private final ArrayList<LimelightDevice> limelights;
     private final SwerveSubsystem swerveSubsystem;
-    private final StructArrayPublisher<Pose3d> visionTargetPublisher;
+    //private final StructArrayPublisher<Pose3d> visionTargetPublisher;
     private final AprilTagFieldLayout fieldLayout;
 
     public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem, AprilTagFieldLayout fieldLayout) {
-        limelights = new ArrayList<>();
+        limelights = new ArrayList<LimelightDevice>();
         for (LimelightConstants limelight : VisionConstants.kLimelights) {
             limelights.add(new LimelightDevice(limelight));
         }
@@ -39,9 +39,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         this.swerveSubsystem = swerveSubsystem;
 
         NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets",
-                Pose3d.struct);
-        visionTargetPublisher = visionTargetTopic.publish();
+        //StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets",
+        //        Pose3d.struct);
+        //visionTargetPublisher = visionTargetTopic.publish();
         Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
     }
 
@@ -89,7 +89,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
 
     @Override
     public void periodic() {
-        visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
+        //visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {

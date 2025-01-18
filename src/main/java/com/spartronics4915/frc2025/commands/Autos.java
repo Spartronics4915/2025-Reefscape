@@ -27,8 +27,9 @@ public final class Autos {
         return new AimDriveToTargetWIthTimeout(detector, swerve, 4, 0.5, 180).andThen(swerve.stopChassisCommand());
     }
 
-    public static Command reverseForSeconds(SwerveSubsystem swerve, double seconds){
-        return Commands.run(() -> swerve.drive(new ChassisSpeeds(-1,0,0)), swerve).withTimeout(seconds);
+    public static Command reverseForSeconds(SwerveSubsystem swerve, double seconds) {
+        return Commands.run(() -> swerve.drive(new ChassisSpeeds(-0.25, 0, 0)), swerve).withTimeout(seconds)
+                .andThen(swerve.stopChassisCommand());
     }
 
 }
