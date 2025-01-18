@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,10 +40,15 @@ public class ArmSubsystem extends SubsystemBase {
             .encoder.velocityConversionFactor(ArmConstants.kVelocityConversionFactor);
         config
             .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP);
+            .pid(ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kI, ArmConstants.kArmMotorPID.kD);
     
         mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    }
+
+    private void initArmProfile() {
+        mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
+        mCurrentState = new State(getArmPosition(), 0.0);
     }
 
     @Override
@@ -51,6 +57,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, 0.0));
 
+        setVoltage (
+            mArmPIDController.calculate(getArmPosition(), mCurrentState.position)
+        );
     }
     
     public void moveToIntake() {

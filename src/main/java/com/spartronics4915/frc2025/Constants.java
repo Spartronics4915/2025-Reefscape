@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -93,5 +94,7 @@ public final class Constants {
         }
         
         public static final double kDt = 0.02;
+
+        public static final Constraints kConstraints = null;
     }
 }
