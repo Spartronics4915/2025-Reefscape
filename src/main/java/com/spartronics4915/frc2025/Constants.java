@@ -70,8 +70,8 @@ public final class Constants {
         //I dont know the numbers yet so 0 is a place holder
         public enum ArmSubsystemState {
 
-            INTAKE(Rotation2d.fromDegrees(0));
-            SCORE(Rotation2d.fromDegrees(0));
+            INTAKE(Rotation2d.fromDegrees(0)),
+            SCORE(Rotation2d.fromDegrees(0)),
             STOW(Rotation2d.fromDegrees(0));
 
             public Rotation2d angle;
@@ -91,6 +91,6 @@ public final class Constants {
             public static final int kI = 0;
             public static final int kD = 0;
         }
-
+        
     }
 }

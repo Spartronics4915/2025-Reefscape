@@ -9,10 +9,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -20,6 +20,13 @@ public class ArmSubsystem extends SubsystemBase {
     
     private SparkMax mArmMotor;
     private SparkClosedLoopController mArmPIDController;
+    private SparkMaxConfig config;
+
+    private TrapezoidProfile mArmProfile;
+    private PIDController mPidController;
+
+    private double mCurrentSetPoint = 0.0;
+    private State mCurrentState;
 
     public ArmSubsystem() {
         
@@ -32,11 +39,19 @@ public class ArmSubsystem extends SubsystemBase {
             .encoder.positionConversionFactor(ArmConstants.kPositionConversionFactor);
         config
             .encoder.velocityConversionFactor(ArmConstants.kVelocityConversionFactor);
-        
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        config.closedLoop.pid(ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP);
+        config
+            .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kP);
     
         mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    }
+
+    @Override
+    public void periodic() {
+        //need set points as a imput
+
+        mCurrentState = mArmProfile.calculate(kDt, mCurrentState, new State(mCurrentSetPoint, 0.0);
 
     }
     
