@@ -74,5 +74,26 @@ public final class Constants {
                 this.meter = meter;
             }
         }
+
+        public static final int elevatorMotorID = 0;
+        public static final int elevatorFollowerID = 0;
+        public static final boolean motorInverted = false;
+        public static final boolean followerInverted = false;
+        public static final double motorPositionConversionFactor = 0;
+        public static final double motorVelocityConversionFactor = 0;
+        public static final double followerPositionConversionFactor = 0;
+        public static final double followerVelocityConversionFactor = 0;
+
+        public static final class motorPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
+
+        public static final class followerPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
     }
 }
