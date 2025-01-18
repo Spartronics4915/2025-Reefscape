@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
@@ -40,7 +41,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
+    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
@@ -50,7 +51,7 @@ public class RobotContainer {
 
     public final MotorSimulationSubsystem mechanismSim;
 
-    public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
+    public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
     private final SendableChooser<Command> autoChooser;
@@ -91,7 +92,8 @@ public class RobotContainer {
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
             ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
-            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem)
+            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem),
+            swerveSubsystem
         ));
     }
 
