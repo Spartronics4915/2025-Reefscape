@@ -92,5 +92,6 @@ public final class Constants {
             public static final int kD = 0;
         }
         
+        public static final double kDt = 0.02;
     }
 }
