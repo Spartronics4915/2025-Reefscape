@@ -8,6 +8,7 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.autos.CalibrateCommands;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
@@ -134,7 +135,8 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
-        return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        //return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        return new CalibrateCommands(swerveSubsystem, visionSubsystem).getCommand();
         // return autoChooser.getSelected();
 
     }
