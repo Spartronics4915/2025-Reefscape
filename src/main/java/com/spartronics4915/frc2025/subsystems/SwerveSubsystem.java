@@ -21,15 +21,14 @@ import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-
     private final SwerveDrive swerveDrive;
 
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,
-                guessStartingPosition()
-            );
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory))
+                    .createSwerveDrive(Drive.kMaxSpeed,
+                            guessStartingPosition());
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -39,29 +38,36 @@ public class SwerveSubsystem extends SubsystemBase {
         Shuffleboard.getTab("logging").addNumber("x", () -> getPose().getX());
         Shuffleboard.getTab("logging").addNumber("y", () -> getPose().getY());
 
-
-
-        // swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-        // swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
-        // swerveDrive.setAngularVelocityCompensation(true, true, 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
-        // swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
-        // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
+        // swerveDrive.setHeadingCorrection(false); // Heading correction should only be
+        // used while controlling the robot via angle.
+        // swerveDrive.setCosineCompensator(false);//
+        // !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
+        // simulations since it causes discrepancies not seen in real life.
+        // swerveDrive.setAngularVelocityCompensation(true, true, 0.1); // Correct for
+        // skew that gets worse as angular velocity increases. Start with a coefficient
+        // of 0.1.
+        // swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want
+        // to resynchronize your absolute encoders and motor encoders periodically when
+        // they are not moving.
+        // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
+        // over the internal encoder and push the offsets onto it. Throws warning if not
+        // possible
         // swerveDrive.resetOdometry(new Pose2d(1.5, 5, Rotation2d.fromDegrees(45)));
 
-        // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
+        // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules",
+        // SwerveModulePosition.struct)
         // Shuffleboard.getTab("swerveLogging").add
 
     }
 
     private static Pose2d guessStartingPosition() {
 
-        if  (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
 
-            return new Pose2d(8,6, Rotation2d.fromDegrees(0));
-        }
-        else {
+            return new Pose2d(8, 6, Rotation2d.fromDegrees(0));
+        } else {
 
-            return new Pose2d(10,2, Rotation2d.fromDegrees(90));
+            return new Pose2d(10, 2, Rotation2d.fromDegrees(90));
 
         }
 
@@ -82,7 +88,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
-        if(RobotBase.isSimulation()) {
+        if (RobotBase.isSimulation()) {
             swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
         }
     }
