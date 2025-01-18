@@ -26,6 +26,17 @@ public final class Constants {
         public static final int kMotorID1 = 0;
         public static final int kMotorID2 = 0;
         public static final int kSensorID = 0;
+
+        public enum IntakeSpeed {
+            IN (0.4),
+            NEURTRAL (0.0),
+            OUT (-0.4);
+
+            private final double intakeSpeed;
+            IntakeSpeed(double intakeSpeed) {
+                this.intakeSpeed = intakeSpeed;
+            }
+        }
     }
 
     public static final class OI {
