@@ -83,16 +83,6 @@ public final class Constants {
 
         }
         
-        public static final int kArmMotorID = 0;
-        public static final int kPositionConversionFactor = 0;
-        public static final int kVelocityConversionFactor = 0;
-
-        public static final class kArmMotorPID {
-            public static final int kP = 0;
-            public static final int kI = 0;
-            public static final int kD = 0;
-        }
-        
         public static final double kDt = 0.02;
 
         public static final Constraints kConstraints = null;
