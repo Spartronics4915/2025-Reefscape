@@ -7,6 +7,7 @@ package com.spartronics4915.frc2025;
 import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -57,5 +58,21 @@ public final class Constants {
 
     public static final class DriveCommandConstants {
         public static final PIDConstants kAnglePIDConstants = new PIDConstants(16, 0, 0);
+    }
+
+    public static final class Elevator {
+
+        public enum ElevatorSubsystemState {
+
+            STOW(0),
+            L3(0),
+            L4(0);
+
+            public double meter;
+
+            private ElevatorSubsystemState(double meter) {
+                this.meter = meter;
+            }
+        }
     }
 }
