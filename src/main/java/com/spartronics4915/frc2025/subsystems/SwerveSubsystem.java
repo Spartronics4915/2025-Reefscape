@@ -21,23 +21,19 @@ import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    private static SwerveSubsystem mInstance = null;
-
-    public static SwerveSubsystem getInstance(){
-        if (mInstance == null) {
-            mInstance = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),SwerveDirectories.PROGRAMMER_CHASSIS.directory));
-        }
-        return mInstance;
-    }
 
     private final SwerveDrive swerveDrive;
 
-    private SwerveSubsystem(File directory) {
+    public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(Drive.kMaxSpeed,
-                guessStartingPosition()
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed//,
+            // new Pose2d(new Translation2d(Meter.of(2),
+            //     Meter.of(5)),
+            //     Rotation2d.fromDegrees(180)
+            // )
             );
+            guessStartingPosition();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
