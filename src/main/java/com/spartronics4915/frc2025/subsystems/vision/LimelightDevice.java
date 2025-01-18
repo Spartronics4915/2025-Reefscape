@@ -45,6 +45,10 @@ public class LimelightDevice extends SubsystemBase {
         }
     }
 
+    public LimelightRole getRole() {
+        return role;
+    }
+
     public double getTx() {
         return LimelightHelpers.getTX(name);
     }
@@ -75,6 +79,14 @@ public class LimelightDevice extends SubsystemBase {
         } else {
             return Optional.of(new VisionMeasurement(megaTag2.pose, megaTag2.timestampSeconds));
         }
+    }
+
+    public Optional<Pose2d> getPose2d() {
+        LimelightHelpers.PoseEstimate pose = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        if (pose.tagCount == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(pose.pose);
     }
 
     public ArrayList<Integer> getVisibleTags() {
