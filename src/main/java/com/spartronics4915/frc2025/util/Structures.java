@@ -9,11 +9,6 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRo
  * this stores all of the records used in the Constants file
  */
 public final class Structures {
-    public record PIDConstants(
-        double kP, 
-        double kI, 
-        double kD
-    ) {}
 
     public record PIDFConstants(
         double kP, 

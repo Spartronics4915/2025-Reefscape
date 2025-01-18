@@ -143,6 +143,7 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         chooser.setDefaultOption("None", Commands.none());
+        chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
