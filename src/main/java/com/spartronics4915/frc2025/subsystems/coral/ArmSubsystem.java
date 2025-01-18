@@ -1,5 +1,6 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
@@ -12,15 +13,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase { 
     
-    SparkMax mMotor = new SparkMax(1, MotorType.kBrushless);
-    RelativeEncoder mEncoder = mMotor.getEncoder();
-    
+    private SparkMax mArmMotor;
+    private SparkClosedLoopController mArmPIDController;
+
     public ArmSubsystem() {
         
+        SparkMax mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
+
+
     }
     
     public void moveToIntake() {
-        
+    
     }
 
     public void moveToScore() {
