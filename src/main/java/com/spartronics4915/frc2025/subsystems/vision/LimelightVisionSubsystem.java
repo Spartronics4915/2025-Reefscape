@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasurement;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 
@@ -79,12 +80,21 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         return visibleTagPoses;
     }
 
+    private LimelightDevice getLimelightFromRole(LimelightRole role) {
+        return limelights.stream()
+                .filter(limelight -> limelight.getRole() == role)
+                .findAny()
+                .orElse(null);
+    }
+
     @Override
     public void periodic() {
         visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
+        LimelightDevice reef = getLimelightFromRole(LimelightRole.REEF);
+        if (reef != null) return reef.getPose2d();
         return Optional.empty();
     }
 }
