@@ -17,6 +17,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class ArmSubsystem extends SubsystemBase { 
+    
+    private SparkMax mArmMotor;
+    private SparkClosedLoopController mArmPIDController;
+    private SparkMaxConfig config;
 
     private TrapezoidProfile mArmProfile;
 
@@ -24,6 +28,21 @@ public class ArmSubsystem extends SubsystemBase {
     private State mCurrentState;
 
     public ArmSubsystem() {
+        
+        SparkMax mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
+        
+        SparkMaxConfig config = new SparkMaxConfig();
+
+        config
+            .idleMode(IdleMode.kBrake)
+            .encoder.positionConversionFactor(ArmConstants.kPositionConversionFactor);
+        config
+            .encoder.velocityConversionFactor(ArmConstants.kVelocityConversionFactor);
+        config
+            .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(ArmConstants.kArmMotorPID.kP, ArmConstants.kArmMotorPID.kI, ArmConstants.kArmMotorPID.kD);
+    
+        mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
 
@@ -38,7 +57,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, 0.0));
 
-        
+        setVoltage (
+            mArmPIDController.calculate(getArmPosition(), mCurrentState.position)
+        );
     }
     
     public void moveToIntake() {
