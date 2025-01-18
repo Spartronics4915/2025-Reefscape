@@ -5,11 +5,14 @@
 package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.util.Structures.*;
+
+import static edu.wpi.first.units.Units.Kilogram;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.units.measure.Mass;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -58,7 +61,7 @@ public final class Constants {
         public static final class AutoConstants {
             public static final PIDConstants kTranslationPID = new PIDConstants(5.0,0,0);
             public static final PIDConstants kRotationPID = new PIDConstants(5.0,0,0);
-            public static final RobotConfig kRobotConfig = null;//new RobotConfig(null, null, null, null);
+            public static final RobotConfig kRobotConfig = null;//new RobotConfig(Mass.ofBaseUnits(10, Kilogram));
         }
 
     }
