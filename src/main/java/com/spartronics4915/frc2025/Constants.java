@@ -4,8 +4,15 @@
 
 package com.spartronics4915.frc2025;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static edu.wpi.first.units.Units.Rotation;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.util.Structures.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -60,7 +67,30 @@ public final class Constants {
     }
 
     public static final class ArmConstants {
-        //I dont know the numbers yet so 42 is a place holder
-        public static final int kArmMotorID = 42;
+        //I dont know the numbers yet so 0 is a place holder
+        public enum ArmSubsystemState {
+
+            INTAKE(Rotation2d.fromDegrees(0));
+            SCORE(Rotation2d.fromDegrees(0));
+            STOW(Rotation2d.fromDegrees(0));
+
+            public Rotation2d angle;
+
+            private ArmSubsystemState(Rotation2d angle) {
+                this.angle = angle;
+            }
+
+        }
+        
+        public static final int kArmMotorID = 0;
+        public static final int kPositionConversionFactor = 0;
+        public static final int kVelocityConversionFactor = 0;
+
+        public static final class kArmMotorPID {
+            public static final int kP = 0;
+            public static final int kI = 0;
+            public static final int kD = 0;
+        }
+
     }
 }
