@@ -97,5 +97,9 @@ public final class Constants {
 
         public static final Constraints kConstraints = null;
         public static final int kPeriodMs = 0;
+
+        public static final double kMaxAngleScore = 0.0;
+        public static final double kMaxAngleIntake = 0.0;
+
     }
 }
