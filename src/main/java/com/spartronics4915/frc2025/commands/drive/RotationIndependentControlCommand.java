@@ -8,29 +8,25 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RotationIndependentControlCommand extends Command {
-    private SwerveSubsystem mSwerve;
+    private SwerveSubsystem mSwerve = SwerveSubsystem.getInstance();
 
     private Supplier<ChassisSpeeds> linearCSSupplier;
     private Supplier<ChassisSpeeds> rotationalCSSupplier;
 
     public RotationIndependentControlCommand(
         Supplier<ChassisSpeeds> rotationalCSSupplier,
-        Supplier<ChassisSpeeds> linearCSSupplier,
-        SwerveSubsystem swerve
+        Supplier<ChassisSpeeds> linearCSSupplier
     ) {
         this.rotationalCSSupplier = rotationalCSSupplier;
         this.linearCSSupplier = linearCSSupplier;
-        mSwerve = swerve;
 
         addRequirements(mSwerve);
     }
     public RotationIndependentControlCommand(
-        Supplier<ChassisSpeeds> cSSupplier,
-        SwerveSubsystem swerve
+        Supplier<ChassisSpeeds> cSSupplier
     ) {
         this.rotationalCSSupplier = cSSupplier;
         this.linearCSSupplier = cSSupplier;
-        mSwerve = swerve;
 
         addRequirements(mSwerve);
     }
