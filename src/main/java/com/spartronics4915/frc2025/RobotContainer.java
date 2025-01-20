@@ -80,15 +80,14 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
+        mechanismSim = new MotorSimulationSubsystem();
+        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); //TODO add any subsystems that extend ModeSwitchInterface
+
         if (RobotBase.isSimulation()) {
-            mechanismSim = new MotorSimulationSubsystem();
             visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
         } else {
-            mechanismSim = null;
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
         }
-
-        ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
         configureBindings();
@@ -143,6 +142,7 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         chooser.setDefaultOption("None", Commands.none());
+        chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
