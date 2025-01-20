@@ -133,8 +133,8 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
-        return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        // return autoChooser.getSelected();
+        // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        return autoChooser.getSelected();
 
     }
 
@@ -143,6 +143,7 @@ public class RobotContainer {
 
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
+        chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
