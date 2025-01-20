@@ -57,40 +57,61 @@ public final class ChassisSpeedSuppliers {
      */
     public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, boolean isFieldRelative, SwerveSubsystem swerve) {
 
-        return () -> {
+        var internalSwerve = swerve.getInternalSwerve();
+        var swerveController = swerve.getInternalSwerve().getSwerveController();
+        
 
-            ChassisSpeeds cs = new ChassisSpeeds();
-    
-            // Need to verify that we are using the right axes.
-            final double inputxraw = driverController.getLeftY() * -1.0;
-            final double inputyraw = driverController.getLeftX() * -1.0;
-            final double inputomegaraw;
-            if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
-            } else {
-                inputomegaraw = driverController.getRightY() * -1.0; // consider changing from angular velocity
-                // control to direct angle control
-            }
-    
-            final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
-            final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
-    
-            cs.vxMetersPerSecond = inputx * Drive.kMaxSpeed;
-            cs.vyMetersPerSecond = inputy * Drive.kMaxSpeed;
-            cs.omegaRadiansPerSecond = inputomega * Drive.kMaxAngularSpeed;
-    
-            if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red && isFieldRelative) {
-                cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
-                cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
-            }
-    
+        return () -> {
+            var cs = swerveController.getTargetSpeeds(
+                -driverController.getLeftY(), 
+                -driverController.getLeftX(), 
+                driverController.getRightX(), 
+                driverController.getRightX(), 
+                internalSwerve.getOdometryHeading().getRadians(), 
+                Drive.kMaxSpeed
+            );
+
             if (isFieldRelative) {
-                cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
+                invertBasedOnAlliance(cs); 
+                cs = ChassisSpeeds.fromRobotRelativeSpeeds(cs, swerve.getPose().getRotation());
             }
-    
             return cs;
         };
+
+        // return () -> {
+
+        //     ChassisSpeeds cs = new ChassisSpeeds();
+    
+        //     // Need to verify that we are using the right axes.
+        //     final double inputxraw = driverController.getLeftY() * -1.0;
+        //     final double inputyraw = driverController.getLeftX() * -1.0;
+        //     final double inputomegaraw;
+        //     if (RobotBase.isSimulation()) {
+        //         inputomegaraw = driverController.getRawAxis(3) * -1.0;
+        //     } else {
+        //         inputomegaraw = driverController.getRightY() * -1.0; // consider changing from angular velocity
+        //         // control to direct angle control
+        //     }
+    
+        //     final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
+        //     final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
+        //     final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+    
+        //     cs.vxMetersPerSecond = inputx * Drive.kMaxSpeed;
+        //     cs.vyMetersPerSecond = inputy * Drive.kMaxSpeed;
+        //     cs.omegaRadiansPerSecond = inputomega * Drive.kMaxAngularSpeed;
+    
+        //     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red && isFieldRelative) {
+        //         cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
+        //         cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
+        //     }
+    
+        //     if (isFieldRelative) {
+        //         cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
+        //     }
+    
+        //     return cs;
+        // };
     }
 
     public static Supplier<ChassisSpeeds> gotoAngle(Supplier<Rotation2d> fieldRelativeAngleSupplier, SwerveSubsystem mSwerve){
