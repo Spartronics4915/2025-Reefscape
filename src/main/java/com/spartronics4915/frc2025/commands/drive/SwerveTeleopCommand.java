@@ -17,11 +17,13 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 public class SwerveTeleopCommand extends Command {
 
-    private final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
+    private final SwerveSubsystem swerveSubsystem;
     private final CommandXboxController driverController;
     private boolean useFieldRelative;
 
-    public SwerveTeleopCommand(CommandXboxController driverController) {
+    public SwerveTeleopCommand(CommandXboxController driverController, SwerveSubsystem swerveSubsystem) {
+
+        this.swerveSubsystem = swerveSubsystem;
 
         this.driverController = driverController;
 
