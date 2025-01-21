@@ -10,14 +10,28 @@ import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.Kilogram;
 
+import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.MomentOfInertiaUnit;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -66,7 +80,32 @@ public final class Constants {
         public static final class AutoConstants {
             public static final PIDConstants kTranslationPID = new PIDConstants(5.0,0,0);
             public static final PIDConstants kRotationPID = new PIDConstants(5.0,0,0);
-            public static final RobotConfig kRobotConfig = null;//new RobotConfig(Mass.ofBaseUnits(10, Kilogram));
+
+            public enum PathplannerConfigs{
+                PROGRAMMER_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
+                    Mass.ofBaseUnits(10, Kilogram), 
+                    MomentOfInertia.ofBaseUnits(4, KilogramSquareMeters), // FIXME rough guess based on research
+                    new ModuleConfig(
+                        Distance.ofBaseUnits(4/2, Inches),
+                        LinearVelocity.ofBaseUnits(5, MetersPerSecond),
+                        1.19,
+                        DCMotor.getNEO(1),
+                        6.75,
+                        Current.ofBaseUnits(40, Amps),
+                        1
+                    ),
+                    new Translation2d(Distance.ofBaseUnits(12.25, Inches), Distance.ofBaseUnits(12.3125, Inches)),
+                    new Translation2d(Distance.ofBaseUnits(12.25, Inches), Distance.ofBaseUnits(-12.3125, Inches)),
+                    new Translation2d(Distance.ofBaseUnits(-12.25, Inches), Distance.ofBaseUnits(12.3125, Inches)),
+                    new Translation2d(Distance.ofBaseUnits(-12.25, Inches), Distance.ofBaseUnits(-12.3125, Inches))
+                ));
+
+                public RobotConfig config;
+    
+                private PathplannerConfigs(RobotConfig config) {
+                    this.config = config;
+                }
+            }
         }
 
     }
