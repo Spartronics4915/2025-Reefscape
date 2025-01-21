@@ -68,6 +68,8 @@ public final class ChassisSpeedSuppliers {
             cs.vyMetersPerSecond = inputy * Drive.kMaxSpeed;
             cs.omegaRadiansPerSecond = inputomega * Drive.kMaxAngularSpeed;
     
+            //inverts based on alliance
+            //CHECKUP need to make sure this works
             if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red && isFieldRelative) {
                 cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
                 cs.vyMetersPerSecond = -cs.vyMetersPerSecond;

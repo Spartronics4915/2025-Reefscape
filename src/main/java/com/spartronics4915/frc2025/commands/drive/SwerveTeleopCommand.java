@@ -37,6 +37,7 @@ public class SwerveTeleopCommand extends Command {
 
         ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), swerveSubsystem).get();
 
+        //get angle from controller and try to match
         if (getFieldRelative()) {
             cs.omegaRadiansPerSecond = gotoAngle(
                 () -> getAngleJoystickAngle(driverController.getHID(), swerveSubsystem), swerveSubsystem
