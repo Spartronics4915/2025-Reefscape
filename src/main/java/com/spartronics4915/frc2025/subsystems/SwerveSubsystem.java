@@ -103,10 +103,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public void setPose(Pose2d pose) {
-        swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
-        if(RobotBase.isSimulation()) {
-            swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
-        }
+        swerveDrive.resetOdometry(pose);
+        // swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
+        // if(RobotBase.isSimulation()) {
+        //     swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
+        // }
     }
 
     public ChassisSpeeds getFieldVelocity() {
