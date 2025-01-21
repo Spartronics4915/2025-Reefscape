@@ -12,6 +12,7 @@ import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface.Det
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,10 +26,6 @@ public final class ChassisSpeedSuppliers {
 
     public static boolean isFieldRelative = OI.kStartFieldRel;
 
-    public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, SwerveSubsystem swerve) {
-        return computeVelocitiesFromController(driverController, isFieldRelative, swerve);
-    }
-    
     /**
      * sets whether {@link #computeVelocitiesFromController computeVelocitiesFromController} is field or robot relative when not specified
      * @param newIsFieldRelative
@@ -37,35 +34,13 @@ public final class ChassisSpeedSuppliers {
         isFieldRelative = newIsFieldRelative;
     }
 
-    
-    static private double applyResponseCurve(double x) {
-        return Math.signum(x) * Math.pow(x, 2);
+    //#region linear and rotation CS suppliers
+
+    public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, SwerveSubsystem swerve) {
+        return computeVelocitiesFromController(driverController, isFieldRelative, swerve);
     }
 
-    private static void invertBasedOnAlliance(ChassisSpeeds cs){
-        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-            cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
-            cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
-        }
-    }
-
-    public static Supplier<ChassisSpeeds> computeRotationalVelocityFromController(XboxController driverController, SwerveSubsystem swerve){
-        return () -> {
-            final double inputomegaraw;
-            if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
-            } else {
-                inputomegaraw = driverController.getRightY() * 1.0; // consider changing from angular velocity
-                // control to direct angle control
-            }
-            
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
-            
-            return new ChassisSpeeds(0, 0, inputomega * Drive.kMaxAngularSpeed);
-        };
-    }
-
-    /**
+        /**
      * @return the robot relative chassis speeds
      */
     public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, boolean isFieldRelative, SwerveSubsystem swerve) {
@@ -106,6 +81,27 @@ public final class ChassisSpeedSuppliers {
         };
     }
 
+
+    //#endregion
+    //#region rotational CS suppliers
+
+    public static Supplier<ChassisSpeeds> controllerRotationVelocity(XboxController driverController, SwerveSubsystem swerve){
+        return () -> {
+            final double inputomegaraw;
+            if (RobotBase.isSimulation()) {
+                inputomegaraw = driverController.getRawAxis(3) * -1.0;
+            } else {
+                inputomegaraw = driverController.getRightY() * 1.0; // consider changing from angular velocity
+                // control to direct angle control
+            }
+            
+            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+            
+            return new ChassisSpeeds(0, 0, inputomega * Drive.kMaxAngularSpeed);
+        };
+    }
+
+    
     public static Supplier<ChassisSpeeds> gotoAngle(Supplier<Rotation2d> fieldRelativeAngleSupplier, SwerveSubsystem mSwerve){
         return () -> {
             return new ChassisSpeeds(0, 0,
@@ -114,6 +110,7 @@ public final class ChassisSpeedSuppliers {
         };
     }
 
+    
     public static Supplier<ChassisSpeeds> targetDetector(Supplier<Optional<Detection>> detectionSupplier, double maxRotVelocity){
         return () -> {
             Optional<Detection> detection = detectionSupplier.get();
@@ -136,5 +133,35 @@ public final class ChassisSpeedSuppliers {
             return cs;
         };
     }
+
+
+    //#endregion 
+
+    //#region utility
+    
+    public static Rotation2d getAngleJoystickAngle(XboxController operatorController, SwerveSubsystem swerve){
+        var leftX = operatorController.getLeftX();
+        var leftY = operatorController.getLeftY();
+
+        if (Math.hypot(leftX, leftY) < OI.kAngleStickDeadband) {
+            return swerve.getPose().getRotation();
+        }
+
+        return new Rotation2d(leftX, leftY);
+    }
+
+    private static void invertBasedOnAlliance(ChassisSpeeds cs){
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+            cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
+            cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
+        }
+    }
+
+    static private double applyResponseCurve(double x) {
+        return Math.signum(x) * Math.pow(x, 2);
+    }
+
+    //#endregion
+
 
 }
