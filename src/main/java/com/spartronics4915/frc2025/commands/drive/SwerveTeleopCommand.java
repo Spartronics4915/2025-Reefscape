@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.*;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.computeVelocitiesFromController;
 
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
@@ -19,7 +19,6 @@ public class SwerveTeleopCommand extends Command {
 
     private final SwerveSubsystem swerveSubsystem;
     private final CommandXboxController driverController;
-    private boolean useFieldRelative;
 
     public SwerveTeleopCommand(CommandXboxController driverController, SwerveSubsystem swerveSubsystem) {
 
@@ -34,17 +33,17 @@ public class SwerveTeleopCommand extends Command {
     @Override
     public void execute() {
 
-        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), getFieldRelative(), swerveSubsystem).get();
+        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), swerveSubsystem).get();
 
         swerveSubsystem.drive(cs);
     }
 
 
     public void setFieldRelative(boolean fieldRelative) {
-        useFieldRelative = fieldRelative;
+        ChassisSpeedSuppliers.setFieldRelative(fieldRelative);
     }
 
     public boolean getFieldRelative() {
-        return useFieldRelative;
+        return ChassisSpeedSuppliers.isFieldRelative;
     }
 }

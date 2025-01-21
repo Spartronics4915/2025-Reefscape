@@ -23,6 +23,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public final class ChassisSpeedSuppliers {
     private static final PIDController mAnglePID = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
 
+    public static boolean isFieldRelative = OI.kStartFieldRel;
+
+    public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, SwerveSubsystem swerve) {
+        return computeVelocitiesFromController(driverController, isFieldRelative, swerve);
+    }
+    
+    /**
+     * sets whether {@link #computeVelocitiesFromController computeVelocitiesFromController} is field or robot relative when not specified
+     * @param newIsFieldRelative
+     */
+    public static void setFieldRelative(boolean newIsFieldRelative){
+        isFieldRelative = newIsFieldRelative;
+    }
 
     
     static private double applyResponseCurve(double x) {

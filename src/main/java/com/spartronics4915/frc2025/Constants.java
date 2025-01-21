@@ -38,6 +38,9 @@ public final class Constants {
 
 
         public static final double kStickDeadband = 0.05;
+        public static final double kAngleStickDeadband = 0.25;
+        public static final boolean kStartFieldRel = true;
+
 
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
