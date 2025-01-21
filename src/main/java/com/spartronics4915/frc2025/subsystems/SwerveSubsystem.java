@@ -13,6 +13,8 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -29,6 +31,8 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     private final SwerveDrive swerveDrive;
 
+    private final StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("pose", Pose2d.struct).publish();
+
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
@@ -43,11 +47,6 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        Shuffleboard.getTab("logging").addNumber("yaw", () -> getPose().getRotation().getDegrees());
-        Shuffleboard.getTab("logging").addNumber("x", () -> getPose().getX());
-        Shuffleboard.getTab("logging").addNumber("y", () -> getPose().getY());
-
 
         swerveDrive.getMapleSimDrive().ifPresent((a) -> a.removeAllFixtures());
         swerveDrive.setMotorIdleMode(true);
@@ -138,6 +137,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     @Override
     public void onModeSwitch() {
         swerveDrive.setMotorIdleMode(true);
+    }
+
+    @Override
+    public void periodic() {
+        posePublisher.accept(getPose());
     }
 
 }
