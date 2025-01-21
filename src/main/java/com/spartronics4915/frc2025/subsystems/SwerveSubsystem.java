@@ -2,7 +2,10 @@ package com.spartronics4915.frc2025.subsystems;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
@@ -57,21 +60,21 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
         // Shuffleboard.getTab("swerveLogging").add
 
-        // AutoBuilder.configure(
-        //     this::getPose, 
-        //     swerveDrive::resetOdometry, 
-        //     swerveDrive::getRobotVelocity, 
-        //     (speeds, FF) -> drive(speeds), 
-        //     new PPHolonomicDriveController(
-        //         Drive.AutoConstants.kTranslationPID, 
-        //         Drive.AutoConstants.kRotationPID), 
-        //     Drive.AutoConstants.kRobotConfig, 
-        //     () -> {
-        //         Optional<Alliance> temp = DriverStation.getAlliance();
-        //         if(temp.isEmpty()) return false;
-        //         if (temp.get() == Alliance.Red) {return true;}
-        //         return false;
-        //     }, this);
+        AutoBuilder.configure(
+            this::getPose, 
+            swerveDrive::resetOdometry, 
+            swerveDrive::getRobotVelocity, 
+            (speeds, FF) -> drive(speeds), 
+            new PPHolonomicDriveController(
+                Drive.AutoConstants.kTranslationPID, 
+                Drive.AutoConstants.kRotationPID), 
+            Drive.AutoConstants.PathplannerConfigs.PROGRAMMER_CHASSIS.config, 
+            () -> {
+                Optional<Alliance> temp = DriverStation.getAlliance();
+                if(temp.isEmpty()) return false;
+                if (temp.get() == Alliance.Red) {return true;}
+                return false;
+            }, this);
 
     }
 
