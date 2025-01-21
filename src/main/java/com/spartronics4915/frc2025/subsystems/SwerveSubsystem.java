@@ -32,13 +32,13 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed//,
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed,
             // new Pose2d(new Translation2d(Meter.of(2),
             //     Meter.of(5)),
             //     Rotation2d.fromDegrees(180)
             // )
+                guessStartingPosition()
             );
-            guessStartingPosition();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -49,6 +49,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         Shuffleboard.getTab("logging").addNumber("y", () -> getPose().getY());
 
 
+        swerveDrive.getMapleSimDrive().ifPresent((a) -> a.removeAllFixtures());
         swerveDrive.setMotorIdleMode(true);
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
         swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
