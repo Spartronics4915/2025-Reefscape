@@ -139,9 +139,9 @@ public final class ChassisSpeedSuppliers {
 
     //#region utility
     
-    public static Rotation2d getAngleJoystickAngle(XboxController operatorController, SwerveSubsystem swerve){
-        var leftX = operatorController.getLeftX();
-        var leftY = operatorController.getLeftY();
+    public static Rotation2d getAngleJoystickAngle(XboxController driverController, SwerveSubsystem swerve){
+        var leftX = driverController.getLeftX();
+        var leftY = driverController.getLeftY();
 
         if (Math.hypot(leftX, leftY) < OI.kAngleStickDeadband) {
             return swerve.getPose().getRotation();

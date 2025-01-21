@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.computeVelocitiesFromController;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.getAngleJoystickAngle;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.gotoAngle;
 
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
@@ -34,6 +36,12 @@ public class SwerveTeleopCommand extends Command {
     public void execute() {
 
         ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), swerveSubsystem).get();
+
+        if (getFieldRelative()) {
+            cs.omegaRadiansPerSecond = gotoAngle(
+                () -> getAngleJoystickAngle(driverController.getHID(), swerveSubsystem), swerveSubsystem
+            ).get().omegaRadiansPerSecond;
+        }
 
         swerveSubsystem.drive(cs);
     }
