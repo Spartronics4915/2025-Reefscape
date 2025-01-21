@@ -8,7 +8,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 
 | input   | action |
 | -------- | ------- |
-|   |     |
+| a | toggle robot relative |
 |  |      |
 |     |     |
 
