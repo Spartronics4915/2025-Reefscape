@@ -2,8 +2,10 @@ package com.spartronics4915.frc2025.util;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightModel;
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
+import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
+import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
+
+import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * this stores all of the records used in the Constants file
@@ -37,6 +39,12 @@ public final class Structures {
         LimelightModel model,
         int id,
         LimelightRole role
+    ) {}
+
+    public static record VisionMeasurement(
+        Pose2d pose,
+        double timestamp,
+        LimelightRole source
     ) {}
 
 

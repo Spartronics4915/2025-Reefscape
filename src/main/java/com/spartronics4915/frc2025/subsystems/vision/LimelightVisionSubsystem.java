@@ -9,9 +9,8 @@ import java.util.logging.Logger;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.VisionMeasurement;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
+import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
