@@ -4,6 +4,11 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ejml.data.ElementLocation;
+import org.json.simple.parser.ParseException;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -134,6 +140,7 @@ public class RobotContainer {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        NamedCommands.registerCommand("print", Commands.print("ping"));
         return autoChooser.getSelected();
 
     }
@@ -144,6 +151,7 @@ public class RobotContainer {
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
+        chooser.addOption("debug", new PathPlannerAuto("example auto"));
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
