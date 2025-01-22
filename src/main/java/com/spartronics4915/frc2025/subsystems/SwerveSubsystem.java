@@ -2,7 +2,10 @@ package com.spartronics4915.frc2025.subsystems;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
@@ -10,6 +13,8 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -26,26 +31,25 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     private final SwerveDrive swerveDrive;
 
+    private final StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("pose", Pose2d.struct).publish();
+    private final StructPublisher<ChassisSpeeds> shimPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("shim", ChassisSpeeds.struct).publish();
+
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed//,
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed,
             // new Pose2d(new Translation2d(Meter.of(2),
             //     Meter.of(5)),
             //     Rotation2d.fromDegrees(180)
             // )
+                guessStartingPosition()
             );
-            guessStartingPosition();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        Shuffleboard.getTab("logging").addNumber("yaw", () -> getPose().getRotation().getDegrees());
-        Shuffleboard.getTab("logging").addNumber("x", () -> getPose().getX());
-        Shuffleboard.getTab("logging").addNumber("y", () -> getPose().getY());
-
-
+        // swerveDrive.getMapleSimDrive().ifPresent((a) -> a.removeAllFixtures());
         swerveDrive.setMotorIdleMode(true);
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
         swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
@@ -57,21 +61,21 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
         // Shuffleboard.getTab("swerveLogging").add
 
-        // AutoBuilder.configure(
-        //     this::getPose, 
-        //     swerveDrive::resetOdometry, 
-        //     swerveDrive::getRobotVelocity, 
-        //     (speeds, FF) -> drive(speeds), 
-        //     new PPHolonomicDriveController(
-        //         Drive.AutoConstants.kTranslationPID, 
-        //         Drive.AutoConstants.kRotationPID), 
-        //     Drive.AutoConstants.kRobotConfig, 
-        //     () -> {
-        //         Optional<Alliance> temp = DriverStation.getAlliance();
-        //         if(temp.isEmpty()) return false;
-        //         if (temp.get() == Alliance.Red) {return true;}
-        //         return false;
-        //     }, this);
+        AutoBuilder.configure(
+            this::getPose, 
+            swerveDrive::resetOdometry, 
+            swerveDrive::getRobotVelocity, 
+            (speeds, FF) -> {shimPublisher.accept(speeds); drive(speeds);}, 
+            new PPHolonomicDriveController(
+                Drive.AutoConstants.kTranslationPID, 
+                Drive.AutoConstants.kRotationPID), 
+            Drive.AutoConstants.PathplannerConfigs.PROGRAMMER_CHASSIS.config, 
+            () -> {
+                Optional<Alliance> temp = DriverStation.getAlliance();
+                if(temp.isEmpty()) return false;
+                if (temp.get() == Alliance.Red) {return true;}
+                return false;
+            }, this);
 
     }
 
@@ -103,10 +107,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public void setPose(Pose2d pose) {
-        swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
-        if(RobotBase.isSimulation()) {
-            swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
-        }
+        swerveDrive.resetOdometry(pose);
+        // swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
+        // if(RobotBase.isSimulation()) {
+        //     swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
+        // }
     }
 
     public ChassisSpeeds getFieldVelocity() {
@@ -133,6 +138,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     @Override
     public void onModeSwitch() {
         swerveDrive.setMotorIdleMode(true);
+    }
+
+    @Override
+    public void periodic() {
+        posePublisher.accept(getPose());
     }
 
 }
