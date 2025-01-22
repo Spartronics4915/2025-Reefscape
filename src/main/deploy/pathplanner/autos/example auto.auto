@@ -21,18 +21,6 @@
           "data": {
             "name": "print"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "debug"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "print"
-          }
         }
       ]
     }
