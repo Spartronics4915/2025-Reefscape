@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -86,18 +87,18 @@ public final class Constants {
                     Mass.ofBaseUnits(10, Kilogram), 
                     MomentOfInertia.ofBaseUnits(1.9387211145, KilogramSquareMeters),
                     new ModuleConfig(
-                        Distance.ofBaseUnits(4/2, Inches),
-                        LinearVelocity.ofBaseUnits(5, MetersPerSecond),
+                        Inches.of(2),
+                        MetersPerSecond.of(5),
                         1.00, //CHECKUP guess
                         DCMotor.getNEO(1),
                         6.75,
-                        Current.ofBaseUnits(40, Amps),
+                        Amps.of(40),
                         1
                     ),
-                    new Translation2d(Distance.ofBaseUnits(12.25, Inches), Distance.ofBaseUnits(12.3125, Inches)),
-                    new Translation2d(Distance.ofBaseUnits(12.25, Inches), Distance.ofBaseUnits(-12.3125, Inches)),
-                    new Translation2d(Distance.ofBaseUnits(-12.25, Inches), Distance.ofBaseUnits(12.3125, Inches)),
-                    new Translation2d(Distance.ofBaseUnits(-12.25, Inches), Distance.ofBaseUnits(-12.3125, Inches))
+                    new Translation2d(Inches.of(12.25), Inches.of(12.3125)),
+                    new Translation2d(Inches.of(12.25), Inches.of(-12.3125)),
+                    new Translation2d(Inches.of(-12.25), Inches.of(12.3125)),
+                    new Translation2d(Inches.of(-12.25), Inches.of(-12.3125))
                 ));
 
                 public RobotConfig config;
