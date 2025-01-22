@@ -122,13 +122,13 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
+        swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController, swerveSubsystem));
 
-        swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
-            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
-            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem),
-            swerveSubsystem
-        ));
+        // swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
+        //     ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
+        //     ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem),
+        //     swerveSubsystem
+        // ));
     }
 
     /**
