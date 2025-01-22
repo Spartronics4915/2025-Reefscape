@@ -140,13 +140,14 @@ public class RobotContainer {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        NamedCommands.registerCommand("print", Commands.print("ping"));
         return autoChooser.getSelected();
 
     }
 
     private SendableChooser<Command> buildAutoChooser() {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
+
+        NamedCommands.registerCommand("print", Commands.print("ping"));
 
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
