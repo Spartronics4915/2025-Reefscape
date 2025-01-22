@@ -10,9 +10,14 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
@@ -138,6 +143,10 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public MutAngularVelocity getAngularVelocity() {
         return swerveDrive.getGyro().getYawAngularVelocity();
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
+        swerveDrive.addVisionMeasurement(pose, timestamp, stdDevs);
     }
 
     @Override
