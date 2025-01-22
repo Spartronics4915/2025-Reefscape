@@ -20,7 +20,6 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import swervelib.SwerveDrive;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
     private final ArrayList<LimelightDevice> limelights;
@@ -66,10 +65,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
     }
 
-    public ArrayList<VisionMeasurement> getVisionMeasurements(SwerveDrive swerve) {
+    public ArrayList<VisionMeasurement> getVisionMeasurements() {
         ArrayList<VisionMeasurement> measurements = new ArrayList<>();
         limelights.forEach((limelight) -> {
-            Optional<VisionMeasurement> measurement = limelight.getVisionMeasurement(swerve);
+            Optional<VisionMeasurement> measurement = limelight.getVisionMeasurement(swerveSubsystem);
             if (measurement.isPresent()) {
                 measurements.add(measurement.get());
             }

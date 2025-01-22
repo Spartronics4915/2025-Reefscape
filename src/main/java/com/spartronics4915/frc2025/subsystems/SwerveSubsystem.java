@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -128,6 +130,14 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public SwerveDrive getInternalSwerve() {
         return swerveDrive;
+    }
+
+    public Rotation2d getHeading() {
+        return swerveDrive.getOdometryHeading();
+    }
+
+    public MutAngularVelocity getAngularVelocity() {
+        return swerveDrive.getGyro().getYawAngularVelocity();
     }
 
     @Override
