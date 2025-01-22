@@ -9,7 +9,12 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class OdometrySubsystem extends SubsystemBase {
@@ -29,8 +34,11 @@ public class OdometrySubsystem extends SubsystemBase {
         }
     }
 
-    public Optional<Double> getVisionStdDevs() {
-        return null; //placeholder so code can compile
+    public Optional<Matrix<N3, N1>> getVisionStdDevs(VisionMeasurement measurement) {
+        double sigmaX = 0.0;
+        double sigmaY = 0.0;
+        double sigmaTheta = 0.0;
+        return Optional.of(MatBuilder.fill(Nat.N3(), Nat.N1(), sigmaX, sigmaY, sigmaTheta));
     }
 
     private Optional<Pose2d> getVisionPose() {
@@ -60,20 +68,15 @@ public class OdometrySubsystem extends SubsystemBase {
         return swervePose;
     }
 
-
-    private void updateSwervePoseEstimator(Pose2d pose, double stdDev) {
-
-    }
-
     @Override
     public void periodic() {
         updateVisionMeasurements();
-        //query vision
-        //...
-        Optional<Double> calculatedStdDevs = getVisionStdDevs();
-        if (calculatedStdDevs.isEmpty()) return; //Optional.empty() = "don't bother"
-        double stdDevs = calculatedStdDevs.get();
-        //...
-        //update pose estimator
+        visionMeasurements.forEach((measurement) -> {
+            Optional<Matrix<N3, N1>> potentialStdDevs = getVisionStdDevs(measurement);
+            if (potentialStdDevs.isPresent()) {
+                Matrix<N3, N1> stdDevs = potentialStdDevs.get();
+                swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), stdDevs);
+            }
+        });
     }
 }
