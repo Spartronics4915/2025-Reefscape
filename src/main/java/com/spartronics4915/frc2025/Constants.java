@@ -131,4 +131,8 @@ public final class Constants {
             NOTHING, REEF, STATION, OBSERVER
         }
     }
+
+    public static final class OdometryConstants {
+        public static final double kMaxSwerveVisionPoseDifference = 1.0; //meters
+    }
 }
