@@ -84,11 +84,11 @@ public final class Constants {
             public enum PathplannerConfigs{
                 PROGRAMMER_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
                     Mass.ofBaseUnits(10, Kilogram), 
-                    MomentOfInertia.ofBaseUnits(4, KilogramSquareMeters), // FIXME rough guess based on research
+                    MomentOfInertia.ofBaseUnits(1.9387211145, KilogramSquareMeters),
                     new ModuleConfig(
                         Distance.ofBaseUnits(4/2, Inches),
                         LinearVelocity.ofBaseUnits(5, MetersPerSecond),
-                        1.19,
+                        1.00, //CHECKUP guess
                         DCMotor.getNEO(1),
                         6.75,
                         Current.ofBaseUnits(40, Amps),
