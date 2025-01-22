@@ -84,8 +84,8 @@ public final class Constants {
 
             public enum PathplannerConfigs{
                 PROGRAMMER_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
-                    Mass.ofBaseUnits(10, Kilogram), 
-                    MomentOfInertia.ofBaseUnits(1.9387211145, KilogramSquareMeters),
+                    Kilogram.of(10), 
+                    KilogramSquareMeters.of(1.9387211145),
                     new ModuleConfig(
                         Inches.of(2),
                         MetersPerSecond.of(5),
