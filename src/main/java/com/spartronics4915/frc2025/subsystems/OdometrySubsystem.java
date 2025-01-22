@@ -17,11 +17,11 @@ public class OdometrySubsystem extends SubsystemBase {
     }
 
     public Optional<Double> getVisionStdDevs() {
-        
+        return null; //placeholder so code can compile
     }
 
     private Optional<Pose2d> getVisionPose() {
-        
+        return null; //placeholder so code can compile
     }
 
     /**
@@ -29,7 +29,7 @@ public class OdometrySubsystem extends SubsystemBase {
      * @return Robot pose from the swerve drive, or the robot pose from vision if the distance between them is too great
      */
     public Pose2d getPose() {
-        
+        return null; //placeholder so code can compile
     }
 
 
