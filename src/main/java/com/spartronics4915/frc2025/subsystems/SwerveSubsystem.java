@@ -18,8 +18,6 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -108,10 +106,6 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public void setPose(Pose2d pose) {
         swerveDrive.resetOdometry(pose);
-        // swerveDrive.swerveDrivePoseEstimator.resetPose(pose);
-        // if(RobotBase.isSimulation()) {
-        //     swerveDrive.getMapleSimDrive().get().setSimulationWorldPose(pose);
-        // }
     }
 
     public ChassisSpeeds getFieldVelocity() {
