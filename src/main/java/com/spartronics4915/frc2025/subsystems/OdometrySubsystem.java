@@ -13,12 +13,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class OdometrySubsystem extends SubsystemBase {
-    private VisionDeviceSubystem visionSubsystem;
-    private SwerveSubsystem swerveSubsystem;
+    private final VisionDeviceSubystem visionSubsystem;
+    private final SwerveSubsystem swerveSubsystem;
+
+    private ArrayList<VisionMeasurement> visionMeasurements = new ArrayList<>();
 
     public OdometrySubsystem(VisionDeviceSubystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
         this.visionSubsystem = visionSubsystem;
         this.swerveSubsystem = swerveSubsystem;
+    }
+
+    private void updateVisionMeasurements() {
+        if (Robot.isReal()) {
+            visionMeasurements = ((LimelightVisionSubsystem) visionSubsystem).getVisionMeasurements();
+        }
     }
 
     public Optional<Double> getVisionStdDevs() {
@@ -29,7 +37,6 @@ public class OdometrySubsystem extends SubsystemBase {
         if (Robot.isSimulation()) {
             return visionSubsystem.getBotPose2dFromReefCamera();
         }
-        ArrayList<VisionMeasurement> visionMeasurements = ((LimelightVisionSubsystem) visionSubsystem).getVisionMeasurements();
         if (visionMeasurements.size() == 0) return Optional.empty();
         if (visionMeasurements.size() == 1) return Optional.of(visionMeasurements.get(0).pose());
         return Optional.of(
@@ -55,11 +62,12 @@ public class OdometrySubsystem extends SubsystemBase {
 
 
     private void updateSwervePoseEstimator(Pose2d pose, double stdDev) {
-        
+
     }
 
     @Override
     public void periodic() {
+        updateVisionMeasurements();
         //query vision
         //...
         Optional<Double> calculatedStdDevs = getVisionStdDevs();
