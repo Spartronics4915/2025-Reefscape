@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "M to R coral mark"
+            "pathName": "Curve M-R marks"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "debug",
   "choreoAuto": false
 }

@@ -5,7 +5,9 @@
   "pathFolders": [
     "debug"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "debug"
+  ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

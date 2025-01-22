@@ -152,7 +152,11 @@ public class RobotContainer {
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
-        chooser.addOption("debug", new PathPlannerAuto("example auto"));
+        chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
+        chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
+        chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
+        chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
