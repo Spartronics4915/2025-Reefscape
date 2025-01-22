@@ -70,7 +70,12 @@ public class LimelightDevice extends SubsystemBase {
         if (rejectUpdate) {
             return Optional.empty();
         } else {
-            return Optional.of(new VisionMeasurement(megaTag2.pose, megaTag2.timestampSeconds, role));
+            return Optional.of(new VisionMeasurement(
+                megaTag2.pose,
+                megaTag2.timestampSeconds,
+                role,
+                megaTag2.tagCount,
+                megaTag2.avgTagDist));
         }
     }
 
