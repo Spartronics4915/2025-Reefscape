@@ -32,6 +32,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private final SwerveDrive swerveDrive;
 
     private final StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("pose", Pose2d.struct).publish();
+    private final StructPublisher<ChassisSpeeds> shimPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("shim", ChassisSpeeds.struct).publish();
 
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
@@ -48,7 +49,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
             throw new RuntimeException(e);
         }
 
-        swerveDrive.getMapleSimDrive().ifPresent((a) -> a.removeAllFixtures());
+        // swerveDrive.getMapleSimDrive().ifPresent((a) -> a.removeAllFixtures());
         swerveDrive.setMotorIdleMode(true);
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
         swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
@@ -64,7 +65,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
             this::getPose, 
             swerveDrive::resetOdometry, 
             swerveDrive::getRobotVelocity, 
-            (speeds, FF) -> drive(speeds), 
+            (speeds, FF) -> {shimPublisher.accept(speeds); drive(speeds);}, 
             new PPHolonomicDriveController(
                 Drive.AutoConstants.kTranslationPID, 
                 Drive.AutoConstants.kRotationPID), 
