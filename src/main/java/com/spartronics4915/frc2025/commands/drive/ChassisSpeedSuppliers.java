@@ -142,14 +142,14 @@ public final class ChassisSpeedSuppliers {
     //#region utility
     
     public static Rotation2d getAngleJoystickAngle(XboxController driverController, SwerveSubsystem swerve){
-        var leftX = driverController.getLeftX();
-        var leftY = driverController.getLeftY();
+        var rightX = driverController.getRightX();
+        var rightY = driverController.getRightY();
 
-        if (Math.hypot(leftX, leftY) < OI.kAngleStickDeadband) {
+        if (Math.hypot(rightX, rightY) < OI.kAngleStickDeadband) {
             return swerve.getPose().getRotation();
         }
 
-        return new Rotation2d(leftX, leftY);
+        return new Rotation2d(rightX, rightY);
     }
 
     private static void invertBasedOnAlliance(ChassisSpeeds cs){
