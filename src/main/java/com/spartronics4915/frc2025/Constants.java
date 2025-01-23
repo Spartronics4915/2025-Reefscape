@@ -76,7 +76,7 @@ public final class Constants {
     }
 
     public static final class DriveCommandConstants {
-        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(AutoConstants.kRotationPID.kP, AutoConstants.kRotationPID.kI, AutoConstants.kRotationPID.kD, 0);
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.0, 0);
     }
 
     public static final class VisionConstants {
