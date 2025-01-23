@@ -1,7 +1,10 @@
 package com.spartronics4915.frc2025.commands.drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,6 +25,8 @@ public class SwerveTeleopCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
     private final CommandXboxController driverController;
 
+    private static final StructPublisher<Rotation2d> desiredAnglePub = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired Angle", Rotation2d.struct).publish();
+
     public SwerveTeleopCommand(CommandXboxController driverController, SwerveSubsystem swerveSubsystem) {
 
         this.swerveSubsystem = swerveSubsystem;
@@ -37,11 +42,14 @@ public class SwerveTeleopCommand extends Command {
 
         ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), swerveSubsystem).get();
 
+        
         //get angle from controller and try to match
         if (getFieldRelative()) {
+            var desiredAngle = getAngleJoystickAngle(driverController.getHID(), swerveSubsystem);
             cs.omegaRadiansPerSecond = gotoAngle(
-                () -> getAngleJoystickAngle(driverController.getHID(), swerveSubsystem), swerveSubsystem
+                () -> desiredAngle, swerveSubsystem
             ).get().omegaRadiansPerSecond;
+            desiredAnglePub.accept(desiredAngle);
         }
 
         swerveSubsystem.drive(cs);
