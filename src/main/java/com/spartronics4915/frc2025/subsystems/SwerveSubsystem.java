@@ -29,13 +29,13 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed//,
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed,
             // new Pose2d(new Translation2d(Meter.of(2),
             //     Meter.of(5)),
             //     Rotation2d.fromDegrees(180)
             // )
+                guessStartingPosition()
             );
-            guessStartingPosition();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
