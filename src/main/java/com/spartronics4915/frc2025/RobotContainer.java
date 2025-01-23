@@ -126,6 +126,12 @@ public class RobotContainer {
                 () -> swerveTeleopCommand.setFieldRelative(false))
         );
 
+        driverController.leftTrigger()
+            .and(driverController.rightTrigger())
+            .whileTrue(
+                Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
+            );
+
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }
 

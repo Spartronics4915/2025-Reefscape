@@ -129,6 +129,10 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         return swerveDrive;
     }
 
+    public void lockModules(){
+        swerveDrive.lockPose();
+    }
+
     @Override
     public void onDisable() {
         swerveDrive.setMotorIdleMode(false);
