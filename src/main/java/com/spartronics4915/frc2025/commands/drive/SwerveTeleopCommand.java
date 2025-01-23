@@ -28,7 +28,7 @@ public class SwerveTeleopCommand extends Command {
 
         this.driverController = driverController;
 
-        setFieldRelative(false);
+        setFieldRelative(true);
         addRequirements(swerveSubsystem);
     }
 
