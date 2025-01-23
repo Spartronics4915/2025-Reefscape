@@ -73,7 +73,7 @@ public final class ChassisSpeedSuppliers {
     
             //inverts based on alliance
             //CHECKUP need to make sure this works
-            if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red && isFieldRelative) {
+            if (shouldFlip() && isFieldRelative) {
                 cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
                 cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
             }
@@ -143,20 +143,32 @@ public final class ChassisSpeedSuppliers {
     //#endregion 
 
     //#region utility
+
+    public static boolean shouldFlip(){
+        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+    }
     
+    /**
+     * get field relative angle based on controller joysticks and alliance
+     */
     public static Rotation2d getAngleJoystickAngle(XboxController driverController, SwerveSubsystem swerve){
         var rightX = driverController.getRightX();
         var rightY = driverController.getRightY();
 
-        if (Math.hypot(rightX, rightY) < OI.kAngleStickDeadband) {
+        if (Math.hypot(rightY, rightX) < OI.kAngleStickDeadband) {
             return swerve.getPose().getRotation();
         }
 
-        return new Rotation2d(rightX, rightY);
+        if (shouldFlip()) {
+            rightX = -rightX;
+            rightY = -rightY;
+        }
+
+        return new Rotation2d(rightY, rightX);
     }
 
     private static void invertBasedOnAlliance(ChassisSpeeds cs){
-        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+        if (shouldFlip()) {
             cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
             cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
         }
