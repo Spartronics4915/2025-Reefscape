@@ -22,6 +22,11 @@ import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
+
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +38,7 @@ import org.ejml.data.ElementLocation;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -51,15 +57,27 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
-
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
     private static final CommandXboxController operatorController = new CommandXboxController(
             OI.kOperatorControllerPort);
 
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+
+    public enum ControlRumblers{
+        DRIVER(new RumbleController(driverController)),
+        OPERATOR(new RumbleController(operatorController)),
+        DEBUG(new RumbleController(debugController));
+
+        public final RumbleController rumbler;
+        private ControlRumblers(RumbleController rumbler) {
+            this.rumbler = rumbler;
+        }
+    }
+
+    // The robot's subsystems and commands are defined here...
+    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
+
 
     private final ElementLocator elementLocator = new ElementLocator();
     private final VisionDeviceSubystem visionSubsystem;
@@ -120,14 +138,15 @@ public class RobotContainer {
 
 
         //switch field and robot relative
-        driverController.a().toggleOnTrue(
+        driverController.x().toggleOnTrue(
             Commands.startEnd(
                 () -> swerveTeleopCommand.setFieldRelative(true), 
                 () -> swerveTeleopCommand.setFieldRelative(false))
         );
 
-        driverController.leftTrigger()
-            .and(driverController.rightTrigger())
+
+
+        driverController.leftTrigger().and(driverController.rightTrigger())
             .whileTrue(
                 Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
             );
