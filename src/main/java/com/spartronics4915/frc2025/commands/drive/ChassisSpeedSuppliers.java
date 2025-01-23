@@ -39,6 +39,25 @@ public final class ChassisSpeedSuppliers {
 
     //#region linear and rotation CS suppliers
 
+    /**
+     * this returns a supplier of chassis speeds for all teleoperated control.
+     * 
+     * this can be used in conjunction with the RotationIndependentControlCommand class to smoothly switch between automated and driver control
+     */
+    public static Supplier<ChassisSpeeds> getSwerveTeleopCSSupplier(XboxController driverController, SwerveSubsystem swerve){
+        return () -> {
+            ChassisSpeeds cs = computeVelocitiesFromController(driverController, swerve).get();
+
+            if (isFieldRelative) {
+                var desiredAngle = getAngleJoystickAngle(driverController, swerve);
+                cs.omegaRadiansPerSecond = gotoAngle(
+                    () -> desiredAngle, swerve
+                ).get().omegaRadiansPerSecond;
+            }
+            return cs;
+        };
+    }
+
     public static Supplier<ChassisSpeeds> computeVelocitiesFromController(XboxController driverController, SwerveSubsystem swerve) {
         return computeVelocitiesFromController(driverController, isFieldRelative, swerve);
     }

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.computeVelocitiesFromController;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.getAngleJoystickAngle;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.getSwerveTeleopCSSupplier;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.gotoAngle;
 
 import com.spartronics4915.frc2025.Constants.Drive;
@@ -40,17 +41,7 @@ public class SwerveTeleopCommand extends Command {
     @Override
     public void execute() {
 
-        ChassisSpeeds cs = computeVelocitiesFromController(driverController.getHID(), swerveSubsystem).get();
-
-        
-        //get angle from controller and try to match
-        if (getFieldRelative()) {
-            var desiredAngle = getAngleJoystickAngle(driverController.getHID(), swerveSubsystem);
-            cs.omegaRadiansPerSecond = gotoAngle(
-                () -> desiredAngle, swerveSubsystem
-            ).get().omegaRadiansPerSecond;
-            desiredAnglePub.accept(desiredAngle);
-        }
+        ChassisSpeeds cs = getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem).get();
 
         swerveSubsystem.drive(cs);
     }
