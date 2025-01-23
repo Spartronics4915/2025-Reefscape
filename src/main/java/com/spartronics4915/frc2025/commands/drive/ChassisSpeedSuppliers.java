@@ -78,7 +78,7 @@ public final class ChassisSpeedSuppliers {
             if (RobotBase.isSimulation()) {
                 inputomegaraw = driverController.getRawAxis(3) * -1.0;
             } else {
-                inputomegaraw = driverController.getRightY() * -1.0; // consider changing from angular velocity
+                inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
                 // control to direct angle control
             }
     
