@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.Constants.Drive.AutoConstants;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightModel;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 import com.spartronics4915.frc2025.util.Structures.*;
@@ -75,7 +76,7 @@ public final class Constants {
     }
 
     public static final class DriveCommandConstants {
-        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(16, 0, 0, 0);
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(AutoConstants.kRotationPID.kP, AutoConstants.kRotationPID.kI, AutoConstants.kRotationPID.kD, 0);
     }
 
     public static final class VisionConstants {

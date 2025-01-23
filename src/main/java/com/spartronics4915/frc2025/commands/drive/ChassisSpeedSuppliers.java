@@ -22,7 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public final class ChassisSpeedSuppliers {
-    private static final PIDController mAnglePID = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
+    private static final PIDController mAnglePIDRad = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
+    static{
+        mAnglePIDRad.enableContinuousInput(-Math.PI, Math.PI);
+    }
 
     public static boolean isFieldRelative = OI.kStartFieldRel;
 
@@ -107,7 +110,7 @@ public final class ChassisSpeedSuppliers {
     public static Supplier<ChassisSpeeds> gotoAngle(Supplier<Rotation2d> fieldRelativeAngleSupplier, SwerveSubsystem mSwerve){
         return () -> {
             return new ChassisSpeeds(0, 0,
-                mAnglePID.calculate(fieldRelativeAngleSupplier.get().getRotations(), mSwerve.getPose().getRotation().getRotations())
+                mAnglePIDRad.calculate(mSwerve.getPose().getRotation().getRadians(), fieldRelativeAngleSupplier.get().getRadians())
             );
         };
     }
@@ -126,7 +129,7 @@ public final class ChassisSpeedSuppliers {
                 double tx;
 
                 tx = detection.get().tx();
-                double angleVelocity = mAnglePID.calculate(tx, 0);
+                double angleVelocity = mAnglePIDRad.calculate(tx, 0);
                 angleVelocity = MathUtil.clamp(angleVelocity, -maxRotVelocity, maxRotVelocity);
                 SmartDashboard.putNumber("angleVelocity", angleVelocity);
                 double inputRotVelocity = angleVelocity / 180 * Math.PI;
