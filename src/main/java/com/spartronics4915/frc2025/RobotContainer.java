@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.ejml.data.ElementLocation;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -147,7 +148,7 @@ public class RobotContainer {
 
 
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
-        driverController.rightTrigger().whileTrue(
+        driverController.rightTrigger().debounce(0.05, DebounceType.kRising).whileTrue(
             new RotationIndependentControlCommand(
                 ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), new Translation2d(4.5, 4)), swerveSubsystem),
                 ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
