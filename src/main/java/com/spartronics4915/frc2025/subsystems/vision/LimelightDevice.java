@@ -55,27 +55,50 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
+        return getVisionMeasurement(swerve, false);
+    }
+
+    public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, boolean useMegaTag1) {
         if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
             return Optional.empty();
         }
         boolean rejectUpdate = false;
-        LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate megaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-        if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
-            rejectUpdate = true;
-        }
-        if (megaTag2.tagCount == 0) {
-            rejectUpdate = true;
+        LimelightHelpers.PoseEstimate poseEstimate;
+        if (useMegaTag1) {
+            poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+            if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) {
+                RawFiducial singleTag = poseEstimate.rawFiducials[0];
+                if (singleTag.ambiguity > 0.7) {
+                    rejectUpdate = true;
+                }
+                if (singleTag.distToCamera > 3) {
+                    rejectUpdate = true;
+                }
+            }
+            if (poseEstimate.tagCount == 0) {
+                rejectUpdate = true;
+            }
+        } else {
+            LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
+            poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+            if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
+                rejectUpdate = true;
+            }
+            if (poseEstimate.tagCount == 0) {
+                rejectUpdate = true;
+            }
         }
         if (rejectUpdate) {
             return Optional.empty();
         } else {
             return Optional.of(new VisionMeasurement(
-                megaTag2.pose,
-                megaTag2.timestampSeconds,
-                role,
-                megaTag2.tagCount,
-                megaTag2.avgTagDist));
+                poseEstimate.pose,
+                poseEstimate.timestampSeconds,
+                poseEstimate.tagCount,
+                poseEstimate.avgTagDist,
+                useMegaTag1,
+                role
+                ));
         }
     }
 

@@ -44,9 +44,10 @@ public final class Structures {
     public static record VisionMeasurement(
         Pose2d pose,
         double timestamp,
-        LimelightRole source,
         int tagCount,
-        double averageDistance
+        double averageDistance,
+        boolean isMegaTag1,
+        LimelightRole source
     ) {}
 
 
