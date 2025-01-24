@@ -125,6 +125,14 @@ public class RobotContainer {
                 () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
             );}
         ,Set.of()));
+
+        driverController.b().onTrue(
+            Commands.defer(() -> {
+                return Commands.runOnce(() -> {
+                    swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+                });
+            }, Set.of())
+        );
         
         driverController.leftTrigger()
             .and(driverController.rightTrigger())
