@@ -38,7 +38,7 @@ public final class RumbleFeedbackHandler{
      */
     public static class RumbleController{
         private final XboxController mController;
-        private RumbleFeedback mCurrentFeedback;
+        private RumbleFeedback mCurrentFeedback = new RumbleFeedback(RumbleType.kBothRumble, 0.0);
         private boolean isActive = false;
         private boolean change = false;
 
