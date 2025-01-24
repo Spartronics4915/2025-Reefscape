@@ -99,12 +99,7 @@ public final class ChassisSpeedSuppliers {
             final double inputxraw = driverController.getLeftY() * -1.0;
             final double inputyraw = driverController.getLeftX() * -1.0;
             final double inputomegaraw;
-            if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
-            } else {
-                inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
-                // control to direct angle control
-            }
+            inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
     
             final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
             final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
