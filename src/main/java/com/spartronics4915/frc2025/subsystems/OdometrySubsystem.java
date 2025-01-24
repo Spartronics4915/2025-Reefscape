@@ -9,9 +9,8 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
-import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -37,8 +36,15 @@ public class OdometrySubsystem extends SubsystemBase {
     public Optional<Matrix<N3, N1>> getVisionStdDevs(VisionMeasurement measurement) {
         double sigmaX = 0.0;
         double sigmaY = 0.0;
-        double sigmaTheta = 0.0;
-        return Optional.of(MatBuilder.fill(Nat.N3(), Nat.N1(), sigmaX, sigmaY, sigmaTheta));
+        double sigmaTheta = 9999999;
+        if (measurement.isMegaTag1()) {
+            sigmaX = 0.5;
+            sigmaY = 0.5;
+        } else {
+            sigmaX = 0.7;
+            sigmaY = 0.7;
+        }
+        return Optional.of(VecBuilder.fill(sigmaX, sigmaY, sigmaTheta));
     }
 
     private Optional<Pose2d> getVisionPose() {
