@@ -133,6 +133,10 @@ public class RobotContainer {
                 });
             }, Set.of())
         );
+
+        driverController.leftStick().onTrue(Commands.runOnce(() -> {
+            swerveTeleopCommand.resetHeadingOffset();
+        }));
         
         driverController.leftTrigger()
             .and(driverController.rightTrigger())
