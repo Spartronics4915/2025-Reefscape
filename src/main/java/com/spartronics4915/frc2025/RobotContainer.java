@@ -173,6 +173,8 @@ public class RobotContainer {
             )
         );
 
+        operatorController.a().onTrue(RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1, ControlRumblers.OPERATOR.rumbler, ControlRumblers.DRIVER.rumbler));
+
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }
 

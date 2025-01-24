@@ -19,7 +19,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 ## Operator controller
 | input   | action |
 | -------- | ------- |
-|   |     |
+| a | rumble both controllers (for testing) | 
 |  |      |
 |     |     |
 
