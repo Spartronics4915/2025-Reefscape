@@ -18,6 +18,7 @@ import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
+import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
@@ -69,6 +70,7 @@ public class RobotContainer {
 
     private final ElementLocator elementLocator = new ElementLocator();
     private final VisionDeviceSubystem visionSubsystem;
+    private final OdometrySubsystem odometrySubsystem;
 
     // ******** Simulation entries
     public final MotorSimulationSubsystem mechanismSim;
@@ -94,6 +96,8 @@ public class RobotContainer {
         } else {
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
         }
+
+        odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
         // Configure the trigger bindings
         configureBindings();
