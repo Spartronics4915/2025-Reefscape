@@ -32,9 +32,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.ejml.data.ElementLocation;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -138,18 +140,38 @@ public class RobotContainer {
 
 
         //switch field and robot relative
-        driverController.x().toggleOnTrue(
-            Commands.startEnd(
-                () -> swerveTeleopCommand.setFieldRelative(true), 
-                () -> swerveTeleopCommand.setFieldRelative(false))
+        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
+                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
+            );}
+        ,Set.of()));
+
+        driverController.b().onTrue(
+            Commands.defer(() -> {
+                return Commands.runOnce(() -> {
+                    swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+                });
+            }, Set.of())
         );
 
-
-
-        driverController.leftTrigger().and(driverController.rightTrigger())
+        driverController.leftStick().onTrue(Commands.runOnce(() -> {
+            swerveTeleopCommand.resetHeadingOffset();
+        }));
+        
+        driverController.leftTrigger()
+            .and(driverController.rightTrigger())
             .whileTrue(
                 Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
             );
+
+
+        //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
+        driverController.rightTrigger().whileTrue(
+            new RotationIndependentControlCommand(
+                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), new Translation2d(4.5, 4)), swerveSubsystem),
+                ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
+                swerveSubsystem
+            )
+        );
 
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }

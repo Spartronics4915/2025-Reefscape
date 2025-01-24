@@ -46,6 +46,13 @@ public class SwerveTeleopCommand extends Command {
         swerveSubsystem.drive(cs);
     }
 
+    public void setHeadingOffset(Rotation2d offset) {
+        ChassisSpeedSuppliers.setTeleopHeadingOffset(offset);
+    }
+
+    public void resetHeadingOffset() {
+        ChassisSpeedSuppliers.resetTeleopHeadingOffset();
+    }
 
     public void setFieldRelative(boolean fieldRelative) {
         ChassisSpeedSuppliers.setFieldRelative(fieldRelative);

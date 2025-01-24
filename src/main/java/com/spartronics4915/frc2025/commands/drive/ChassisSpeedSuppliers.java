@@ -19,22 +19,46 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 
 public final class ChassisSpeedSuppliers {
     private static final PIDController mAnglePIDRad = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
+    
     static{
         mAnglePIDRad.enableContinuousInput(-Math.PI, Math.PI);
+        RobotModeTriggers.teleop()
+            .or(RobotModeTriggers.autonomous())
+            .or(RobotModeTriggers.test())
+            .onTrue(
+                Commands.runOnce(() -> {
+                    resetTeleopHeadingOffset();
+                })
+            );
     }
 
     public static boolean isFieldRelative = OI.kStartFieldRel;
+
+    public static Rotation2d teleopHeadingOffset = Rotation2d.fromDegrees(0.0);
 
     /**
      * sets whether {@link #computeVelocitiesFromController computeVelocitiesFromController} is field or robot relative when not specified
      * @param newIsFieldRelative
      */
     public static void setFieldRelative(boolean newIsFieldRelative){
+        if (newIsFieldRelative != isFieldRelative) {
+            resetTeleopHeadingOffset();
+        }
         isFieldRelative = newIsFieldRelative;
+    }
+
+    public static void setTeleopHeadingOffset(Rotation2d offset){
+        teleopHeadingOffset = offset;
+    }
+
+    public static void resetTeleopHeadingOffset(){
+        teleopHeadingOffset = shouldFlip() ? Rotation2d.fromDegrees(180) : new Rotation2d();
     }
 
     //#region linear and rotation CS suppliers
@@ -75,12 +99,7 @@ public final class ChassisSpeedSuppliers {
             final double inputxraw = driverController.getLeftY() * -1.0;
             final double inputyraw = driverController.getLeftX() * -1.0;
             final double inputomegaraw;
-            if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
-            } else {
-                inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
-                // control to direct angle control
-            }
+            inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
     
             final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
             final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
@@ -89,16 +108,10 @@ public final class ChassisSpeedSuppliers {
             cs.vxMetersPerSecond = inputx * Drive.kMaxSpeed;
             cs.vyMetersPerSecond = inputy * Drive.kMaxSpeed;
             cs.omegaRadiansPerSecond = inputomega * Drive.kMaxAngularSpeed;
-    
-            //inverts based on alliance
-            //CHECKUP need to make sure this works
-            if (shouldFlip() && isFieldRelative) {
-                cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
-                cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
-            }
-    
+
             if (isFieldRelative) {
                 cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
+                cs = rotateLinearChassisSpeeds(cs, teleopHeadingOffset);
             }
     
             return cs;
@@ -166,6 +179,18 @@ public final class ChassisSpeedSuppliers {
     public static boolean shouldFlip(){
         return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
     }
+
+    public static ChassisSpeeds rotateLinearChassisSpeeds(ChassisSpeeds in, Rotation2d offset){
+        var modifiedLinear = new Translation2d(
+            in.vxMetersPerSecond,
+            in.vyMetersPerSecond
+        ).rotateBy(offset);
+
+        return new ChassisSpeeds(
+            modifiedLinear.getX(),
+            modifiedLinear.getY(), 
+        in.omegaRadiansPerSecond);
+    }
     
     /**
      * get field relative angle based on controller joysticks and alliance
@@ -178,7 +203,7 @@ public final class ChassisSpeedSuppliers {
             return swerve.getPose().getRotation();
         }
 
-        if (shouldFlip()) {
+        if (shouldFlip()) { //CHECKUP can be replaced by the teleop offset? but also messes with behavior
             rightX = -rightX;
             rightY = -rightY;
         }
@@ -186,15 +211,12 @@ public final class ChassisSpeedSuppliers {
         return new Rotation2d(rightY, rightX);
     }
 
-    private static void invertBasedOnAlliance(ChassisSpeeds cs){
-        if (shouldFlip()) {
-            cs.vxMetersPerSecond = -cs.vxMetersPerSecond;
-            cs.vyMetersPerSecond = -cs.vyMetersPerSecond;
-        }
-    }
-
     static private double applyResponseCurve(double x) {
         return Math.signum(x) * Math.pow(x, 2);
+    }
+
+    public static Rotation2d getFieldAngleBetween(Translation2d from, Translation2d to){
+        return from.minus(to).getAngle();
     }
 
     //#endregion
