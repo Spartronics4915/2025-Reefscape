@@ -215,6 +215,10 @@ public final class ChassisSpeedSuppliers {
         return Math.signum(x) * Math.pow(x, 2);
     }
 
+    public static Rotation2d getFieldAngleBetween(Translation2d from, Translation2d to){
+        return from.minus(to).getAngle();
+    }
+
     //#endregion
 
 
