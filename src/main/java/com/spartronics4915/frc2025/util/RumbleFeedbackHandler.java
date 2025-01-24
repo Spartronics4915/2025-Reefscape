@@ -8,8 +8,6 @@ import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 
-import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -19,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.spartronics4915.frc2025.Constants.OI;
 
-public final class RumbleFeedbackHandler implements ModeSwitchInterface{
+public final class RumbleFeedbackHandler{
     public enum FeedbackControllers{
         DRIVER,
         OPERATOR,
@@ -108,8 +106,7 @@ public final class RumbleFeedbackHandler implements ModeSwitchInterface{
         rumbleControllers.forEach((c) -> c.periodicBehavior());
     }
 
-    @Override
-    public void onDisable() {
+    public static void onDisable() {
         rumbleControllers.forEach((c) -> c.disable());
     }
 }
