@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.ejml.data.ElementLocation;
 
@@ -120,12 +121,11 @@ public class RobotContainer {
 
 
         //switch field and robot relative
-        driverController.a().toggleOnTrue(
-            Commands.startEnd(
-                () -> swerveTeleopCommand.setFieldRelative(true), 
-                () -> swerveTeleopCommand.setFieldRelative(false))
-        );
-
+        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
+                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
+            );}
+        ,Set.of()));
+        
         driverController.leftTrigger()
             .and(driverController.rightTrigger())
             .whileTrue(
