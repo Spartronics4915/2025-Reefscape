@@ -4,8 +4,6 @@
 
 package com.spartronics4915.frc2025;
 
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightModel;
-import com.spartronics4915.frc2025.subsystems.vision.LimelightDevice.LimelightRole;
 import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -125,5 +123,17 @@ public final class Constants {
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.OBSERVER),
                 new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
         };
+
+        public enum LimelightModel {
+            LIMELIGHT_3, LIMELIGHT_3G
+        }
+    
+        public enum LimelightRole {
+            NOTHING, REEF, STATION, OBSERVER
+        }
+    }
+
+    public static final class OdometryConstants {
+        public static final double kMaxSwerveVisionPoseDifference = 1.0; //meters
     }
 }
