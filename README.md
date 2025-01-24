@@ -8,9 +8,11 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 
 | input   | action |
 | -------- | ------- |
-| a | toggle robot relative |
-|  |      |
-|     |     |
+| Left stick |  Drive |
+| Right stick | Field angle |
+| L & R Triggers | X Brake Swerve |
+| B | Toggle field relative |
+| A | Reset FR pos heading |
 
 ## Operator controller
 | input   | action |
