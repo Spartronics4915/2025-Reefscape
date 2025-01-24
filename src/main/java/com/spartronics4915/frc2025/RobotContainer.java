@@ -199,16 +199,16 @@ public class RobotContainer {
         chooser.addOption("Ready to rumble", 
             Commands.sequence(
                 Commands.parallel(
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0),
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0)
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0, ControlRumblers.OPERATOR.rumbler),
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0, ControlRumblers.DRIVER.rumbler)
                 ), Commands.waitSeconds(1.0),
                 Commands.parallel(
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0),
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0)
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0, ControlRumblers.OPERATOR.rumbler),
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0, ControlRumblers.DRIVER.rumbler)
                 ), Commands.waitSeconds(1.0),
                 Commands.parallel(
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0),
-                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0)
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0, ControlRumblers.OPERATOR.rumbler),
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0, ControlRumblers.DRIVER.rumbler)
                 ), Commands.waitSeconds(1.0)
             )
         );

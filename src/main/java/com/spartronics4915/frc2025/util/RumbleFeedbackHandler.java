@@ -90,16 +90,20 @@ public final class RumbleFeedbackHandler{
     }
 
 
-    public static Command getRumbleCommand(RumbleController controller, RumbleFeedback feedback){
-        return Commands.startEnd(() ->  controller.setFeedback(feedback), controller::disable);
+    public static Command getRumbleCommand(RumbleFeedback feedback, RumbleController... controller){
+        return Commands.startEnd(() ->  {
+                for(var c : controller) c.setFeedback(feedback);
+        }, () -> {
+            for(var c : controller) c.disable();
+        });
     }
 
-    public static Command getRumbleCommand(RumbleController controller, RumbleFeedback feedback, double seconds){
-        return getRumbleCommand(controller, feedback).withTimeout(seconds);
+    public static Command getRumbleCommand(RumbleFeedback feedback, double seconds, RumbleController... controller){
+        return getRumbleCommand(feedback, controller).withTimeout(seconds);
     }
 
-    public static Command getRumbleCommand(RumbleController controller, RumbleFeedback feedback, Time timeout){
-        return getRumbleCommand(controller, feedback, timeout.in(Seconds));
+    public static Command getRumbleCommand(RumbleFeedback feedback, Time timeout, RumbleController... controller){
+        return getRumbleCommand(feedback, timeout.in(Seconds), controller);
     }
 
     public static void handleControllers(){
