@@ -173,6 +173,24 @@ public class RobotContainer {
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
+        
+        chooser.addOption("Ready to rumble", 
+            Commands.sequence(
+                Commands.parallel(
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0),
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kBothRumble, 0.25), 1.0)
+                ), Commands.waitSeconds(1.0),
+                Commands.parallel(
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0),
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kLeftRumble, 0.25), 1.0)
+                ), Commands.waitSeconds(1.0),
+                Commands.parallel(
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.OPERATOR.rumbler, new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0),
+                    RumbleFeedbackHandler.getRumbleCommand(ControlRumblers.DRIVER.rumbler, new RumbleFeedback(RumbleType.kRightRumble, 0.25), 1.0)
+                ), Commands.waitSeconds(1.0)
+            )
+        );
+
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
