@@ -24,7 +24,10 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int kMotorID1 = 0;
-        public static final int kMotorID2 = 0;
+
+        public static final int mPIDController = 0;
+        public static final int kPIDConstants = 0;
+
         public static final int kSensorID = 0;
 
         public enum IntakeSpeed {
