@@ -85,7 +85,7 @@ public final class Constants {
                     Kilogram.of(10), 
                     KilogramSquareMeters.of(1.9387211145),
                     new ModuleConfig(
-                        Inches.of(2),
+                        Inches.of(3.75/2),
                         MetersPerSecond.of(5),
                         1.00, //CHECKUP guess
                         DCMotor.getNEO(1),
