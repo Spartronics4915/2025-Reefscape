@@ -47,8 +47,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(ElevatorConstants.followerPIDConstants.kP, ElevatorConstants.followerPIDConstants.kI, ElevatorConstants.followerPIDConstants.kD);
 
-        motor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         followerConfig.follow(motor);
+        motor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     public void moveToPosition(ElevatorSubsystemState value) {
         
