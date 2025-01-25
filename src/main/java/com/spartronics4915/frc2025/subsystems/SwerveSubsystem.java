@@ -146,7 +146,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public Rotation2d getHeading() {
-        return swerveDrive.getOdometryHeading();
+        return getPose().getRotation();
     }
 
     public MutAngularVelocity getAngularVelocity() {
