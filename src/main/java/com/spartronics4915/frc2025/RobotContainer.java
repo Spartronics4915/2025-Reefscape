@@ -4,6 +4,11 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
@@ -13,6 +18,7 @@ import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
+import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
@@ -30,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.ejml.data.ElementLocation;
+import org.json.simple.parser.ParseException;
 
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -66,6 +73,7 @@ public class RobotContainer {
 
     private final ElementLocator elementLocator = new ElementLocator();
     private final VisionDeviceSubystem visionSubsystem;
+    private final OdometrySubsystem odometrySubsystem;
 
     // ******** Simulation entries
     public final MotorSimulationSubsystem mechanismSim;
@@ -91,6 +99,8 @@ public class RobotContainer {
         } else {
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
         }
+
+        odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
         // Configure the trigger bindings
         configureBindings();
@@ -119,7 +129,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
+        swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController, swerveSubsystem));
 
 
         //switch field and robot relative
@@ -175,9 +185,16 @@ public class RobotContainer {
     private SendableChooser<Command> buildAutoChooser() {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
+        NamedCommands.registerCommand("print", Commands.print("ping"));
+
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
         chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
+        chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
+        chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
+        chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
+        chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
