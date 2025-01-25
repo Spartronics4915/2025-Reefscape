@@ -24,6 +24,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -82,17 +83,30 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
                 return false;
             }, this);
 
+        SmartDashboard.putData("set angle to 0", Commands.runOnce(() -> {
+            var currPose = getPose();
+            setPose(new Pose2d(
+                currPose.getX(),
+                currPose.getY(),
+                Rotation2d.kZero
+            ));
+        }));
+
+        SmartDashboard.putData("set pose to M coral mark", Commands.runOnce(() -> {
+            setPose(new Pose2d(16.3,4, Rotation2d.fromDegrees(180.0)));
+        }));
+
     }
 
     private static Pose2d guessStartingPosition() {
 
         if  (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
 
-            return new Pose2d(8,6, Rotation2d.fromDegrees(0));
+            return new Pose2d(1.198, 4.025, Rotation2d.fromDegrees(0.0));
         }
         else {
 
-            return new Pose2d(10,2, Rotation2d.fromDegrees(90));
+            return new Pose2d(16.3,4, Rotation2d.fromDegrees(0.0));
 
         }
 
