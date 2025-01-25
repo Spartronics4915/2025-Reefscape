@@ -13,12 +13,15 @@ import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystem
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
+
+    private SparkMax motor;
+    private SparkMaxConfig motorConfig;
     
     public ElevatorSubsystem() {
         // Main elevator motor init
-        SparkMax motor = new SparkMax(ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
+        motor = new SparkMax(ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
 
-        SparkMaxConfig motorConfig = new SparkMaxConfig();
+        motorConfig = new SparkMaxConfig();
 
         motorConfig
             .inverted(ElevatorConstants.motorInverted)
