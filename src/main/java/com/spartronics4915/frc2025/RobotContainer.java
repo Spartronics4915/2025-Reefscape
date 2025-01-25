@@ -10,6 +10,7 @@ import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
 import com.spartronics4915.frc2025.commands.autos.CalibrateCommands;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
+import com.spartronics4915.frc2025.commands.autos.LineFollower;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -72,11 +73,12 @@ public class RobotContainer {
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
-    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
+    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21),
+            BlingSegment.solid(Color.kBlue, 21));
 
     private final SendableChooser<Command> autoChooser;
 
-    private final Command calibrateCommand;
+    // private final Command calibrateCommand;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -101,8 +103,8 @@ public class RobotContainer {
 
                 buildAutoChooser();
 
-        calibrateCommand = new CalibrateCommands(swerveSubsystem, visionSubsystem).getCommand();
-        
+        // calibrateCommand = new CalibrateCommands(swerveSubsystem,
+        // visionSubsystem).getCommand();
 
     }
 
@@ -125,10 +127,11 @@ public class RobotContainer {
         // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
-            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
-            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem),
-            swerveSubsystem
-        ));
+                ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(),
+                        swerveSubsystem),
+                ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false,
+                        swerveSubsystem),
+                swerveSubsystem));
     }
 
     /**
@@ -139,9 +142,9 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
-        //return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        return calibrateCommand;// return autoChooser.getSelected();
-
+        // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
+        return new LineFollower(swerveSubsystem,
+                elementLocator.getApproachPoint(elementLocator.getLeftReefPoint(11), 1));
     }
 
     private SendableChooser<Command> buildAutoChooser() {

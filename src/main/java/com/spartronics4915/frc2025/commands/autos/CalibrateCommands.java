@@ -35,6 +35,8 @@ public class CalibrateCommands {
         field.getObject("start").setPose(Pose2d.kZero);
         field.getObject("vision").setPose(Pose2d.kZero);
         field.getObject("odom").setPose(Pose2d.kZero);
+        SmartDashboard.putNumber("wheelDiam", 
+        swerve.getInternalSwerve().getModules()[0].getConfiguration().conversionFactors.drive.diameter);
     }
 
     private boolean gotStartPose() {

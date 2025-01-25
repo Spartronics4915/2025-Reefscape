@@ -107,6 +107,10 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         return swerveDrive.getFieldVelocity();
     }
 
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
+    }
+
     public void stopChassis() {
         drive(new ChassisSpeeds());
     }
