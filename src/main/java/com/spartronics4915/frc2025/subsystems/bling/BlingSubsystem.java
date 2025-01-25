@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.subsystems.Bling;
+package com.spartronics4915.frc2025.subsystems.bling;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;

@@ -12,8 +12,8 @@ import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlComm
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
-import com.spartronics4915.frc2025.subsystems.Bling.BlingSubsystem;
+import com.spartronics4915.frc2025.subsystems.bling.BlingSegment;
+import com.spartronics4915.frc2025.subsystems.bling.BlingSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
@@ -57,14 +57,13 @@ public class RobotContainer {
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
-    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
+    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.rainbow(21), BlingSegment.solid(Color.kBlue, 21));
 
     private final SendableChooser<Command> autoChooser;
     /**
     * The container for the robot. Contains subsystems, OI devices, and commands.
     */
     public RobotContainer() {
-
         mechanismSim = new MotorSimulationSubsystem();
         ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
 
