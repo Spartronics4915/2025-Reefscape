@@ -4,6 +4,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -12,6 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
 import com.spartronics4915.frc2025.Constants.ArmConstants.kArmPIDConstants;
+import com.spartronics4915.frc2025.util.Structures.FeedForwardConstants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,6 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
     
         mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+
     }
 
     private void setVoltage(double volts){
@@ -55,14 +58,6 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     private double getPosition() {
-        
-        double positionFactor = mArmMotor.configAccessor.encoder.getPositionConversionFactor();
-        double velocityFactor = mArmMotor.configAccessor.encoder.getVelocityConversionFactor();
-
-        config.signals.primaryEncoderPositionPeriodMs(ArmConstants.kPeriodMs);
-
-        mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
         double position = mArmMotor.getEncoder().getPosition();
 
         return position;
@@ -79,9 +74,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, 0.0));
 
-        setVoltage (
-            mArmClosedLoopController.setReference(mCurrentSetPoint, ControlType.kCurrent)
-        );
+        // setVoltage (
+        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FeedForwardConstants);
+        // );
     }
     
     private void initClosedLoopController() {
