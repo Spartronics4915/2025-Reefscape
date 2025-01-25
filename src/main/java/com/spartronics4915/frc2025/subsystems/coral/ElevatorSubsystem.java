@@ -53,6 +53,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         followerConfig.follow(motor);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        setVoltage(0.05);
+    }
+    private double getPosition() {
+        return motor.getEncoder().getPosition();
+    }
+    private void setVoltage(double voltage) {
+        motor.setVoltage(voltage);
+    }
+    @Override
+    public void periodic() {
+        System.out.println(motor.getAppliedOutput() + ", " + follower.getAppliedOutput());
     }
     public void moveToPosition(ElevatorSubsystemState value) {
         
