@@ -16,6 +16,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private SparkMax motor;
     private SparkMaxConfig motorConfig;
+    private SparkMax follower;
     
     public ElevatorSubsystem() {
         // Main elevator motor init
@@ -36,7 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // Follower motor init
-        SparkMax follower = new SparkMax(ElevatorConstants.elevatorFollowerID, MotorType.kBrushless);
+        follower = new SparkMax(ElevatorConstants.elevatorFollowerID, MotorType.kBrushless);
 
         SparkMaxConfig followerConfig = new SparkMaxConfig();
 
