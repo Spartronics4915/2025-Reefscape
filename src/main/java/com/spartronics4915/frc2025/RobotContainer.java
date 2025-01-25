@@ -29,6 +29,8 @@ import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -151,16 +153,17 @@ public class RobotContainer {
         }));
         
         driverController.leftTrigger()
-            .and(driverController.rightTrigger())
             .whileTrue(
                 Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
             );
 
 
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
-        driverController.rightTrigger().debounce(0.05, DebounceType.kRising).whileTrue(
+        driverController.rightTrigger().whileTrue(
             new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), new Translation2d(4.5, 4)), swerveSubsystem),
+                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), 
+                    shouldFlip() ? new Translation2d(13.073, 4): new Translation2d(4.5, 4)
+                ), swerveSubsystem),
                 ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
                 swerveSubsystem
             )

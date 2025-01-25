@@ -72,12 +72,12 @@ public final class ChassisSpeedSuppliers {
         return () -> {
             ChassisSpeeds cs = computeVelocitiesFromController(driverController, swerve).get();
 
-            if (isFieldRelative) {
-                var desiredAngle = getAngleJoystickAngle(driverController, swerve);
-                cs.omegaRadiansPerSecond = gotoAngle(
-                    () -> desiredAngle, swerve
-                ).get().omegaRadiansPerSecond;
-            }
+            // if (isFieldRelative) {
+            //     var desiredAngle = getAngleJoystickAngle(driverController, swerve);
+            //     cs.omegaRadiansPerSecond = gotoAngle(
+            //         () -> desiredAngle, swerve
+            //     ).get().omegaRadiansPerSecond;
+            // }
             return cs;
         };
     }
@@ -196,8 +196,8 @@ public final class ChassisSpeedSuppliers {
      * get field relative angle based on controller joysticks and alliance
      */
     public static Rotation2d getAngleJoystickAngle(XboxController driverController, SwerveSubsystem swerve){
-        var rightX = driverController.getRightX();
-        var rightY = driverController.getRightY();
+        var rightX = driverController.getRightX() * -1.0;
+        var rightY = driverController.getRightY() * -1.0;
 
         if (Math.hypot(rightY, rightX) < OI.kAngleStickDeadband) {
             return swerve.getPose().getRotation();
