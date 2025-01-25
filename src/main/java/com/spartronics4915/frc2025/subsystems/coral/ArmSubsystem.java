@@ -16,6 +16,7 @@ import com.spartronics4915.frc2025.Constants.ArmConstants.kArmPIDConstants;
 import com.spartronics4915.frc2025.util.Structures.FeedForwardConstants;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -27,11 +28,14 @@ public class ArmSubsystem extends SubsystemBase {
     private SparkMax mArmMotor;
     private SparkClosedLoopController mArmClosedLoopController;
     private SparkMaxConfig config;
+    private ArmFeedforward mFFCalculator;
 
     private TrapezoidProfile mArmProfile;
 
     private double mCurrentSetPoint = 0.0;
     private State mCurrentState;
+
+    private double velocity;
 
     public ArmSubsystem() {
         
@@ -50,11 +54,8 @@ public class ArmSubsystem extends SubsystemBase {
     
         mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
 
-    }
-
-    private void setVoltage(double volts){
-        mArmMotor.setVoltage(volts);
     }
 
     private double getPosition() {
@@ -68,20 +69,25 @@ public class ArmSubsystem extends SubsystemBase {
         mCurrentState = new State(getPosition(), 0.0);
     }
 
+    private double getVelocity() {
+        double velocity = mArmMotor.getEncoder().getVelocity();
+
+        return velocity;
+    }
+
     @Override
     public void periodic() {
         //need set points as a imput
 
-        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, 0.0));
+        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, velocity));
 
-        // setVoltage (
-        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FeedForwardConstants);
-        // );
+        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(getPosition(), getVelocity()));
     }
     
     private void initClosedLoopController() {
         mArmClosedLoopController = mArmMotor.getClosedLoopController();
     }
+
 
     public void moveToIntake() {
     

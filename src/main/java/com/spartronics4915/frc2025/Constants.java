@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.util.Structures.*;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -106,7 +107,6 @@ public final class Constants {
         public static final double kV = 0.0;
         public static final double kA = 0.0;
 
-        public static final FeedForwardConstants kFF = new FeedForwardConstants(kS, kG, kV, kA);
 
 
     }
