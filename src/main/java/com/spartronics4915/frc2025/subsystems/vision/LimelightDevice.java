@@ -66,6 +66,7 @@ public class LimelightDevice extends SubsystemBase {
         LimelightHelpers.PoseEstimate poseEstimate;
         if (useMegaTag1) {
             poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+            if (poseEstimate == null) return Optional.empty();
             if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) {
                 RawFiducial singleTag = poseEstimate.rawFiducials[0];
                 if (singleTag.ambiguity > 0.7) {
@@ -81,6 +82,7 @@ public class LimelightDevice extends SubsystemBase {
         } else {
             LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
             poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+            if (poseEstimate == null) return Optional.empty();
             if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
                 rejectUpdate = true;
             }
