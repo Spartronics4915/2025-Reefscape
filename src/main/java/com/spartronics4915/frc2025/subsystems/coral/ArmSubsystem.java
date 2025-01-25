@@ -55,7 +55,9 @@ public class ArmSubsystem extends SubsystemBase {
         mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
-
+        
+        mCurrentSetPoint = Rotation2d.fromRotations(
+            MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
     }
 
     private double getPosition() {
@@ -66,7 +68,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private void initArmProfile() {
         mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
-        mCurrentState = new State(getPosition(), 0.0);
+        mCurrentState = new State(getPosition(), velocity);
     }
 
     private double getVelocity() {
@@ -87,7 +89,6 @@ public class ArmSubsystem extends SubsystemBase {
     private void initClosedLoopController() {
         mArmClosedLoopController = mArmMotor.getClosedLoopController();
     }
-
 
     public void moveToIntake() {
     
