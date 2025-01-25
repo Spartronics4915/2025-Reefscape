@@ -12,27 +12,20 @@ public class ClimberSubsystem extends SubsystemBase {
 
     //private SparkMax motorLeft;
     private SparkMax motorRight;
-
-    
-    
     
 
     public enum ClimberState {
-        CAGE(Rotation2d.fromDegrees(0), 7),
-        STOW(Rotation2d.fromDegrees(0), 5),;
-        
+        LIFTED(Rotation2d.fromDegrees(0)),
+        GRAB(Rotation2d.fromDegrees(0)),
+        STOW(Rotation2d.fromDegrees(0)),;
         
         public final Rotation2d angle;
-        public final double claw;
 
-        private ClimberState(Rotation2d angle, double claw) {
+        private ClimberState(Rotation2d angle) {
             this.angle = angle;
-            this.claw = claw;
+            
         }
 
-        public Rotation2d getAngle() {
-            return angle;
-        }
         
 
     }
@@ -41,7 +34,6 @@ public class ClimberSubsystem extends SubsystemBase {
         /*
         SparkMaxConfig Left = new SparkMaxConfig();
         Left.idleMode(IdleMode.kBrake);
-        Left.inverted(true);
         motorLeft = new SparkMax(1, MotorType.kBrushless);
         motorLeft.configure(Left, null, null);
         */
@@ -55,9 +47,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     }
 
-    public void grab () {
-        SparkMaxConfig Right = new SparkMaxConfig();
-        Right.idleMode(IdleMode.kBrake);
+    public void setposition () {
 
     }
 
@@ -75,12 +65,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public double getClimberAngle () {
         return 0.0;
-    }
-
-    public void release () {
-        /*
-        while on cage, to get off the cage (gently)
-        */
     }
 
 }
