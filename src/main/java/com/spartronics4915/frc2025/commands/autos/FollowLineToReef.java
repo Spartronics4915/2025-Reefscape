@@ -10,6 +10,6 @@ public class FollowLineToReef extends SequentialCommandGroup{
     Translation2d approachPoint;
     public FollowLineToReef(SwerveSubsystem swerveSubsystem) {
         
-        addCommands(new DriveToPoseCommand(null, null, null, 0, 0, swerveSubsystem));
+ //       addCommands(new DriveToPoseCommand(null, null, null, 0, 0, swerveSubsystem));
     }
 }

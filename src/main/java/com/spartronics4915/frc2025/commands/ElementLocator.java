@@ -3,6 +3,7 @@ package com.spartronics4915.frc2025.commands;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ElementLocator {
@@ -16,7 +17,7 @@ public class ElementLocator {
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     }
 
-    public Pose2d getLeftReefPoint(int tagID) {
+    public Pose2d getLeftReefPose(int tagID) {
         
         var poseResult = fieldLayout.getTagPose(tagID);
 
@@ -36,7 +37,7 @@ public class ElementLocator {
         var rotatedOffset = pointOffset.rotateBy(reefPoint.getRotation());
         var approachPoint = reefPoint.getTranslation().plus(rotatedOffset);
 
-        return new Pose2d(approachPoint, reefPoint.getRotation());
+        return new Pose2d(approachPoint, reefPoint.getRotation().rotateBy(Rotation2d.k180deg));
 
 
     }

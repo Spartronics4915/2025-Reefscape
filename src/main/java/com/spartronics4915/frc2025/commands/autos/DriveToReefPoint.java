@@ -34,7 +34,7 @@ public class DriveToReefPoint {
             SmartDashboard.putData("Field 2", field);
         }
 
-        reefPoint = elementLocator.getLeftReefPoint(targetTagID);
+        reefPoint = elementLocator.getLeftReefPose(targetTagID);
         approachPoint = elementLocator.getApproachPoint(reefPoint, 1);
     }
 
@@ -43,20 +43,21 @@ public class DriveToReefPoint {
 
         if (RobotBase.isSimulation()) {
             command = command.andThen(() -> {
-                field.getObject("TagPose").setPose(elementLocator.getLeftReefPoint(targetTagID));
+                field.getObject("TagPose").setPose(elementLocator.getLeftReefPose(targetTagID));
                 field.getObject("ApproachPoint").setPose(approachPoint);
                 field.setRobotPose(swerve.getPose());
 
-                System.out.println(elementLocator.getLeftReefPoint(targetTagID));
+                System.out.println(elementLocator.getLeftReefPose(targetTagID));
                 System.out.println(swerve.getPose());
                 System.out.println(approachPoint);
-                
 
             });
         }
-        TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(5, 1);
+
+        TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(10, 6);
+        TrapezoidProfile.Constraints rotationConstraints = new TrapezoidProfile.Constraints(Math.PI, Math.PI);
         command = command.andThen(
-                new DriveToPointCommand(approachPoint.getTranslation(), translationConstraints, 0.4, 0.5, swerve));
+                new DriveToPoseCommand(approachPoint, translationConstraints, rotationConstraints, 0.1, 0.5, swerve));
 
         return command;
 

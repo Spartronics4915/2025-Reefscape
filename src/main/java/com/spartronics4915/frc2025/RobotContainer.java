@@ -144,7 +144,7 @@ public class RobotContainer {
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
         return new LineFollower(swerveSubsystem,
-                elementLocator.getApproachPoint(elementLocator.getLeftReefPoint(11), 1));
+                elementLocator.getLeftReefPose(11), 0.5);
     }
 
     private SendableChooser<Command> buildAutoChooser() {

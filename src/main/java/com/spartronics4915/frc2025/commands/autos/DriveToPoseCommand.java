@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -27,6 +29,9 @@ public class DriveToPoseCommand extends Command {
     private final double minimumSpeed;
 
     private Supplier<Pose2d> poseSupplier;
+
+        private Field2d field;
+
     /*
      * Command that uses a trapezoidal profile to drive to a point in a smooth
      * fashion.
@@ -45,6 +50,7 @@ public class DriveToPoseCommand extends Command {
 
         poseSupplier = null;
         velocitySetpoint = 0;
+        rotationVelocitySetpoint = 0;
         nearGoal = false;
 
         addRequirements(swerve);
@@ -63,6 +69,7 @@ public class DriveToPoseCommand extends Command {
 
         poseSupplier = targetPoseSupplier;
         velocitySetpoint = 0;
+        rotationVelocitySetpoint = 0;
         nearGoal = false;
 
         addRequirements(swerve);
@@ -72,7 +79,15 @@ public class DriveToPoseCommand extends Command {
     @Override
     public void initialize() {
 
+
+
         velocitySetpoint = 0;
+        rotationVelocitySetpoint = 0;
+
+        field = new Field2d();
+        SmartDashboard.putData("LineFollower", field);
+        field.getObject("ClosestPoint").setPose(targetPose);
+
         nearGoal = false;
         if(targetPose == null) {
             targetPose = poseSupplier.get();
@@ -110,7 +125,9 @@ public class DriveToPoseCommand extends Command {
 
         Rotation2d rotationRemaining = targetPose.getRotation().minus(currPose.getRotation());
         goalState = new State(rotationRemaining.getRadians(), 0);
-        currentState = new State()
+        currentState = new State(0, rotationVelocitySetpoint);
+
+       State rotationOutputState = rotationProfile.calculate(dT, currentState, goalState);
 
         if(driveVelocity < minimumSpeed) {
             driveVelocity = minimumSpeed;
@@ -120,11 +137,14 @@ public class DriveToPoseCommand extends Command {
                 .times(driveVelocity);
 
         ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(driveTranslation.getX(),
-                driveTranslation.getY(), 0);
+                driveTranslation.getY(), rotationOutputState.velocity);
 
         swerve.driveFieldOriented(newChassisSpeeds);
         velocitySetpoint = outputState.velocity;
-    }
+        rotationVelocitySetpoint = rotationOutputState.velocity;
+
+        field.setRobotPose(currPose);
+    }   
 
     @Override
     public boolean isFinished() {
