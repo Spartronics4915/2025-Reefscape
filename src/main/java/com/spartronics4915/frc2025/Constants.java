@@ -131,6 +131,10 @@ public final class Constants {
         public enum LimelightRole {
             NOTHING, REEF, STATION, OBSERVER
         }
+
+        public enum PoseEstimationMethod {
+            MEGATAG_1, MEGATAG_2
+        }
     }
 
     public static final class OdometryConstants {

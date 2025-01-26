@@ -33,19 +33,19 @@ public class OdometrySubsystem extends SubsystemBase {
         }
     }
 
-    public Optional<Matrix<N3, N1>> getVisionStdDevs(VisionMeasurement measurement) {
-        double sigmaX = 0.0;
-        double sigmaY = 0.0;
-        double sigmaTheta = 9999999;
-        if (measurement.isMegaTag1()) {
-            sigmaX = 0.5;
-            sigmaY = 0.5;
-        } else {
-            sigmaX = 0.7;
-            sigmaY = 0.7;
-        }
-        return Optional.of(VecBuilder.fill(sigmaX, sigmaY, sigmaTheta));
-    }
+    // public Optional<Matrix<N3, N1>> getVisionStdDevs(VisionMeasurement measurement) {
+    //     double sigmaX = 0.0;
+    //     double sigmaY = 0.0;
+    //     double sigmaTheta = 9999999;
+    //     if (measurement.isMegaTag1()) {
+    //         sigmaX = 0.5;
+    //         sigmaY = 0.5;
+    //     } else {
+    //         sigmaX = 0.7;
+    //         sigmaY = 0.7;
+    //     }
+    //     return Optional.of(VecBuilder.fill(sigmaX, sigmaY, sigmaTheta));
+    // }
 
     private Optional<Pose2d> getVisionPose() {
         if (Robot.isSimulation()) {
@@ -76,13 +76,13 @@ public class OdometrySubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updateVisionMeasurements();
-        visionMeasurements.forEach((measurement) -> {
-            Optional<Matrix<N3, N1>> potentialStdDevs = getVisionStdDevs(measurement);
-            if (potentialStdDevs.isPresent()) {
-                Matrix<N3, N1> stdDevs = potentialStdDevs.get();
-                swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), stdDevs);
-            }
-        });
+        // updateVisionMeasurements();
+        // visionMeasurements.forEach((measurement) -> {
+        //     Optional<Matrix<N3, N1>> potentialStdDevs = getVisionStdDevs(measurement);
+        //     if (potentialStdDevs.isPresent()) {
+        //         Matrix<N3, N1> stdDevs = potentialStdDevs.get();
+        //         swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), stdDevs);
+        //     }
+        // });
     }
 }

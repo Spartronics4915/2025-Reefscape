@@ -102,6 +102,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
 
     @Override
     public void periodic() {
+        getVisionMeasurements().forEach((measurement) -> {
+            swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
+        });
+
         visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 

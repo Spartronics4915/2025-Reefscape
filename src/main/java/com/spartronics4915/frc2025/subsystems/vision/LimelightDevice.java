@@ -6,13 +6,17 @@ import java.util.Optional;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
+import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
 import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.LimelightHelpers.RawFiducial;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,54 +58,71 @@ public class LimelightDevice extends SubsystemBase {
         return LimelightHelpers.getTV(name);
     }
 
+    /**
+     * Defaults to MegaTag2. Call <code>getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_1)</code> to use MegaTag1.
+     */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
-        return getVisionMeasurement(swerve, false);
+        return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_2);
     }
 
-    public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, boolean useMegaTag1) {
+    public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, PoseEstimationMethod method) {
         if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
             return Optional.empty();
         }
-        boolean rejectUpdate = false;
         LimelightHelpers.PoseEstimate poseEstimate;
-        if (useMegaTag1) {
-            poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-            if (poseEstimate == null) return Optional.empty();
-            if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) {
-                RawFiducial singleTag = poseEstimate.rawFiducials[0];
-                if (singleTag.ambiguity > 0.7) {
-                    rejectUpdate = true;
+        Optional<Matrix<N3, N1>> stdDevs;
+        switch (method) {
+            case MEGATAG_1:
+                poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+                stdDevs = calculateStdDevsMegaTag1(poseEstimate);
+                // if (poseEstimate == null) return Optional.empty();
+                // if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) {
+                //     RawFiducial singleTag = poseEstimate.rawFiducials[0];
+                //     if (singleTag.ambiguity > 0.7) {
+                //         rejectUpdate = true;
+                //     }
+                //     if (singleTag.distToCamera > 3) {
+                //         rejectUpdate = true;
+                //     }
+                // }
+                // if (poseEstimate.tagCount == 0) {
+                //     rejectUpdate = true;
+                // }
+                break;
+            case MEGATAG_2:
+                LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
+                poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+                if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
+                    stdDevs = Optional.empty();
+                } else {
+                    stdDevs = calculateStdDevsMegaTag2(poseEstimate);
                 }
-                if (singleTag.distToCamera > 3) {
-                    rejectUpdate = true;
-                }
-            }
-            if (poseEstimate.tagCount == 0) {
-                rejectUpdate = true;
-            }
-        } else {
-            LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
-            poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-            if (poseEstimate == null) return Optional.empty();
-            if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
-                rejectUpdate = true;
-            }
-            if (poseEstimate.tagCount == 0) {
-                rejectUpdate = true;
-            }
+                // if (poseEstimate == null) return Optional.empty();
+                // if (poseEstimate.tagCount == 0) {
+                //     rejectUpdate = true;
+                // }
+                break;
+            default:
+                System.out.println("Unknown pose estimation method provided: " + method);
+                return Optional.empty();
         }
-        if (rejectUpdate) {
+        if (stdDevs.isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(new VisionMeasurement(
                 poseEstimate.pose,
                 poseEstimate.timestampSeconds,
-                poseEstimate.tagCount,
-                poseEstimate.avgTagDist,
-                useMegaTag1,
-                role
+                stdDevs.get()
                 ));
         }
+    }
+
+    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate) {
+        return null;
+    }
+
+    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag2(LimelightHelpers.PoseEstimate poseEstimate) {
+        return null;
     }
 
     public Optional<Pose2d> getPose2d() {
