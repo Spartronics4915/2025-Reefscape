@@ -25,14 +25,36 @@ import swervelib.SwerveDrive;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
     private final ArrayList<LimelightDevice> limelights;
+
+    private LimelightDevice reefLL;
+    private LimelightDevice stationLL;
+    private LimelightDevice observerLL;
+
     private final SwerveSubsystem swerveSubsystem;
     //private final StructArrayPublisher<Pose3d> visionTargetPublisher;
     private final AprilTagFieldLayout fieldLayout;
 
     public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem, AprilTagFieldLayout fieldLayout) {
-        limelights = new ArrayList<LimelightDevice>();
-        for (LimelightConstants limelight : VisionConstants.kLimelights) {
-            limelights.add(new LimelightDevice(limelight));
+        limelights = new ArrayList<>();
+        for (LimelightConstants config : VisionConstants.kLimelights) {
+            LimelightDevice limelight = new LimelightDevice(config);
+            limelights.add(limelight);
+            switch(config.role()) {
+                case REEF:
+                    reefLL = limelight;
+                    System.out.println("Setting reef limelight to " + config.id());
+                    break;
+                case STATION:
+                    stationLL = limelight;
+                    System.out.println("Setting station limelight to " + config.id());
+                    break;
+                case OBSERVER:
+                    observerLL = limelight;
+                    System.out.println("Setting observer limelight to " + config.id());
+                    break;
+                default:
+                System.out.println("Not setting " + config.id() + " to anything");
+            }
         }
 
         this.fieldLayout = fieldLayout;
@@ -93,8 +115,6 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
-        LimelightDevice reef = getLimelightFromRole(LimelightRole.REEF);
-        if (reef != null) return reef.getPose2d();
-        return Optional.empty();
+        return reefLL.getPose2d();
     }
 }

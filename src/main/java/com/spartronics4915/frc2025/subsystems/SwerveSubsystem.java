@@ -2,15 +2,14 @@ package com.spartronics4915.frc2025.subsystems;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import com.spartronics4915.frc2025.Constants.Drive;
+import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -20,18 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
-import swervelib.motors.SparkMaxSwerve;
 import swervelib.parser.SwerveParser;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.revrobotics.spark.SparkMax;
-import com.spartronics4915.frc2025.Constants.Drive;
-import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
-import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
-
-
-import static edu.wpi.first.units.Units.Meter;
 
 public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
@@ -41,9 +29,13 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory))
-                    .createSwerveDrive(Drive.kMaxSpeed,
-                            guessStartingPosition());
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed//,
+            // new Pose2d(new Translation2d(Meter.of(2),
+            //     Meter.of(5)),
+            //     Rotation2d.fromDegrees(180)
+            // )
+            );
+            guessStartingPosition();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

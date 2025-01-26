@@ -84,15 +84,14 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
+        mechanismSim = new MotorSimulationSubsystem();
+        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); //TODO add any subsystems that extend ModeSwitchInterface
+
         if (RobotBase.isSimulation()) {
-            mechanismSim = new MotorSimulationSubsystem();
             visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
         } else {
-            mechanismSim = null;
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
         }
-
-        ModeSwitchHandler.EnableModeSwitchHandler(); // TODO add any subsystems that extend ModeSwitchInterface
 
         // Configure the trigger bindings
         configureBindings();
@@ -127,11 +126,10 @@ public class RobotContainer {
         // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
 
         swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(),
-                        swerveSubsystem),
-                ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false,
-                        swerveSubsystem),
-                swerveSubsystem));
+            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
+            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem),
+            swerveSubsystem
+        ));
     }
 
     /**
@@ -143,8 +141,8 @@ public class RobotContainer {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        return new LineFollower(swerveSubsystem,
-                elementLocator.getLeftReefPose(11), 0.5);
+        return autoChooser.getSelected();
+
     }
 
     private SendableChooser<Command> buildAutoChooser() {
@@ -152,6 +150,7 @@ public class RobotContainer {
 
         chooser.setDefaultOption("None", Commands.none());
         chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
+        chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
