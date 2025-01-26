@@ -76,6 +76,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         return measurements;
     }
 
+    public boolean canSeeTags() {
+        return reefLL.getTv() || stationLL.getTv();
+    }
+
     public ArrayList<Integer> getVisibleTagIDs() {
         Set<Integer> set = new HashSet<>();
         limelights.forEach((limelight) -> {
@@ -111,5 +115,17 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
         return reefLL.getPose2d();
+    }
+
+    public LimelightDevice getReefLimelight() {
+        return reefLL;
+    }
+
+    public LimelightDevice getStationLimelight() {
+        return stationLL;
+    }
+
+    public LimelightDevice getObserverLimelight() {
+        return observerLL;
     }
 }
