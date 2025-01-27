@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "print"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "reef loop no turning"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "print"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R-L coral marks"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "reef loop with turning"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "print"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "debug",
+  "choreoAuto": false
+}

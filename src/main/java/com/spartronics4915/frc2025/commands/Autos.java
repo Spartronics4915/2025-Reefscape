@@ -6,6 +6,7 @@ package com.spartronics4915.frc2025.commands;
 
 import com.spartronics4915.frc2025.commands.autos.DriveToPointCommand;
 import com.spartronics4915.frc2025.commands.drive.AimDriveToTargetWIthTimeout;
+import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,9 +28,8 @@ public final class Autos {
         return new AimDriveToTargetWIthTimeout(detector, swerve, 4, 0.5, 180).andThen(swerve.stopChassisCommand());
     }
 
-    public static Command reverseForSeconds(SwerveSubsystem swerve, double seconds) {
-        return Commands.run(() -> swerve.drive(new ChassisSpeeds(-0.25, 0, 0)), swerve).withTimeout(seconds)
-                .andThen(swerve.stopChassisCommand());
+    public static Command reverseForSeconds(SwerveSubsystem swerve, double seconds){
+        return Commands.run(() -> swerve.driveFieldOriented(new ChassisSpeeds(ChassisSpeedSuppliers.shouldFlip() ? 1 : -1,0,0)), swerve).withTimeout(seconds);
     }
 
 }
