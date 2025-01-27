@@ -172,7 +172,10 @@ public class RobotContainer {
         
         driverController.leftTrigger()
             .whileTrue(
-                Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
+                Commands.parallel(
+                    Commands.run(swerveSubsystem::lockModules, swerveSubsystem),
+                    RumbleFeedbackHandler.getRumbleCommand(new RumbleFeedback(RumbleType.kLeftRumble, 0.05), ControlRumblers.DRIVER.rumbler)
+                )
             );
 
 
