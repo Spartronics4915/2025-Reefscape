@@ -81,16 +81,12 @@ public class LimelightDevice extends SubsystemBase {
         switch (method) {
             case MEGATAG_1:
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-                stdDevs = calculateStdDevsMegaTag1(poseEstimate);
+                stdDevs = calculateStdDevsMegaTag1(poseEstimate, swerve);
                 break;
             case MEGATAG_2:
                 LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-                if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) {
-                    stdDevs = Optional.empty(); //special case: don't trust if turning too fast
-                } else {
-                    stdDevs = calculateStdDevsMegaTag2(poseEstimate);
-                }
+                stdDevs = calculateStdDevsMegaTag2(poseEstimate, swerve);
                 break;
             default:
                 System.out.println("Unknown pose estimation method provided: " + method);
@@ -107,7 +103,7 @@ public class LimelightDevice extends SubsystemBase {
         }
     }
 
-    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate) {
+    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate, SwerveSubsystem swerve) {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
         double transStdDev = 0.6; //not very trustworthy to start
         
@@ -135,14 +131,16 @@ public class LimelightDevice extends SubsystemBase {
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }
 
-    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag2(LimelightHelpers.PoseEstimate poseEstimate) {
+    private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag2(LimelightHelpers.PoseEstimate poseEstimate, SwerveSubsystem swerve) {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
+        if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) 
+            return Optional.empty(); //don't trust if turning too fast
+        
         double transStdDev = 0.4; //trustworthy to start
 
         if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
-
-        if (poseEstimate.tagCount > 1) transStdDev -= 0.1; //trust slightly more if multiple tags seen
         transStdDev += poseEstimate.avgTagDist * 0.1; //trust less and less the further away the tags are
+        if (poseEstimate.tagCount > 1) transStdDev -= 0.1; //trust slightly more if multiple tags seen
 
         double rotStdDev = Double.MAX_VALUE; //never trust rotation under any circumstances
 
