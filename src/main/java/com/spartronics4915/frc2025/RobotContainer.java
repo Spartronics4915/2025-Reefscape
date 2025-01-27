@@ -4,26 +4,50 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
+import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
+import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
+import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
+import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
+import com.spartronics4915.frc2025.subsystems.Bling.BlingSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.NoteLocatorSim;
+import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.ejml.data.ElementLocation;
+import org.json.simple.parser.ParseException;
+
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -40,35 +64,55 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = SwerveSubsystem.getInstance();
+    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
-    private static final CommandXboxController operatorController = new CommandXboxController(OI.kOperatorControllerPort);
-    
+    private static final CommandXboxController operatorController = new CommandXboxController(
+            OI.kOperatorControllerPort);
+
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
-    public final MotorSimulationSubsystem mechanismSim;
+    private final ElementLocator elementLocator = new ElementLocator();
+    private final VisionDeviceSubystem visionSubsystem;
+    private final OdometrySubsystem odometrySubsystem;
 
-    public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController);
+    // ******** Simulation entries
+    public final MotorSimulationSubsystem mechanismSim;
+    // ********
+
+    public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
+    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
+
     private final SendableChooser<Command> autoChooser;
+
     /**
-    * The container for the robot. Contains subsystems, OI devices, and commands.
-    */
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
     public RobotContainer() {
 
         mechanismSim = new MotorSimulationSubsystem();
-        ModeSwitchHandler.EnableModeSwitchHandler(); //TODO add any subsystems that extend ModeSwitchInterface
+        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); //TODO add any subsystems that extend ModeSwitchInterface
+
+        if (RobotBase.isSimulation()) {
+            visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
+        } else {
+            visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
+        }
+
+        odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
         // Configure the trigger bindings
         configureBindings();
 
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
-        autoChooser = buildAutoChooser();
-        
+        autoChooser =
+
+                buildAutoChooser();
+
     }
 
     /**
@@ -87,12 +131,45 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        // swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController));
+        swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController, swerveSubsystem));
 
-        swerveSubsystem.setDefaultCommand(new RotationIndependentControlCommand(
-            ChassisSpeedSuppliers.computeRotationalVelocityFromController(driverController.getHID(), swerveSubsystem),
-            ChassisSpeedSuppliers.computeVelocitiesFromController(driverController.getHID(), false, swerveSubsystem)
-        ));
+
+        //switch field and robot relative
+        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
+                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
+            );}
+        ,Set.of()));
+
+        driverController.b().onTrue(
+            Commands.defer(() -> {
+                return Commands.runOnce(() -> {
+                    swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+                });
+            }, Set.of())
+        );
+
+        driverController.leftStick().onTrue(Commands.runOnce(() -> {
+            swerveTeleopCommand.resetHeadingOffset();
+        }));
+        
+        driverController.leftTrigger()
+            .whileTrue(
+                Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
+            );
+
+
+        //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
+        driverController.rightTrigger().whileTrue(
+            new RotationIndependentControlCommand(
+                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), 
+                    shouldFlip() ? new Translation2d(13.073, 4): new Translation2d(4.5, 4)
+                ), swerveSubsystem),
+                ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
+                swerveSubsystem
+            )
+        );
+
+        swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }
 
     /**
@@ -103,6 +180,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
+        // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
         return autoChooser.getSelected();
 
     }
@@ -110,15 +188,31 @@ public class RobotContainer {
     private SendableChooser<Command> buildAutoChooser() {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
+        NamedCommands.registerCommand("print", Commands.print("ping"));
+
         chooser.setDefaultOption("None", Commands.none());
+        chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
+        chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
+        chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
+        chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
+        chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
+        chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
     }
 
-    public static CommandXboxController getDriveController(){return driverController;}
-    public static CommandXboxController getOperatorController(){return operatorController;}
-    public static CommandXboxController getDebugController(){return debugController;}
+    public static CommandXboxController getDriveController() {
+        return driverController;
+    }
 
-    
+    public static CommandXboxController getOperatorController() {
+        return operatorController;
+    }
+
+    public static CommandXboxController getDebugController() {
+        return debugController;
+    }
+
 }
