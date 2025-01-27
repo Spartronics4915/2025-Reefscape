@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.Constants.Drive.AutoConstants;
 import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -51,6 +52,9 @@ public final class Constants {
 
 
         public static final double kStickDeadband = 0.05;
+        public static final double kAngleStickDeadband = 0.25;
+        public static final boolean kStartFieldRel = true;
+
 
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
@@ -85,7 +89,7 @@ public final class Constants {
                     Kilogram.of(10), 
                     KilogramSquareMeters.of(1.9387211145),
                     new ModuleConfig(
-                        Inches.of(2),
+                        Inches.of(3.75/2.0),
                         MetersPerSecond.of(5),
                         1.00, //CHECKUP guess
                         DCMotor.getNEO(1),
@@ -110,7 +114,7 @@ public final class Constants {
     }
 
     public static final class DriveCommandConstants {
-        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(16, 0, 0, 0);
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.0, 0);
     }
 
     public static final class VisionConstants {
