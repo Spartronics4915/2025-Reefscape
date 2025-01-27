@@ -10,17 +10,14 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
-import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -106,7 +103,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         }
         else {
 
-            return new Pose2d(16.3,4, Rotation2d.fromDegrees(0.0));
+            return new Pose2d(16.3,4, Rotation2d.fromDegrees(180.0));
 
         }
 
@@ -143,6 +140,10 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public SwerveDrive getInternalSwerve() {
         return swerveDrive;
+    }
+
+    public void lockModules(){
+        swerveDrive.lockPose();
     }
 
     public Rotation2d getHeading() {
