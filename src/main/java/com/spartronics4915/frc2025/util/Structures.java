@@ -47,7 +47,10 @@ public final class Structures {
     public static record VisionMeasurement(
         Pose2d pose,
         double timestamp,
-        Matrix<N3, N1> stdDevs
+        Matrix<N3, N1> stdDevs,
+        String diagName,
+        int diagTagCount,
+        double diagTagDistance
     ) {}
 
 

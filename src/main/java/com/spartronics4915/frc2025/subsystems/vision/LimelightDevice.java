@@ -128,14 +128,20 @@ public class LimelightDevice extends SubsystemBase {
             return Optional.of(new VisionMeasurement(
                 poseEstimate.pose,
                 poseEstimate.timestampSeconds,
-                stdDevs.get()
+                stdDevs.get(),
+                name,
+                poseEstimate.tagCount,
+                poseEstimate.avgTagDist
                 ));
         }
     }
 
     private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate, SwerveSubsystem swerve) {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
-        double transStdDev = 0.6; //not very trustworthy to start
+        final boolean START_OF_AUTO = DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3);
+        double transStdDev = 0.5; //not very trustworthy to start
+
+        if (START_OF_AUTO) transStdDev -= 0.2; //trust more at the start of auto to get an initial pose
         
         if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) { //single tag
             transStdDev += 0.2; //trust less if single tag
@@ -150,13 +156,14 @@ public class LimelightDevice extends SubsystemBase {
                                             .max(Double::compare)
                                             .get();
             if (poseEstimate.tagCount > 2) transStdDev -= 0.2; //trust more if more than two tags
-            if (furthestDistance > 7) transStdDev += 0.4; //trust less if at least one tag is very far
+            if (furthestDistance > 7) transStdDev += 0.6; //trust less if at least one tag is very far
             if (poseEstimate.avgTagDist < 3) transStdDev -= 0.2; //trust more if tags tend to be close
         }
 
-        double rotStdDev = (DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3))
-                           ? 0.3 //trust a lot if start of auto
-                           : Double.MAX_VALUE; //otherwise don't trust at all
+        transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
+
+        double rotStdDev = (START_OF_AUTO) ? 0.3 //trust a lot if start of auto
+                                           : Double.MAX_VALUE; //otherwise don't trust at all
 
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }
@@ -166,11 +173,13 @@ public class LimelightDevice extends SubsystemBase {
         if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) 
             return Optional.empty(); //don't trust if turning too fast
         
-        double transStdDev = 0.4; //trustworthy to start
+        double transStdDev = 0.1; //very trustworthy to start
 
         if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
-        transStdDev += poseEstimate.avgTagDist * 0.1; //trust less and less the further away the tags are
-        if (poseEstimate.tagCount > 1) transStdDev -= 0.1; //trust slightly more if multiple tags seen
+        transStdDev += poseEstimate.avgTagDist * 0.075; //trust less and less the further away the tags are
+        if (poseEstimate.tagCount > 1) transStdDev -= 0.15; //trust slightly more if multiple tags seen
+
+        transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
         double rotStdDev = Double.MAX_VALUE; //never trust rotation under any circumstances
 

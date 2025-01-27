@@ -1,7 +1,6 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -13,14 +12,15 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem, ModeSwitchInterface {
@@ -39,7 +39,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         for (LimelightConstants config : VisionConstants.kLimelights) {
             LimelightDevice limelight = new LimelightDevice(config);
             limelights.add(limelight);
-            switch(config.role()) {
+            boolean diagnosticsNeeded = VisionConstants.kVisionMeasurementDiagnostics;
+            switch (config.role()) {
                 case REEF:
                     reefLL = limelight;
                     System.out.println("Setting reef limelight to " + config.id());
@@ -50,10 +51,17 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                     break;
                 case OBSERVER:
                     observerLL = limelight;
+                    diagnosticsNeeded = false;
                     System.out.println("Setting observer limelight to " + config.id());
                     break;
                 default:
-                System.out.println("Not setting " + config.id() + " to anything");
+                    diagnosticsNeeded = false;
+                    System.out.println("Not setting " + config.id() + " to anything");
+            }
+            if (diagnosticsNeeded) {
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/stddev", -1);
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/count", -1);
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/distance", -1);
             }
         }
 
@@ -118,6 +126,11 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     @Override
     public void periodic() {
         getVisionMeasurements().forEach((measurement) -> {
+            if (VisionConstants.kVisionMeasurementDiagnostics) {
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
+            }
             swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
         });
 
