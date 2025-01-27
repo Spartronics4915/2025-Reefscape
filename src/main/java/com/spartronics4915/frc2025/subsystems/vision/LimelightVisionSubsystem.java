@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
@@ -18,10 +19,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
+public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem, ModeSwitchInterface {
     private final ArrayList<LimelightDevice> limelights;
 
     private LimelightDevice reefLL;
@@ -55,6 +57,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
             }
         }
 
+        updateTagFilters();
+
         this.fieldLayout = fieldLayout;
         this.swerveSubsystem = swerveSubsystem;
 
@@ -63,6 +67,13 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                 Pose3d.struct);
         visionTargetPublisher = visionTargetTopic.publish();
         Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
+    }
+
+    private void updateTagFilters() {
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        limelights.forEach(limelight -> {
+            limelight.setTagFilter(alliance);
+        });
     }
 
     public ArrayList<VisionMeasurement> getVisionMeasurements() {
@@ -111,6 +122,11 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         });
 
         visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
+    }
+
+    @Override
+    public void onModeSwitch() {
+        updateTagFilters();
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {

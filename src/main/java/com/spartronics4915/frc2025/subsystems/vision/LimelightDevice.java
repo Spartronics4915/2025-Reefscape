@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.Constants.VisionConstants.AprilTagRegion;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
 import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
@@ -31,6 +32,7 @@ public class LimelightDevice extends SubsystemBase {
     private final LimelightModel model;
     private final int id;
     private final LimelightRole role;
+    private int[] tagFilter = new int[]{};
 
     public LimelightDevice(LimelightConstants constants) {
         this.name = "limelight-" + constants.name();
@@ -43,6 +45,32 @@ public class LimelightDevice extends SubsystemBase {
         // ports are forwarded to http://roborio-4915-FRC.local and are accessed while tethered to the roborio over USB
         for (int port = 5800; port <= 5809; port++) {
             PortForwarder.add(port + portOffset, name + ".local", port); 
+        }
+    }
+
+    public void setTagFilter(Optional<DriverStation.Alliance> alliance) {
+        AprilTagRegion region;
+        switch (role) {
+            case REEF:
+                region = AprilTagRegion.REEF;
+                break;
+            case STATION:
+                region = AprilTagRegion.STATION;
+                break;
+            default:
+                region = AprilTagRegion.EMPTY;
+        }
+
+        if (alliance.isEmpty()) tagFilter = region.both();
+        else {
+            switch (alliance.get()) {
+                case Red:
+                    tagFilter = region.red();
+                    break;
+                case Blue:
+                    tagFilter = region.blue();
+                    break;
+            }
         }
     }
 
@@ -80,10 +108,12 @@ public class LimelightDevice extends SubsystemBase {
         Optional<Matrix<N3, N1>> stdDevs;
         switch (method) {
             case MEGATAG_1:
+                LimelightHelpers.SetFiducialIDFiltersOverride(name, new int[]{});
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
                 stdDevs = calculateStdDevsMegaTag1(poseEstimate, swerve);
                 break;
             case MEGATAG_2:
+                LimelightHelpers.SetFiducialIDFiltersOverride(name, tagFilter);
                 LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
                 stdDevs = calculateStdDevsMegaTag2(poseEstimate, swerve);

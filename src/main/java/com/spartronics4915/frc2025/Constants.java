@@ -135,6 +135,31 @@ public final class Constants {
         public enum PoseEstimationMethod {
             MEGATAG_1, MEGATAG_2
         }
+
+        public enum AprilTagRegion {
+            STATION(new int[]{1, 2}, new int[]{12, 13}),
+            PROCESSOR(new int[]{3}, new int[]{16}),
+            BARGE(new int[]{4, 5}, new int[]{14, 15}),
+            REEF(new int[]{6, 7, 8, 9, 10, 11}, new int[]{17, 18, 19, 20, 21, 22}),
+            EMPTY(new int[]{}, new int[]{});
+
+            public final int[] red;
+            public final int[] blue;
+
+            private AprilTagRegion(int[] red, int[] blue) {
+                this.red = red;
+                this.blue = blue;
+            }
+
+            public int[] red(){return red;}
+            public int[] blue(){return blue;}
+            public int[] both() {
+                int[] both = new int[red.length + blue.length];
+                System.arraycopy(red, 0, both, 0, red.length);
+                System.arraycopy(blue, 0, both, red.length, blue.length);
+                return both;
+            }
+        }
     }
 
     public static final class OdometryConstants {
