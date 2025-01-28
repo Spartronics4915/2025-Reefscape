@@ -16,7 +16,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public enum ClimberState {
         LIFTED(Rotation2d.fromDegrees(0)),
-        GRAB(Rotation2d.fromDegrees(0)),
         STOW(Rotation2d.fromDegrees(0)),;
         
         public final Rotation2d angle;
