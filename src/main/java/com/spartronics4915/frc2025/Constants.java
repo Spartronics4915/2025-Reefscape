@@ -201,8 +201,8 @@ public final class Constants {
         public static final double kV = 0.0;
         public static final double kA = 0.0;
 
-        public static final double kMinAngle = 0.0;
-        public static final double kMaxAngle = 0.0;
+        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(0);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(0);
 
 
 

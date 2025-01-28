@@ -56,8 +56,16 @@ public class ArmSubsystem extends SubsystemBase {
 
         mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
         
-        mCurrentSetPoint = Rotation2d.fromRotations(
-            MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
+    }
+
+    private Rotation2d mConvertRaw(double rotation) {
+        Rotation2d angle = Rotation2d.fromDegrees(rotation);
+        return angle;
+    }
+
+    private double mAngleToRaw(Rotation2d angle) {
+        double rotation = angle.getRotations();
+        return rotation;
     }
 
     private double getPosition() {
@@ -80,10 +88,13 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         //need set points as a imput
+        mCurrentSetPoint = Rotation2d.fromRotations(
+            MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
 
-        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State(mCurrentSetPoint, velocity));
+        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((mCurrentSetPoint), velocity));
 
         mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(getPosition(), getVelocity()));
+
     }
     
     private void initClosedLoopController() {
@@ -94,7 +105,11 @@ public class ArmSubsystem extends SubsystemBase {
     
     }
 
-    public void moveToScore() {
+    public void moveToLowScore() {
+
+    }
+
+    public void moveToHighScore() {
 
     }
 
