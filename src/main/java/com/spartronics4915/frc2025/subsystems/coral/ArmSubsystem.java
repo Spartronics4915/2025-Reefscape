@@ -1,6 +1,5 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
-import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,8 +11,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
-import com.spartronics4915.frc2025.Constants.ArmConstants.kArmPIDConstants;
-import com.spartronics4915.frc2025.util.Structures.FeedForwardConstants;
+import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -21,6 +20,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
 
 
 public class ArmSubsystem extends SubsystemBase { 
@@ -32,7 +33,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private TrapezoidProfile mArmProfile;
 
-    private double mCurrentSetPoint = 0.0;
+    private Rotation2d mCurrentSetPoint = Rotation2d.fromRotations(0);;
     private State mCurrentState;
 
     private double velocity;
@@ -87,11 +88,12 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        
         //need set points as a imput
         mCurrentSetPoint = Rotation2d.fromRotations(
             MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
 
-        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((mCurrentSetPoint), velocity));
+        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((mAngleToRaw(mCurrentSetPoint)), velocity));
 
         mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(getPosition(), getVelocity()));
 
@@ -101,19 +103,19 @@ public class ArmSubsystem extends SubsystemBase {
         mArmClosedLoopController = mArmMotor.getClosedLoopController();
     }
 
-    public void moveToIntake() {
-    
+    public void setSetpoint(Rotation2d newSetpoint){
+        mCurrentSetPoint = newSetpoint;
     }
 
-    public void moveToLowScore() {
-
+    public void setSetpoint(ArmSubsystemState newState) {
+        setSetpoint(newState.angle);
     }
 
-    public void moveToHighScore() {
-
+    public void setReference() {
+        
     }
 
-    public void moveToStow() {
-
+    public void incrementAngle(Rotation2d delta){
+        mCurrentSetPoint = mCurrentSetPoint.plus(delta);
     }
 }
