@@ -94,7 +94,8 @@ public class LimelightDevice extends SubsystemBase {
      * Use MegaTag1 if it's within the first three seconds of auto, otherwise use MegaTag2
      */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
-        if (DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3)) {
+        final boolean START_OF_AUTO = DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3);
+        if (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override()) {
             return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_1);
         }
         return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_2);
@@ -162,8 +163,9 @@ public class LimelightDevice extends SubsystemBase {
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
-        double rotStdDev = (START_OF_AUTO) ? 0.3 //trust a lot if start of auto
-                                           : Double.MAX_VALUE; //otherwise don't trust at all
+        double rotStdDev = (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override())
+                           ? 0.3 //trust a lot if start of auto
+                           : Double.MAX_VALUE; //otherwise don't trust at all
 
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }

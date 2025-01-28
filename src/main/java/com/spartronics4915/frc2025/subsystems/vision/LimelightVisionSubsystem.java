@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem, ModeSwitchInterface {
     private final ArrayList<LimelightDevice> limelights;
+    private static boolean mt1Override = false;
 
     private LimelightDevice reefLL;
     private LimelightDevice stationLL;
@@ -140,6 +141,14 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     @Override
     public void onModeSwitch() {
         updateTagFilters();
+    }
+
+    public static boolean getMegaTag1Override() {
+        return mt1Override;
+    }
+
+    public static void setMegaTag1Override(boolean b) {
+        mt1Override = b;
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
