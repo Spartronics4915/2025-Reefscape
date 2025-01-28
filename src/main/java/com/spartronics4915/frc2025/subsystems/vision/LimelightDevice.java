@@ -52,6 +52,9 @@ public class LimelightDevice extends SubsystemBase {
         AprilTagRegion region;
         switch (role) {
             case REEF:
+                region = AprilTagRegion.REEF.and(AprilTagRegion.PROCESSOR);
+                break;
+            case REEF_CLOSE:
                 region = AprilTagRegion.REEF;
                 break;
             case STATION:
@@ -102,9 +105,7 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, PoseEstimationMethod method) {
-        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
-            return Optional.empty();
-        }
+        if (role == LimelightRole.NOTHING) return Optional.empty();
         LimelightHelpers.PoseEstimate poseEstimate;
         Optional<Matrix<N3, N1>> stdDevs;
         switch (method) {
@@ -197,9 +198,7 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public ArrayList<Integer> getVisibleTags() {
-        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
-            return new ArrayList<Integer>();
-        }
+        if (role == LimelightRole.NOTHING) return new ArrayList<Integer>();
         RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(name);
         ArrayList<Integer> visibleTags = new ArrayList<>();
         for (RawFiducial raw : fiducials) {

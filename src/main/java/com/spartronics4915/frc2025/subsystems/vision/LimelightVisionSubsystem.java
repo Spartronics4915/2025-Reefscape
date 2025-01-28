@@ -28,8 +28,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     private static boolean mt1Override = false;
 
     private LimelightDevice reefLL;
+    private LimelightDevice closeLL;
     private LimelightDevice stationLL;
-    private LimelightDevice observerLL;
 
     private final SwerveSubsystem swerveSubsystem;
     private final StructArrayPublisher<Pose3d> visionTargetPublisher;
@@ -46,23 +46,22 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                     reefLL = limelight;
                     System.out.println("Setting reef limelight to " + config.id());
                     break;
+                case REEF_CLOSE:
+                    closeLL = limelight;
+                    System.out.println("Setting reef close limelight to " + config.id());
+                    break;
                 case STATION:
                     stationLL = limelight;
                     System.out.println("Setting station limelight to " + config.id());
-                    break;
-                case OBSERVER:
-                    observerLL = limelight;
-                    diagnosticsNeeded = false;
-                    System.out.println("Setting observer limelight to " + config.id());
                     break;
                 default:
                     diagnosticsNeeded = false;
                     System.out.println("Not setting " + config.id() + " to anything");
             }
             if (diagnosticsNeeded) {
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/stddev", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/count", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/distance", -1);
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/stddev", -1);
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/count", -1);
+                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/distance", -1);
             }
         }
 
@@ -159,11 +158,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         return reefLL;
     }
 
+    public LimelightDevice getCloseLimelight() {
+        return closeLL;
+    }
+
     public LimelightDevice getStationLimelight() {
         return stationLL;
     }
 
-    public LimelightDevice getObserverLimelight() {
-        return observerLL;
-    }
 }

@@ -16,6 +16,8 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.Arrays;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -112,7 +114,7 @@ public final class Constants {
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
-                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.OBSERVER),
+                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.REEF_CLOSE),
                 new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
         };
 
@@ -121,7 +123,7 @@ public final class Constants {
         }
     
         public enum LimelightRole {
-            NOTHING, REEF, STATION, OBSERVER
+            NOTHING, REEF, REEF_CLOSE, STATION
         }
 
         public enum PoseEstimationMethod {
@@ -135,8 +137,8 @@ public final class Constants {
             REEF(new int[]{6, 7, 8, 9, 10, 11}, new int[]{17, 18, 19, 20, 21, 22}),
             EMPTY(new int[]{}, new int[]{});
 
-            public final int[] red;
-            public final int[] blue;
+            private int[] red;
+            private int[] blue;
 
             private AprilTagRegion(int[] red, int[] blue) {
                 this.red = red;
@@ -150,6 +152,15 @@ public final class Constants {
                 System.arraycopy(red, 0, both, 0, red.length);
                 System.arraycopy(blue, 0, both, red.length, blue.length);
                 return both;
+            }
+            public AprilTagRegion and(AprilTagRegion newRegion) {
+                int[] newRed = Arrays.copyOf(red, red.length + newRegion.red.length);
+                System.arraycopy(newRegion.red, 0, newRed, red.length, newRegion.red.length);
+                red = newRed;
+                int[] newBlue = Arrays.copyOf(blue, blue.length + newRegion.blue.length);
+                System.arraycopy(newRegion.blue, 0, newBlue, blue.length, newRegion.blue.length);
+                blue = newBlue;
+                return this;
             }
         }
     }
