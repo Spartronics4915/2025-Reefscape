@@ -31,6 +31,6 @@ this controller will have tools for debugging
 
 | input   | action |
 | -------- | ------- |
-|   |     |
+| L Bumper | Force vision to use MegaTag 1 |
 |  |      |
 |     |     |
