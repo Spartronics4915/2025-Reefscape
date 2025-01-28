@@ -183,6 +183,7 @@ public class RobotContainer {
         chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
         chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
         chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+        chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
