@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkSim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -21,6 +23,54 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class MotorSimulationSubsystem extends SubsystemBase{
+    public enum MechanismSims{
+        // 0 = straight down
+        // intake side swinging = positive
+        ARM(new PhysicalSimWrapper(
+            new SingleJointedArmSim(
+                DCMotor.getFalcon500(1),
+                25.7143,
+                0.1395451863,
+                Units.inchesToMeters(17.429886),
+                0,
+                2*Math.PI,
+                true,
+                0
+            )
+        )),
+        ELEVATOR(new PhysicalSimWrapper(
+            new ElevatorSim(
+                LinearSystemId.createElevatorSystem(
+                    DCMotor.getNEO(2),
+                    Units.lbsToKilograms(9),
+                    Units.inchesToMeters(1.63800),
+                    25
+                ),
+                DCMotor.getNEO(2),
+                Units.inchesToMeters(36.000000),
+                Units.inchesToMeters(88.000000),
+                true,
+                Units.inchesToMeters(36.000000)
+            )
+        )),
+        GRABBER_FLYWHEEL(new PhysicalSimWrapper(
+            new FlywheelSim(
+                LinearSystemId.createFlywheelSystem(
+                    DCMotor.getNeo550(1), 
+                    0.00003068 * 2.0, 
+                    4.0
+                ),
+                DCMotor.getNeo550(1)
+            )
+        ));
+
+        public PhysicalSimWrapper sim;
+
+        private MechanismSims(PhysicalSimWrapper sim) {
+            this.sim = sim;
+        }
+    }
+
 
     public static class PhysicalSimWrapper{
         private DCMotorSim mDCMotorSim = null;
