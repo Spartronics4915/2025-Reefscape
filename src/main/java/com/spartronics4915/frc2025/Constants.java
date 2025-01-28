@@ -106,7 +106,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
-        public static final boolean kVisionMeasurementDiagnostics = false;
+        public static final boolean kVisionMeasurementDiagnostics = true;
         
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
