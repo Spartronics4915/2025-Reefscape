@@ -62,6 +62,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/stddev", -1);
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/count", -1);
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/distance", -1);
+                SmartDashboard.putString("VisionMeasurementDiagnostics/limelight-" + config.name() + "/method", "");
             }
         }
 
@@ -130,6 +131,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
                 SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
+                SmartDashboard.putString("VisionMeasurementDiagnostics/" + measurement.diagName() + "/method", measurement.diagMethod().toString());
             }
             swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
         });

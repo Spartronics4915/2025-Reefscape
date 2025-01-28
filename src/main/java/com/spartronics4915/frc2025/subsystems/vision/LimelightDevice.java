@@ -133,7 +133,8 @@ public class LimelightDevice extends SubsystemBase {
                 stdDevs.get(),
                 name,
                 poseEstimate.tagCount,
-                poseEstimate.avgTagDist
+                poseEstimate.avgTagDist,
+                method
                 ));
         }
     }
