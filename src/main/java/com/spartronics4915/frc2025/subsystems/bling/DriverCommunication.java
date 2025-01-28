@@ -1,9 +1,15 @@
 package com.spartronics4915.frc2025.subsystems.Bling;
 
+import com.spartronics4915.frc2025.RobotContainer;
+import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class DriverCommunication extends BlingSegment {
+    LimelightVisionSubsystem vision;
+
     public enum Message {
         OFF(LEDPattern.solid(Color.kBlack)),
         WARNING(LEDPattern.solid(Color.kYellow)),
@@ -19,8 +25,9 @@ public class DriverCommunication extends BlingSegment {
 
     private Message message = Message.OFF;
 
-    public DriverCommunication(int length) {
+    public DriverCommunication(int length, VisionDeviceSubystem vision) {
         this.ledLength = length;
+        this.vision = (LimelightVisionSubsystem) vision;
     }
 
     public Message getCurrentMessage() {
@@ -34,7 +41,10 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         // Periodic logic goes here
-        message.pattern.applyTo(buffer);
+        if (vision.canSeeTags())
+            Message.GOOD.pattern.applyTo(buffer);
+        else
+            Message.UH_OH.pattern.applyTo(buffer);
     }
 
 }

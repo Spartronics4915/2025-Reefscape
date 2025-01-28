@@ -20,6 +20,7 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSubsystem;
+import com.spartronics4915.frc2025.subsystems.Bling.DriverCommunication;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
@@ -69,7 +70,7 @@ public class RobotContainer {
     public final SwerveTeleopCommand swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
-    public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
+    public final BlingSubsystem blingSubsystem;
 
     private final SendableChooser<Command> autoChooser;
 
@@ -87,6 +88,7 @@ public class RobotContainer {
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
             ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
         }
+        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(21, visionSubsystem), BlingSegment.rainbow(21));
 
         odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
