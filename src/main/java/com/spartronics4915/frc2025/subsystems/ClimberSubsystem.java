@@ -64,7 +64,9 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public double getClimberAngle () {
-        return 0.0;
+        double position = motorRight.getEncoder().getPosition();
+        return position;
+
     }
 
 }
