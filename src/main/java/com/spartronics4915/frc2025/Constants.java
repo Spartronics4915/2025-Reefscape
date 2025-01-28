@@ -174,8 +174,8 @@ public final class Constants {
             }
         }
 
-        public static final int elevatorMotorID = 0;
-        public static final int elevatorFollowerID = 0;
+        public static final int elevatorMotorID = 20;
+        public static final int elevatorFollowerID = 16;
         public static final boolean motorInverted = false;
         public static final boolean followerInverted = false;
         public static final double motorPositionConversionFactor = 0;

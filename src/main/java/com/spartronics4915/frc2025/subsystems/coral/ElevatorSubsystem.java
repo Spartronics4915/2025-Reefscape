@@ -26,13 +26,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         motorConfig
             .inverted(ElevatorConstants.motorInverted)
-            .idleMode(IdleMode.kBrake);
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(40);
         motorConfig.encoder
             .positionConversionFactor(ElevatorConstants.motorPositionConversionFactor)
             .velocityConversionFactor(ElevatorConstants.motorVelocityConversionFactor);
         motorConfig
             .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(ElevatorConstants.motorPIDConstants.kP, ElevatorConstants.motorPIDConstants.kI, ElevatorConstants.motorPIDConstants.kD);
+            
         
         motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -43,7 +45,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         followerConfig
             .inverted(ElevatorConstants.followerInverted)
-            .idleMode(IdleMode.kBrake);
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(40);
         followerConfig.encoder
             .positionConversionFactor(ElevatorConstants.followerPositionConversionFactor)
             .velocityConversionFactor(ElevatorConstants.followerVelocityConversionFactor);
@@ -53,7 +56,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         followerConfig.follow(motor);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        setVoltage(0.05);
     }
     private double getPosition() {
         return motor.getEncoder().getPosition();
@@ -63,6 +65,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
+        setVoltage(0.05);
         System.out.println(motor.getAppliedOutput() + ", " + follower.getAppliedOutput());
     }
     public void moveToPosition(ElevatorSubsystemState value) {
