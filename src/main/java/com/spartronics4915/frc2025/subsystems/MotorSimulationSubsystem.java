@@ -1,6 +1,5 @@
 package com.spartronics4915.frc2025.subsystems;
 
-import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -11,8 +10,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkSim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
