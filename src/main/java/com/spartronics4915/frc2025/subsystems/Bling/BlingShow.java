@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.subsystems.bling;
+package com.spartronics4915.frc2025.subsystems.Bling;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
