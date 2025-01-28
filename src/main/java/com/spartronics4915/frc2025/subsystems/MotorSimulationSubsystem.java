@@ -257,6 +257,36 @@ public class MotorSimulationSubsystem extends SubsystemBase{
             mSparkConstants.updateState.accept(mSparkConstants);
         }
 
+        for(var mTalonConstants : mSimTalons){
+
+            //TODO gear ratios and conversion
+            
+            // var motor = mSparkConstants.motor;
+
+            var motorSim = mTalonConstants.motor.getSimState();
+            
+            motorSim.setSupplyVoltage(RoboRioSim.getVInVoltage());
+
+            var motorVoltage = motorSim.getMotorVoltage();
+
+            mTalonConstants.physicalSim.setInputVoltage(motorVoltage);
+            mTalonConstants.physicalSim.update(dt);
+
+               // apply the new rotor position and velocity to the TalonFX;
+            // note that this is rotor position/velocity (before gear ratio), but
+            // DCMotorSim returns mechanism position/velocity (after gear ratio)
+            motorSim.setRawRotorPosition(
+                mTalonConstants.gearRatio * mTalonConstants.physicalSim.getPosition()
+            );
+            motorSim.setRotorVelocity(
+                mTalonConstants.gearRatio * mTalonConstants.physicalSim.getVelocity()
+            );
+
+            RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(mTalonConstants.physicalSim.getCurrentDrawAmps()));
+
+            mTalonConstants.updateState.accept(mTalonConstants);
+        }
+
         for(var subsystems : mSimSubsystems){
             subsystems.finalSimUpdate();
         }
