@@ -42,9 +42,9 @@ public final class Constants {
         public static final int kSensorID = 0;
 
         public enum IntakeSpeed {
-            IN (0.4),
+            IN (0.0),
             NEURTRAL (0.0),
-            OUT (-0.4);
+            OUT (-0.0);
 
             public final double intakeSpeed;
             
@@ -52,6 +52,10 @@ public final class Constants {
                 this.intakeSpeed = intakeSpeed;
             }
         }
+
+        public static final double intakeP = 0;
+        public static final double intakeI = 0;
+        public static final double intakeD = 0;
     }
 
     public static final class OI {
