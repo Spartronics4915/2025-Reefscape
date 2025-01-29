@@ -114,7 +114,7 @@ public final class Constants {
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
-                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.REEF_CLOSE),
+                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.ALIGN),
                 new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
         };
 
@@ -123,7 +123,7 @@ public final class Constants {
         }
     
         public enum LimelightRole {
-            NOTHING, REEF, REEF_CLOSE, STATION
+            NOTHING, REEF, ALIGN, STATION
         }
 
         public enum PoseEstimationMethod {

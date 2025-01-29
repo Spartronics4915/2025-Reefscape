@@ -28,7 +28,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     private static boolean mt1Override = false;
 
     private LimelightDevice reefLL;
-    private LimelightDevice closeLL;
+    private LimelightDevice alignLL;
     private LimelightDevice stationLL;
 
     private final SwerveSubsystem swerveSubsystem;
@@ -46,9 +46,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                     reefLL = limelight;
                     System.out.println("Setting reef limelight to " + config.id());
                     break;
-                case REEF_CLOSE:
-                    closeLL = limelight;
-                    System.out.println("Setting reef close limelight to " + config.id());
+                case ALIGN:
+                    alignLL = limelight;
+                    System.out.println("Setting align limelight to " + config.id());
                     break;
                 case STATION:
                     stationLL = limelight;
@@ -162,8 +162,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         return reefLL;
     }
 
-    public LimelightDevice getCloseLimelight() {
-        return closeLL;
+    public LimelightDevice getAlignLimelight() {
+        return alignLL;
     }
 
     public LimelightDevice getStationLimelight() {
