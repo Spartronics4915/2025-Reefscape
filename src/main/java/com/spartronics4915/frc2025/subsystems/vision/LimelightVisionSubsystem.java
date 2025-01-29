@@ -40,7 +40,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         for (LimelightConstants config : VisionConstants.kLimelights) {
             LimelightDevice limelight = new LimelightDevice(config);
             limelights.add(limelight);
-            boolean diagnosticsNeeded = VisionConstants.kVisionMeasurementDiagnostics;
+            boolean diagnosticsNeeded = VisionConstants.kVisionDiagnostics;
             switch (config.role()) {
                 case REEF:
                     reefLL = limelight;
@@ -59,23 +59,25 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
                     System.out.println("Not setting " + config.id() + " to anything");
             }
             if (diagnosticsNeeded) {
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/stddev", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/count", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/limelight-" + config.name() + "/distance", -1);
-                SmartDashboard.putString("VisionMeasurementDiagnostics/limelight-" + config.name() + "/method", "");
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/stddev", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/count", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/distance", -1);
+                SmartDashboard.putString("VisionDiagnostics/limelight-" + config.name() + "/method", "");
             }
         }
-
-        updateTagFilters();
 
         this.fieldLayout = fieldLayout;
         this.swerveSubsystem = swerveSubsystem;
 
-        NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets",
-                Pose3d.struct);
-        visionTargetPublisher = visionTargetTopic.publish();
-        Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
+        if (VisionConstants.kVisionDiagnostics) {
+            NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+            StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic(
+                "VisionDiagnostics/vision targets", Pose3d.struct);
+            visionTargetPublisher = visionTargetTopic.publish();
+            // Shuffleboard.getTab("logging").addString("VisionDiagnostics/vision target ids", () -> this.getVisibleTagIDs().toString());
+        } else visionTargetPublisher = null;
+
+        updateTagFilters();
     }
 
     private void updateTagFilters() {
@@ -127,16 +129,16 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     @Override
     public void periodic() {
         getVisionMeasurements().forEach((measurement) -> {
-            if (VisionConstants.kVisionMeasurementDiagnostics) {
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
-                SmartDashboard.putString("VisionMeasurementDiagnostics/" + measurement.diagName() + "/method", measurement.diagMethod().toString());
-            }
             swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
+            if (VisionConstants.kVisionDiagnostics) {
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
+                SmartDashboard.putString("VisionDiagnostics/" + measurement.diagName() + "/method", measurement.diagMethod().toString());
+            }
         });
 
-        visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
+        if (VisionConstants.kVisionDiagnostics) visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 
     @Override

@@ -108,7 +108,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
-        public static final boolean kVisionMeasurementDiagnostics = true;
+        public static final boolean kVisionDiagnostics = true;
         
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
@@ -153,12 +153,12 @@ public final class Constants {
                 System.arraycopy(blue, 0, both, red.length, blue.length);
                 return both;
             }
-            public AprilTagRegion and(AprilTagRegion newRegion) {
-                int[] newRed = Arrays.copyOf(red, red.length + newRegion.red.length);
-                System.arraycopy(newRegion.red, 0, newRed, red.length, newRegion.red.length);
+            public AprilTagRegion and(AprilTagRegion other) {
+                int[] newRed = Arrays.copyOf(red, red.length + other.red.length);
+                System.arraycopy(other.red, 0, newRed, red.length, other.red.length);
                 red = newRed;
-                int[] newBlue = Arrays.copyOf(blue, blue.length + newRegion.blue.length);
-                System.arraycopy(newRegion.blue, 0, newBlue, blue.length, newRegion.blue.length);
+                int[] newBlue = Arrays.copyOf(blue, blue.length + other.blue.length);
+                System.arraycopy(other.blue, 0, newBlue, blue.length, other.blue.length);
                 blue = newBlue;
                 return this;
             }
