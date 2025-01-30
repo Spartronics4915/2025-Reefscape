@@ -4,7 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.Constants;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -13,10 +15,12 @@ public class ClimberSubsystem extends SubsystemBase {
     //private SparkMax motorLeft;
     private SparkMax motorRight;
     
+    private PIDController mPidController;
 
     public enum ClimberState {
-        LIFTED(Rotation2d.fromDegrees(0)),
-        STOW(Rotation2d.fromDegrees(0)),;
+        
+        LIFTED(Rotation2d.fromDegrees(Constants.ClimberConstants.liftedAngle)),
+        STOW(Rotation2d.fromDegrees(Constants.ClimberConstants.stowAngle)),;
         
         public final Rotation2d angle;
 
@@ -68,4 +72,26 @@ public class ClimberSubsystem extends SubsystemBase {
 
     }
 
+    private void initiPID() {
+        //mPidController = new PIDController(kPIDConstants.kP(), kPIDConstants.kI(), kPIDConstants.kD());
+        mPidController = new PIDController(0,0,0);
+        mPidController.setIZone(kIZone);
+
+
+
+    }
+
+    public void setSetpoint(double newPos){
+
+
+
+        mPidController.setSetpoint(newPos);
+    }
+
+    @Override
+    public void periodic() {
+        setVoltage(
+            mPidController.calculate(getPosition)
+        );
+    }
 }

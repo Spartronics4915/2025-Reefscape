@@ -5,6 +5,7 @@
 package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.util.Structures.*;
+import com.spartronics4915.frc2025.util.Structures.PIDConstants;
 
 import edu.wpi.first.math.util.Units;
 
@@ -31,6 +32,16 @@ public final class Constants {
 
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
+
+    }
+
+    public static final class ClimberConstants{
+
+        public static double liftedAngle = 0.5;
+        public static double stowAngle = 0.5;
+
+
+        public static final PIDConstants kPIDconstants = new PIDConstants(1.0, 0.0, 0.0);
     }
 
     public static final class Drive {
