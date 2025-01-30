@@ -182,6 +182,10 @@ public final class Constants {
         public static final double motorVelocityConversionFactor = 0;
         public static final double followerPositionConversionFactor = 0;
         public static final double followerVelocityConversionFactor = 0;
+        public static final int motorSmartCurrentLimit = 0;
+        public static final int motorSecondaryCurrentLimit = 0;
+        public static final int followerSmartCurrentLimit = 0;
+        public static final int followerSecondaryCurrentLimit = 0;
 
         public static final class motorPIDConstants {
             public static final double kP = 0;
