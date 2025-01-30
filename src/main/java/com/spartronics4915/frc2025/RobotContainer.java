@@ -4,8 +4,10 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
@@ -13,6 +15,7 @@ import com.spartronics4915.frc2025.commands.ElementLocator;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef.BranchSide;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef.ReefSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -153,7 +156,7 @@ public class RobotContainer {
             );
 
         driverController.leftBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of())
+            alignmentCommandFactory.generateCommand(BranchSide.LEFT)
         );
 
         driverController.rightBumper().whileTrue(
@@ -205,6 +208,30 @@ public class RobotContainer {
         chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
         chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
         chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
+
+        chooser.addOption("Align with move", Commands.sequence(
+            new PathPlannerAuto("Coral-2"),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.LEFT),
+            new PathPlannerAuto("2-Coral"),
+            new PathPlannerAuto("Coral-2"),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.RIGHT),
+            new PathPlannerAuto("2-Coral"),
+            new PathPlannerAuto("Coral-3"),
+            alignmentCommandFactory.generateCommand(ReefSide.THREE, BranchSide.LEFT),
+            new PathPlannerAuto("3-Coral")
+        ));
+
+        chooser.addOption("Align Mirror with move", Commands.sequence(
+            new PathPlannerAuto("Coral-2", true),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.LEFT),
+            new PathPlannerAuto("2-Coral", true),
+            new PathPlannerAuto("Coral-2", true),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.RIGHT),
+            new PathPlannerAuto("2-Coral", true),
+            new PathPlannerAuto("Coral-3", true),
+            alignmentCommandFactory.generateCommand(ReefSide.THREE.mirror(), BranchSide.LEFT),
+            new PathPlannerAuto("3-Coral", true)
+        ));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
