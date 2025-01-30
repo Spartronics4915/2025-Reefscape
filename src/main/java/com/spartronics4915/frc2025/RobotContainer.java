@@ -111,10 +111,6 @@ public class RobotContainer {
 
     }
 
-    private final StructPublisher<Pose2d> leftpublisher = NetworkTableInstance.getDefault().getStructTopic("LeftBranch", Pose2d.struct).publish();
-    private final StructPublisher<Pose2d> rightpublisher = NetworkTableInstance.getDefault().getStructTopic("RightBranch", Pose2d.struct).publish();
-
-
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -155,20 +151,11 @@ public class RobotContainer {
             );
 
         driverController.leftBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of()).alongWith(
-                Commands.run(() -> {
-                    leftpublisher.accept(AlignToReef.getClosestBranch(BranchSide.LEFT, swerveSubsystem));
-                    rightpublisher.accept(AlignToReef.getClosestBranch(BranchSide.RIGHT, swerveSubsystem));
-                })
-            )
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of())
         );
+        
         driverController.rightBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of()).alongWith(
-                Commands.run(() -> {
-                    leftpublisher.accept(AlignToReef.getClosestBranch(BranchSide.LEFT, swerveSubsystem));
-                    rightpublisher.accept(AlignToReef.getClosestBranch(BranchSide.RIGHT, swerveSubsystem));
-                })
-            )
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of())
         );
 
 
