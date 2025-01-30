@@ -66,6 +66,8 @@ public class RobotContainer {
 
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
+    private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
     private final ElementLocator elementLocator = new ElementLocator();
     private final VisionDeviceSubystem visionSubsystem;
     private final OdometrySubsystem odometrySubsystem;
@@ -79,7 +81,7 @@ public class RobotContainer {
 
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
 
-    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.getFieldLayout());
+    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -221,8 +223,8 @@ public class RobotContainer {
         return debugController;
     }
 
-    public AprilTagFieldLayout getFieldLayout() {
-        return elementLocator.getFieldLayout();
+    public static AprilTagFieldLayout getFieldLayout() {
+        return fieldLayout;
     }
 
 }
