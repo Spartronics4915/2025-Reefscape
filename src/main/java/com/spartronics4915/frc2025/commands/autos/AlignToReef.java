@@ -40,6 +40,8 @@ public class AlignToReef {
 
     public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
+    public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
+
 
     public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
         this.mSwerve = mSwerve;
@@ -57,6 +59,16 @@ public class AlignToReef {
         Arrays.stream(AprilTagRegion.REEF.red()).forEach((i) -> {
             field.getTagPose(i).ifPresent((p) -> {
                 redReefTagPoses.add(new Pose2d(
+                    p.getMeasureX(),
+                    p.getMeasureY(),
+                    p.getRotation().toRotation2d()
+                ));
+            });
+        });
+
+        Arrays.stream(AprilTagRegion.REEF.both()).forEach((i) -> {
+            field.getTagPose(i).ifPresent((p) -> {
+                allReefTagPoses.add(new Pose2d(
                     p.getMeasureX(),
                     p.getMeasureY(),
                     p.getRotation().toRotation2d()
@@ -151,17 +163,20 @@ public class AlignToReef {
      * @return
      */
     public static Pose2d getClosestReefAprilTag(Pose2d pose) {
-        return pose.nearest(
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 
-            blueReefTagPoses :
-            redReefTagPoses
-        );
+        var alliance = DriverStation.getAlliance();
+        
+        ArrayList<Pose2d> reefPoseList;
+        if (alliance.isEmpty()) {
+            reefPoseList = allReefTagPoses;
+        } else{
+            reefPoseList = alliance.get() == Alliance.Blue ? 
+                blueReefTagPoses :
+                redReefTagPoses;
+        }
 
-        // return reefTagPoses.stream().min((tagA, tagB) -> {
-        //     double distA = tagA.getTranslation().getDistance(pose);
-        //     double distB = tagB.getTranslation().getDistance(pose);
-        //     return (int) Math.signum(distA - distB);
-        // }).get();
+
+        return pose.nearest(reefPoseList);
+
     }
 
 }
