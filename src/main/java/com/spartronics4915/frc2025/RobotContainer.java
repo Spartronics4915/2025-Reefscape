@@ -135,10 +135,7 @@ public class RobotContainer {
 
 
         //switch field and robot relative
-        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
-                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
-            );}
-        ,Set.of()));
+        driverController.a().toggleOnTrue(Commands.startEnd(() -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);}, () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}));
 
         driverController.b().onTrue(
             Commands.defer(() -> {
@@ -187,6 +184,10 @@ public class RobotContainer {
         );
 
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+
+        // DEBUG CONTROLLER
+        debugController.leftBumper().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)));
+        debugController.leftBumper().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
     }
 
     /**

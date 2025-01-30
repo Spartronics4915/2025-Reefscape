@@ -11,8 +11,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Left stick |  Drive |
 | Push Left Stick |  reset FR pos heading |
 | Right stick | Field angle |
-| L & R Triggers | X Brake Swerve |
-| R Trigger | reef auto orient |
+| R Triggers | X Brake Swerve |
+| L Trigger | reef auto orient |
 | B | Toggle field relative |
 | A | Set FR pos heading |
 
@@ -31,6 +31,6 @@ this controller will have tools for debugging
 
 | input   | action |
 | -------- | ------- |
-|   |     |
+| L Bumper | Force vision to use MegaTag 1 |
 |  |      |
 |     |     |

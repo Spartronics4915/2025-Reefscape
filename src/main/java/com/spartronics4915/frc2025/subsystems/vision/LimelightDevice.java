@@ -52,6 +52,9 @@ public class LimelightDevice extends SubsystemBase {
         AprilTagRegion region;
         switch (role) {
             case REEF:
+                region = AprilTagRegion.REEF.and(AprilTagRegion.PROCESSOR);
+                break;
+            case ALIGN:
                 region = AprilTagRegion.REEF;
                 break;
             case STATION:
@@ -94,16 +97,15 @@ public class LimelightDevice extends SubsystemBase {
      * Use MegaTag1 if it's within the first three seconds of auto, otherwise use MegaTag2
      */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
-        if (DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3)) {
+        final boolean START_OF_AUTO = DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3);
+        if (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override()) {
             return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_1);
         }
         return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_2);
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, PoseEstimationMethod method) {
-        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
-            return Optional.empty();
-        }
+        if (role == LimelightRole.NOTHING) return Optional.empty();
         LimelightHelpers.PoseEstimate poseEstimate;
         Optional<Matrix<N3, N1>> stdDevs;
         switch (method) {
@@ -131,7 +133,8 @@ public class LimelightDevice extends SubsystemBase {
                 stdDevs.get(),
                 name,
                 poseEstimate.tagCount,
-                poseEstimate.avgTagDist
+                poseEstimate.avgTagDist,
+                method
                 ));
         }
     }
@@ -162,8 +165,9 @@ public class LimelightDevice extends SubsystemBase {
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
-        double rotStdDev = (START_OF_AUTO) ? 0.3 //trust a lot if start of auto
-                                           : Double.MAX_VALUE; //otherwise don't trust at all
+        double rotStdDev = (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override())
+                           ? 0.3 //trust a lot if start of auto
+                           : Double.MAX_VALUE; //otherwise don't trust at all
 
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }
@@ -195,9 +199,7 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     public ArrayList<Integer> getVisibleTags() {
-        if (role == LimelightRole.NOTHING || role == LimelightRole.OBSERVER) {
-            return new ArrayList<Integer>();
-        }
+        if (role == LimelightRole.NOTHING) return new ArrayList<Integer>();
         RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(name);
         ArrayList<Integer> visibleTags = new ArrayList<>();
         for (RawFiducial raw : fiducials) {
