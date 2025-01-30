@@ -6,6 +6,9 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.util.Structures.*;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -19,6 +22,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -96,6 +100,11 @@ public final class Constants {
                     this.config = config;
                 }
             }
+
+            public static final PathConstraints kPathConstraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+        
+            // X = side to side, Y = away from tag
+            public static final Translation2d kTagOffset = new Translation2d(0.075, 0.5);
         }
 
     }

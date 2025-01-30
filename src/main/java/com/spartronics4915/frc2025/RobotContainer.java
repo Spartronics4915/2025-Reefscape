@@ -10,7 +10,9 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef.BranchSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -32,7 +34,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -74,6 +79,8 @@ public class RobotContainer {
 
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
 
+    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.fieldLayout);
+
     private final SendableChooser<Command> autoChooser;
 
     /**
@@ -103,6 +110,10 @@ public class RobotContainer {
                 buildAutoChooser();
 
     }
+
+    private final StructPublisher<Pose2d> leftpublisher = NetworkTableInstance.getDefault().getStructTopic("LeftBranch", Pose2d.struct).publish();
+    private final StructPublisher<Pose2d> rightpublisher = NetworkTableInstance.getDefault().getStructTopic("RightBranch", Pose2d.struct).publish();
+
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
@@ -145,6 +156,23 @@ public class RobotContainer {
             .whileTrue(
                 Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
             );
+
+        driverController.leftBumper().whileTrue(
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of()).alongWith(
+                Commands.run(() -> {
+                    leftpublisher.accept(AlignToReef.getClosestBranch(BranchSide.LEFT, swerveSubsystem));
+                    rightpublisher.accept(AlignToReef.getClosestBranch(BranchSide.RIGHT, swerveSubsystem));
+                })
+            )
+        );
+        driverController.rightBumper().whileTrue(
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of()).alongWith(
+                Commands.run(() -> {
+                    leftpublisher.accept(AlignToReef.getClosestBranch(BranchSide.LEFT, swerveSubsystem));
+                    rightpublisher.accept(AlignToReef.getClosestBranch(BranchSide.RIGHT, swerveSubsystem));
+                })
+            )
+        );
 
 
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
