@@ -37,12 +37,12 @@ public class AlignToReef {
     } 
 
     public enum ReefSide{
-        ONE(0, 0),
-        TWO(0, 0),
-        THREE(0, 0),
-        FOUR(0, 0),
-        FIVE(0, 0),
-        SIX(0, 0);
+        ONE(18, 7),
+        TWO(19, 6),
+        THREE(20, 11),
+        FOUR(21, 10),
+        FIVE(22, 9),
+        SIX(17, 8);
 
         public final Pose2d redTagPose;
         public final Pose2d blueTagPose;
