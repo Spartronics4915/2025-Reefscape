@@ -9,11 +9,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private SparkMax motor;
     private SparkMaxConfig motorConfig;
@@ -85,5 +86,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void moveToPosition(ElevatorSubsystemState value) {
         currentSetPoint = value.meter;
+    }
+
+    @Override
+    public void onModeSwitch() {
+        resetMechanism();
     }
 }
