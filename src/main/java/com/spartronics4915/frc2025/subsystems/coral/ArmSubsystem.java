@@ -3,6 +3,7 @@ package com.spartronics4915.frc2025.subsystems.coral;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -19,17 +20,19 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 
 
-public class ArmSubsystem extends SubsystemBase { 
+public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{ 
     
     private SparkMax mArmMotor;
     private SparkClosedLoopController mArmClosedLoopController;
     private SparkMaxConfig config;
     private ArmFeedforward mFFCalculator;
+    private RelativeEncoder mArmEncoder;
 
     private TrapezoidProfile mArmProfile;
 
@@ -41,6 +44,8 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         
         SparkMax mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
+
+        RelativeEncoder mArmEncoder = mArmMotor.getEncoder();
         
         SparkMaxConfig config = new SparkMaxConfig();
 
@@ -57,27 +62,34 @@ public class ArmSubsystem extends SubsystemBase {
 
         mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
         
+        resetMechanism();
     }
 
-    private Rotation2d mConvertRaw(double rotation) {
+    public void resetMechanism(){
+        var position = getPosition();
+        mCurrentSetPoint = (position);
+        mCurrentState = new State(angleToRaw(position), 0.0);
+    }
+
+    private Rotation2d convertRaw(double rotation) {
         Rotation2d angle = Rotation2d.fromDegrees(rotation);
         return angle;
     }
 
-    private double mAngleToRaw(Rotation2d angle) {
+    private double angleToRaw(Rotation2d angle) {
         double rotation = angle.getRotations();
         return rotation;
     }
 
-    private double getPosition() {
+    private Rotation2d getPosition() {
         double position = mArmMotor.getEncoder().getPosition();
 
-        return position;
+        return convertRaw(position);
     }
 
     private void initArmProfile() {
         mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
-        mCurrentState = new State(getPosition(), velocity);
+        mCurrentState = new State(angleToRaw(getPosition()), velocity);
     }
 
     private double getVelocity() {
@@ -93,12 +105,17 @@ public class ArmSubsystem extends SubsystemBase {
         mCurrentSetPoint = Rotation2d.fromRotations(
             MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
 
-        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((mAngleToRaw(mCurrentSetPoint)), velocity));
+        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((angleToRaw(mCurrentSetPoint)), 0.0));
 
-        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(getPosition(), getVelocity()));
+        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(mCurrentState.position, mCurrentState.velocity));
 
     }
     
+    private void setMechanismAngle(Rotation2d angle){
+        mArmEncoder.setPosition(angleToRaw(angle));
+        resetMechanism();
+    }
+
     private void initClosedLoopController() {
         mArmClosedLoopController = mArmMotor.getClosedLoopController();
     }
@@ -111,11 +128,35 @@ public class ArmSubsystem extends SubsystemBase {
         setSetpoint(newState.angle);
     }
 
-    public void setReference() {
-        
-    }
-
     public void incrementAngle(Rotation2d delta){
         mCurrentSetPoint = mCurrentSetPoint.plus(delta);
+    }
+
+
+    //Commands 
+
+    public Command manualMode(Rotation2d delta){
+        return this.runEnd(() -> {
+            incrementAngle(delta);
+        }, () -> {
+            resetMechanism();
+        });
+    }
+
+    public Command setSetpointCommand(Rotation2d newSetpoint){
+        return this.runOnce(() -> setSetpoint(newSetpoint));
+    }
+
+    public Command presetCommand(ArmSubsystemState preset){
+        return setSetpointCommand(preset.angle);
+    }
+
+    public Command setMechanismAngleCommand(Rotation2d newAngle){
+        return this.runOnce(() -> setMechanismAngle(newAngle));
+    }
+
+    @Override
+    public void onModeSwitch() {
+        resetMechanism();
     }
 }
