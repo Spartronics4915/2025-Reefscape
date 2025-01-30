@@ -10,7 +10,9 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef.BranchSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -28,8 +30,14 @@ import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.s
 
 import java.util.Set;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -70,6 +78,8 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
+
+    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.getFieldLayout());
 
     private final SendableChooser<Command> autoChooser;
 
@@ -121,10 +131,7 @@ public class RobotContainer {
 
 
         //switch field and robot relative
-        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
-                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
-            );}
-        ,Set.of()));
+        driverController.a().toggleOnTrue(Commands.startEnd(() -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);}, () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}));
 
         driverController.b().onTrue(
             Commands.defer(() -> {
@@ -143,6 +150,14 @@ public class RobotContainer {
                 Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
             );
 
+        driverController.leftBumper().whileTrue(
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of())
+        );
+
+        driverController.rightBumper().whileTrue(
+            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of())
+        );
+
 
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
         driverController.rightTrigger().whileTrue(
@@ -156,6 +171,10 @@ public class RobotContainer {
         );
 
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+
+        // DEBUG CONTROLLER
+        debugController.leftBumper().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)));
+        debugController.leftBumper().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
     }
 
     /**
@@ -183,6 +202,7 @@ public class RobotContainer {
         chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
         chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
         chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+        chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
@@ -199,6 +219,10 @@ public class RobotContainer {
 
     public static CommandXboxController getDebugController() {
         return debugController;
+    }
+
+    public AprilTagFieldLayout getFieldLayout() {
+        return elementLocator.getFieldLayout();
     }
 
 }

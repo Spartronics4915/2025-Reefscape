@@ -6,6 +6,9 @@ package com.spartronics4915.frc2025;
 
 import com.spartronics4915.frc2025.util.Structures.*;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -16,9 +19,12 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.Arrays;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -96,6 +102,11 @@ public final class Constants {
                     this.config = config;
                 }
             }
+
+            public static final PathConstraints kPathConstraints = new PathConstraints(1.75, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+        
+            // X = side to side, Y = away from tag
+            public static final Translation2d kTagOffset = new Translation2d(0.10, 0.75); //TODO fix based off field cad
         }
 
     }
@@ -106,13 +117,13 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
-        public static final boolean kVisionMeasurementDiagnostics = false;
+        public static final boolean kVisionDiagnostics = true;
         
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
-                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.OBSERVER),
+                new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.ALIGN),
                 new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
         };
 
@@ -121,7 +132,7 @@ public final class Constants {
         }
     
         public enum LimelightRole {
-            NOTHING, REEF, STATION, OBSERVER
+            NOTHING, REEF, ALIGN, STATION
         }
 
         public enum PoseEstimationMethod {
@@ -135,8 +146,8 @@ public final class Constants {
             REEF(new int[]{6, 7, 8, 9, 10, 11}, new int[]{17, 18, 19, 20, 21, 22}),
             EMPTY(new int[]{}, new int[]{});
 
-            public final int[] red;
-            public final int[] blue;
+            private int[] red;
+            private int[] blue;
 
             private AprilTagRegion(int[] red, int[] blue) {
                 this.red = red;
@@ -150,6 +161,15 @@ public final class Constants {
                 System.arraycopy(red, 0, both, 0, red.length);
                 System.arraycopy(blue, 0, both, red.length, blue.length);
                 return both;
+            }
+            public AprilTagRegion and(AprilTagRegion other) {
+                int[] newRed = Arrays.copyOf(red, red.length + other.red.length);
+                System.arraycopy(other.red, 0, newRed, red.length, other.red.length);
+                red = newRed;
+                int[] newBlue = Arrays.copyOf(blue, blue.length + other.blue.length);
+                System.arraycopy(other.blue, 0, newBlue, blue.length, other.blue.length);
+                blue = newBlue;
+                return this;
             }
         }
     }
