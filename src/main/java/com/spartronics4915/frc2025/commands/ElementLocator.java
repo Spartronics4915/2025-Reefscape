@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class ElementLocator {
     
-    public final AprilTagFieldLayout fieldLayout;
+    private final AprilTagFieldLayout fieldLayout;
 
     private final double kDistanceFromTagToCoralMeters = .2;
 

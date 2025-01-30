@@ -79,7 +79,7 @@ public class RobotContainer {
 
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
 
-    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.fieldLayout);
+    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.getFieldLayout());
 
     private final SendableChooser<Command> autoChooser;
 
@@ -153,7 +153,7 @@ public class RobotContainer {
         driverController.leftBumper().whileTrue(
             Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of())
         );
-        
+
         driverController.rightBumper().whileTrue(
             Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of())
         );
@@ -222,7 +222,7 @@ public class RobotContainer {
     }
 
     public AprilTagFieldLayout getFieldLayout() {
-        return elementLocator.fieldLayout;
+        return elementLocator.getFieldLayout();
     }
 
 }
