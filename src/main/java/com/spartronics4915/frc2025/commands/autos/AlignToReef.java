@@ -102,7 +102,7 @@ public class AlignToReef {
 
     /**
      * 
-     * @return Pathplanner waypoint with
+     * @return Pathplanner waypoint with direction of travel away from the associated reef side
      */
     private Pose2d getBranchPathWaypoint(BranchSide side){
         var nearest = getClosestBranch(side, mSwerve);
