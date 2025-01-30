@@ -74,6 +74,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return motor.getEncoder().getPosition();
     }
 
+    private double getVelocity() {
+        return motor.getEncoder().getVelocity();
+    }
+
     @Override
     public void periodic() {
         currentSetPoint = MathUtil.clamp(currentSetPoint, ElevatorConstants.minHeight, ElevatorConstants.maxHeight);
