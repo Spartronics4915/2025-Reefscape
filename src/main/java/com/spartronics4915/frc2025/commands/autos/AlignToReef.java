@@ -35,6 +35,32 @@ public class AlignToReef {
         LEFT,
         RIGHT;
     } 
+
+    public enum ReefSide{
+        ONE(0, 0),
+        TWO(0, 0),
+        THREE(0, 0),
+        FOUR(0, 0),
+        FIVE(0, 0),
+        SIX(0, 0);
+
+        public final Pose2d redTagPose;
+        public final Pose2d blueTagPose;
+
+        public Pose2d getCurrent(){
+            return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ?
+                blueTagPose : 
+                redTagPose;
+        }
+
+        private ReefSide(int blue, int red) {
+            var layout = RobotContainer.getFieldLayout();
+
+
+            redTagPose =layout.getTagPose(red).get().toPose2d();
+            blueTagPose = layout.getTagPose(blue).get().toPose2d();
+        }
+    } 
     
     private final SwerveSubsystem mSwerve;
 
@@ -80,7 +106,22 @@ public class AlignToReef {
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
     public Command generateCommand(BranchSide side) {
-        var waypoint = getBranchPathWaypoint(side);
+        var branch = getClosestBranch(side, mSwerve);
+        desiredBranchPublisher.accept(branch);
+
+        return getPathFromWaypoint(getWaypointFromBranch(branch));
+    }
+
+
+    public Command generateCommand(ReefSide reefTag, BranchSide side) {
+        var branch = getBranchFromTag(reefTag.getCurrent(), side);
+        desiredBranchPublisher.accept(branch);
+
+        return getPathFromWaypoint(getWaypointFromBranch(branch));
+    }
+
+
+    private Command getPathFromWaypoint(Pose2d waypoint) {
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
             new Pose2d(mSwerve.getPose().getTranslation(), getVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
             waypoint
@@ -120,14 +161,10 @@ public class AlignToReef {
      * 
      * @return Pathplanner waypoint with direction of travel away from the associated reef side
      */
-    private Pose2d getBranchPathWaypoint(BranchSide side){
-        var nearest = getClosestBranch(side, mSwerve);
-
-        desiredBranchPublisher.accept(nearest);
-
+    private Pose2d getWaypointFromBranch(Pose2d branch){
         return new Pose2d(
-            nearest.getTranslation(),
-            nearest.getRotation().rotateBy(Rotation2d.k180deg)
+            branch.getTranslation(),
+            branch.getRotation().rotateBy(Rotation2d.k180deg)
         );
     }
 
@@ -142,6 +179,11 @@ public class AlignToReef {
     public static Pose2d getClosestBranch(BranchSide side, SwerveSubsystem swerve){
         Pose2d tag = getClosestReefAprilTag(swerve.getPose());
         
+        return getBranchFromTag(tag, side);
+    }
+
+
+    private static Pose2d getBranchFromTag(Pose2d tag, BranchSide side) {
         var translation = tag.getTranslation().plus(
             new Translation2d(
                 kTagOffset.getY(),
