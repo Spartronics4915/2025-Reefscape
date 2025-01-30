@@ -19,11 +19,13 @@ import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightDevice extends SubsystemBase {
@@ -97,11 +99,15 @@ public class LimelightDevice extends SubsystemBase {
      * Use MegaTag1 if it's within the first three seconds of auto, otherwise use MegaTag2
      */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
-        final boolean START_OF_AUTO = DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3);
-        if (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override()) {
-            return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_1);
-        }
-        return getVisionMeasurement(swerve, PoseEstimationMethod.MEGATAG_2);
+        if (role == LimelightRole.NOTHING) return Optional.empty();
+        final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01);
+        final boolean twoOrMoreTags = LimelightHelpers.getRawFiducials(name).length >= 2;
+        double robotSpeed = swerve.getSpeed();
+        final boolean movingSlowEnough = robotSpeed < VisionConstants.kMaxSpeedForMegaTag1;
+        final boolean CAN_GET_GOOD_HEADING = twoOrMoreTags && movingSlowEnough;
+        PoseEstimationMethod method = PoseEstimationMethod.MEGATAG_2;
+        if (BEFORE_MATCH || CAN_GET_GOOD_HEADING || LimelightVisionSubsystem.getMegaTag1Override()) method = PoseEstimationMethod.MEGATAG_1;
+        return getVisionMeasurement(swerve, method);
     }
 
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve, PoseEstimationMethod method) {
@@ -165,9 +171,7 @@ public class LimelightDevice extends SubsystemBase {
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
-        double rotStdDev = (START_OF_AUTO || LimelightVisionSubsystem.getMegaTag1Override())
-                           ? 0.3 //trust a lot if start of auto
-                           : Double.MAX_VALUE; //otherwise don't trust at all
+        double rotStdDev = 0.3; //we mainly use megatag1 for rotation
 
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }
@@ -181,7 +185,7 @@ public class LimelightDevice extends SubsystemBase {
 
         if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
         transStdDev += poseEstimate.avgTagDist * 0.075; //trust less and less the further away the tags are
-        if (poseEstimate.tagCount > 1) transStdDev -= 0.15; //trust slightly more if multiple tags seen
+        if (poseEstimate.tagCount > 1) transStdDev -= 0.05; //trust slightly more if multiple tags seen TODO: is this even needed?
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 

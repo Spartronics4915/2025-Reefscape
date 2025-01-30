@@ -117,6 +117,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
+        public static final double kMaxSpeedForMegaTag1 = 0.5; //meters
         public static final boolean kVisionDiagnostics = true;
         
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
