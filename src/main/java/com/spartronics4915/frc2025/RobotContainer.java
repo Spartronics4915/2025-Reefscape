@@ -28,6 +28,9 @@ import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.s
 
 import java.util.Set;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -200,6 +203,10 @@ public class RobotContainer {
 
     public static CommandXboxController getDebugController() {
         return debugController;
+    }
+
+    public AprilTagFieldLayout getFieldLayout() {
+        return elementLocator.fieldLayout;
     }
 
 }

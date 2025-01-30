@@ -7,13 +7,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class ElementLocator {
     
-    private final AprilTagFieldLayout fieldLayout;
+    public final AprilTagFieldLayout fieldLayout;
 
     private final double kDistanceFromTagToCoralMeters = .2;
 
     public ElementLocator() {
 
-        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     }
 
     public Pose2d getLeftReefPoint(int tagID) {
