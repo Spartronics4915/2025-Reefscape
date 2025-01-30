@@ -22,7 +22,6 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
     private SparkMaxConfig motorConfig;
     private SparkMax follower;
     private RelativeEncoder motorEncoder;
-    private RelativeEncoder followerEncoder;
 
     private double currentSetPoint;
     
@@ -51,8 +50,6 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
         // Follower motor init
         follower = new SparkMax(ElevatorConstants.elevatorFollowerID, MotorType.kBrushless);
-
-        RelativeEncoder followerEncoder = follower.getEncoder();
 
         SparkMaxConfig followerConfig = new SparkMaxConfig();
 
