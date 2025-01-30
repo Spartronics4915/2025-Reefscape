@@ -88,6 +88,10 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         currentSetPoint = value.meter;
     }
 
+    public void setSetPoint(double setPoint) {
+        currentSetPoint = setPoint;
+    }
+
     @Override
     public void onModeSwitch() {
         resetMechanism();
