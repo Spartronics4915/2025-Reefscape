@@ -64,9 +64,10 @@ public class AlignToReef {
     }
 
     public Command generateCommand(BranchSide side) {
+        var waypoint = getBranchPathWaypoint(side);
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-            new Pose2d(mSwerve.getPose().getTranslation(), getVelocityHeading(mSwerve.getFieldVelocity())),
-            getBranchPathWaypoint(side)
+            new Pose2d(mSwerve.getPose().getTranslation(), getVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
+            waypoint
         );
 
         if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
@@ -91,9 +92,10 @@ public class AlignToReef {
      * @param cs field relative chassis speeds
      * @return
      */
-    private Rotation2d getVelocityHeading(ChassisSpeeds cs){
+    private Rotation2d getVelocityHeading(ChassisSpeeds cs, Pose2d target){
         if (Math.abs(cs.vxMetersPerSecond) < 0.01 && Math.abs(cs.vyMetersPerSecond) < 0.01 ) {
-            return Rotation2d.kZero;
+            var diff =  mSwerve.getPose().minus(target).getTranslation();
+            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();
         }
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
     }
