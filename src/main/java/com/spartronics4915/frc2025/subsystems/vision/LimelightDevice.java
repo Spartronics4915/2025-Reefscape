@@ -140,6 +140,7 @@ public class LimelightDevice extends SubsystemBase {
                 name,
                 poseEstimate.tagCount,
                 poseEstimate.avgTagDist,
+                swerve.getSpeed(),
                 method
                 ));
         }
@@ -185,6 +186,7 @@ public class LimelightDevice extends SubsystemBase {
 
         if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
         transStdDev += poseEstimate.avgTagDist * 0.075; //trust less and less the further away the tags are
+        transStdDev += swerve.getSpeed() * 0.25; //trust less and less the faster we are moving
         if (poseEstimate.tagCount > 1) transStdDev -= 0.05; //trust slightly more if multiple tags seen TODO: is this even needed?
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision

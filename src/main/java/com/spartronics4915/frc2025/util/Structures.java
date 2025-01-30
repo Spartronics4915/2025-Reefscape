@@ -52,6 +52,7 @@ public final class Structures {
         String diagName,
         int diagTagCount,
         double diagTagDistance,
+        double diagRobotSpeed,
         PoseEstimationMethod diagMethod
     ) {}
 
