@@ -54,6 +54,18 @@ public class AlignToReef {
                 redTagPose;
         }
 
+        public ReefSide mirror(){
+            switch (this) {
+                case ONE: return ReefSide.ONE;
+                case TWO: return ReefSide.SIX;
+                case THREE: return ReefSide.FIVE;
+                case FOUR: return ReefSide.FOUR;
+                case FIVE: return ReefSide.THREE;
+                case SIX: return ReefSide.TWO;
+                default: return ReefSide.ONE;
+            }
+        }
+
         private ReefSide(int blue, int red) {
             var layout = RobotContainer.getFieldLayout();
 
