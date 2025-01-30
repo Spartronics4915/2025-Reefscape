@@ -64,14 +64,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         return motor.getEncoder().getPosition();
     }
 
-    private void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
-    }
-
     @Override
     public void periodic() {
-        setVoltage(0.05);
-        System.out.println(motor.getAppliedOutput() + ", " + follower.getAppliedOutput());
+
     }
 
     public void moveToPosition(ElevatorSubsystemState value) {
