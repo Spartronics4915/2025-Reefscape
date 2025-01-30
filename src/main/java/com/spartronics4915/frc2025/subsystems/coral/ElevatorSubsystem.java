@@ -11,6 +11,7 @@ import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -75,10 +76,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        currentSetPoint = MathUtil.clamp(currentSetPoint, ElevatorConstants.minHeight, ElevatorConstants.maxHeight);
     }
 
     public void moveToPosition(ElevatorSubsystemState value) {
-        
+        currentSetPoint = value.meter;
     }
 }
