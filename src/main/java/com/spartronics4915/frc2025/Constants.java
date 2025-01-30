@@ -103,10 +103,10 @@ public final class Constants {
                 }
             }
 
-            public static final PathConstraints kPathConstraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kPathConstraints = new PathConstraints(1.75, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
         
             // X = side to side, Y = away from tag
-            public static final Translation2d kTagOffset = new Translation2d(0.075, 0.5);
+            public static final Translation2d kTagOffset = new Translation2d(0.10, 0.75); //TODO fix based off field cad
         }
 
     }

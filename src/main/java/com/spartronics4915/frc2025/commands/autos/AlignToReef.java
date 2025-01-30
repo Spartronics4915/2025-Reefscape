@@ -115,7 +115,7 @@ public class AlignToReef {
      * @return target rotation for the robot when it reaches the final waypoint
      */
     private Rotation2d getBranchRotation(SwerveSubsystem swerve){
-        return getClosestReefAprilTag(swerve.getPose()).getRotation();
+        return getClosestReefAprilTag(swerve.getPose()).getRotation().rotateBy(Rotation2d.k180deg);
     }
 
     public static Pose2d getClosestBranch(BranchSide side, SwerveSubsystem swerve){
