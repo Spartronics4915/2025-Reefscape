@@ -2,6 +2,7 @@ package com.spartronics4915.frc2025.commands.autos;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTagOffset;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.spartronics4915.frc2025.RobotContainer;
@@ -25,6 +27,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -140,7 +143,7 @@ public class AlignToReef {
 
     private Command getPathFromWaypoint(Pose2d waypoint) {
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-            new Pose2d(mSwerve.getPose().getTranslation(), getVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
+            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
             waypoint
         );
 
@@ -151,7 +154,7 @@ public class AlignToReef {
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
             kPathConstraints,
-            null, 
+            new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
             new GoalEndState(0.0, getBranchRotation(mSwerve))
         );
 
@@ -166,12 +169,16 @@ public class AlignToReef {
      * @param cs field relative chassis speeds
      * @return
      */
-    private Rotation2d getVelocityHeading(ChassisSpeeds cs, Pose2d target){
-        if (Math.abs(cs.vxMetersPerSecond) < 0.01 && Math.abs(cs.vyMetersPerSecond) < 0.01 ) {
+    private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
+        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.01 ) {
             var diff =  mSwerve.getPose().minus(target).getTranslation();
             return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();
         }
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+    }
+
+    private LinearVelocity getVelocityMagnitude(ChassisSpeeds cs){
+        return MetersPerSecond.of(new Translation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond).getNorm());
     }
 
     /**
