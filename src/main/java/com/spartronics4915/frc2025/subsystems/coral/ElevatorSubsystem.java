@@ -17,6 +17,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkMax motor;
     private SparkMaxConfig motorConfig;
     private SparkMax follower;
+
+    private double currentSetPoint;
     
     public ElevatorSubsystem() {
         // Main elevator motor init
@@ -58,6 +60,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         followerConfig.follow(motor);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        resetMechanism();
+    }
+
+    public void resetMechanism() {
+        double position = getPosition();
+        currentSetPoint = position;
     }
 
     private double getPosition() {
