@@ -106,6 +106,10 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         resetMechanism();
     }
 
+    public void incrementAngle(double delta){
+        currentSetPoint += delta;
+    }
+
     @Override
     public void onModeSwitch() {
         resetMechanism();
