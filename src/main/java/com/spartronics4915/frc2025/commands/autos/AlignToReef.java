@@ -22,6 +22,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,6 +64,8 @@ public class AlignToReef {
             });
         });
     }
+
+    private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
     public Command generateCommand(BranchSide side) {
         var waypoint = getBranchPathWaypoint(side);
@@ -106,6 +110,9 @@ public class AlignToReef {
      */
     private Pose2d getBranchPathWaypoint(BranchSide side){
         var nearest = getClosestBranch(side, mSwerve);
+
+        desiredBranchPublisher.accept(nearest);
+
         return new Pose2d(
             nearest.getTranslation(),
             nearest.getRotation().rotateBy(Rotation2d.k180deg)
