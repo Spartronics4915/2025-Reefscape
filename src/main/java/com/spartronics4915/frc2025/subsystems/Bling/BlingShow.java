@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.Filesystem;
 
@@ -11,7 +13,7 @@ import edu.wpi.first.wpilibj.Filesystem;
  * This one is quite weird. Check out github FinnSpartronics/fbling-sim for the shows and put the exported files into the deploy directory.
  */
 public class BlingShow extends BlingSegment {
-    private short[][] show;
+    private byte[][] show;
 
     public BlingShow(String filename) {
         try {
@@ -23,44 +25,45 @@ public class BlingShow extends BlingSegment {
         this.maxLength = show.length - 1;
     }
     
-    private short[][] loadFromDeploy(String filename) throws FileNotFoundException, IOException {
-        String path = Filesystem.getDeployDirectory().getPath() + "/" + filename;
-        System.out.println("Attempting to load " + path);
-        BufferedReader reader = new BufferedReader(new FileReader(path));
+    private byte[][] loadFromDeploy(String filename) throws IOException, OutOfMemoryError, SecurityException {
+        System.out.println("Attempting to load " + Filesystem.getDeployDirectory().getPath() + "/" + filename);
 
-        String line = reader.readLine();
+        byte[] arr = Files.readAllBytes(Path.of(Filesystem.getDeployDirectory().getPath() + "/" + filename));
 
-        ArrayList<ArrayList<Short>> arr = new ArrayList<ArrayList<Short>>();
+        ArrayList<ArrayList<Byte>> arrList = new ArrayList<ArrayList<Byte>>();
         
-        for (String x : line.split(" ")) {
-            ArrayList<Short> tmp = new ArrayList<Short>();
-            for (String num : x.split(",")) {
-                tmp.add(Short.parseShort(num));
-            }
-            arr.add(tmp);
+        ArrayList<Byte> current = new ArrayList<Byte>();
+        for (byte b : arr) {
+            if (b == 0) {
+                arrList.add(current);
+                current = new ArrayList<Byte>();
+            } else current.add(Byte.valueOf(b));
         }
 
-        short[][] array = new short[arr.size()][arr.get(0).size()];
-        for (int x = 0; x < arr.size(); x++) {
-            for (int y = 0; y < arr.get(x).size(); y++) {
-                array[x][y] = arr.get(x).get(y);
+        byte[][] output = new byte[arrList.size()][arrList.get(0).size()];
+        for (int x = 0; x < arrList.size(); x++) {
+            for (int y = 0; y < arrList.get(0).size(); y++) {
+                try {
+                    output[x][y] = arrList.get(x).get(y);
+                } catch (Exception e) {
+                    break;
+                }
             }
         }
 
-        reader.close();
-        return array;
+        return output;
     }
 
     public int getR(int index) {
-        return show[frame][index * 3];
+        return show[frame][index * 3] & 0xff;
     }
 
     public int getG(int index) {
-        return show[frame][index * 3 + 1];
+        return show[frame][index * 3 + 1] & 0xff;
     }
 
     public int getB(int index) {
-        return show[frame][index * 3 + 2];
+        return show[frame][index * 3 + 2] & 0xff;
     }
 
     @Override

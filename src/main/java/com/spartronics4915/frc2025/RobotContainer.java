@@ -19,6 +19,7 @@ import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSegment;
+import com.spartronics4915.frc2025.subsystems.Bling.BlingShow;
 import com.spartronics4915.frc2025.subsystems.Bling.BlingSubsystem;
 import com.spartronics4915.frc2025.subsystems.Bling.DriverCommunication;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
@@ -88,7 +89,7 @@ public class RobotContainer {
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
             ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
         }
-        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(21, visionSubsystem), BlingSegment.rainbow(21));
+        blingSubsystem = new BlingSubsystem(0, new BlingShow("bling\\funrainbow21.bling"), BlingSegment.rainbow(21));
 
         odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
