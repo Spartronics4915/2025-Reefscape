@@ -2,6 +2,7 @@ package com.spartronics4915.frc2025.subsystems.coral;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -13,18 +14,23 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private SparkMax motor;
     private SparkMaxConfig motorConfig;
     private SparkMax follower;
+    private RelativeEncoder motorEncoder;
+    private RelativeEncoder followerEncoder;
 
     private double currentSetPoint;
     
     public ElevatorSubsystem() {
         // Main elevator motor init
         motor = new SparkMax(ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
+
+        RelativeEncoder motorEncoder = motor.getEncoder();
 
         motorConfig = new SparkMaxConfig();
 
@@ -45,6 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
         // Follower motor init
         follower = new SparkMax(ElevatorConstants.elevatorFollowerID, MotorType.kBrushless);
+
+        RelativeEncoder followerEncoder = follower.getEncoder();
 
         SparkMaxConfig followerConfig = new SparkMaxConfig();
 
@@ -90,6 +98,16 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
     public void setSetPoint(double setPoint) {
         currentSetPoint = setPoint;
+    }
+
+    private double angleToRaw(Rotation2d angle) {
+        return angle.getRotations();
+    }
+
+    private void setMechanismAngle(Rotation2d angle){
+        motorEncoder.setPosition(angleToRaw(angle));
+        followerEncoder.setPosition(angleToRaw(angle));
+        resetMechanism();
     }
 
     @Override
