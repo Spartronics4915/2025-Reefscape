@@ -106,7 +106,6 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
     private void setMechanismAngle(Rotation2d angle){
         motorEncoder.setPosition(angleToRaw(angle));
-        followerEncoder.setPosition(angleToRaw(angle));
         resetMechanism();
     }
 
