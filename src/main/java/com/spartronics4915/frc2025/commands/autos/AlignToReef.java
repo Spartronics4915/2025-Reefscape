@@ -6,6 +6,7 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTagOffs
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
@@ -106,18 +107,22 @@ public class AlignToReef {
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
     public Command generateCommand(BranchSide side) {
-        var branch = getClosestBranch(side, mSwerve);
-        desiredBranchPublisher.accept(branch);
-
-        return getPathFromWaypoint(getWaypointFromBranch(branch));
+        return Commands.defer(() -> {
+            var branch = getClosestBranch(side, mSwerve);
+            desiredBranchPublisher.accept(branch);
+    
+            return getPathFromWaypoint(getWaypointFromBranch(branch));
+        }, Set.of());
     }
 
 
     public Command generateCommand(ReefSide reefTag, BranchSide side) {
-        var branch = getBranchFromTag(reefTag.getCurrent(), side);
-        desiredBranchPublisher.accept(branch);
-
-        return getPathFromWaypoint(getWaypointFromBranch(branch));
+        return Commands.defer(() -> {
+            var branch = getBranchFromTag(reefTag.getCurrent(), side);
+            desiredBranchPublisher.accept(branch);
+    
+            return getPathFromWaypoint(getWaypointFromBranch(branch));
+        }, Set.of());
     }
 
 

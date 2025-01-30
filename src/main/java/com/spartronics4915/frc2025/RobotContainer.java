@@ -157,7 +157,7 @@ public class RobotContainer {
         );
 
         driverController.rightBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of())
+            alignmentCommandFactory.generateCommand(BranchSide.RIGHT)
         );
 
 
