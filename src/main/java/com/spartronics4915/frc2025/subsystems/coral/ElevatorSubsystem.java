@@ -141,7 +141,7 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         });
     }
 
-    public Command setSetpointCommand(double newSetPoint){
+    public Command setSetPointCommand(double newSetPoint){
         return this.runOnce(() -> setSetPoint(newSetPoint));
     }
 
