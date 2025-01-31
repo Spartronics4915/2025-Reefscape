@@ -107,7 +107,7 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
         currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
 
-        elevatorClosedLoopController.setReference(currentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FFCalculator.calculate(currentState.position, currentState.velocity));
+        elevatorClosedLoopController.setReference(currentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FFCalculator.calculate(currentState.velocity));
     }
 
     public void moveToPosition(ElevatorSubsystemState value) {
