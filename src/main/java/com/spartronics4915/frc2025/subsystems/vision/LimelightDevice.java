@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.Constants.VisionConstants.StdDevConstants;
 import com.spartronics4915.frc2025.Constants.VisionConstants.AprilTagRegion;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
@@ -149,18 +150,18 @@ public class LimelightDevice extends SubsystemBase {
 
     private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate, SwerveSubsystem swerve) {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
-        double transStdDev = 0.3; //trustworthy to start
+        double transStdDev = StdDevConstants.MegaTag1.kInitialValue;
         
         if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) { //single tag TODO: why are two checks needed?
             RawFiducial singleTag = poseEstimate.rawFiducials[0];
             if (singleTag.ambiguity > 0.7 || singleTag.distToCamera > 5) { //TODO: what does ambiguity measure?
                 return Optional.empty(); //don't trust if too ambiguous or too far
             }
-            transStdDev += 0.3; //megatag1 performs much worse with only one tag
+            transStdDev += StdDevConstants.MegaTag1.kSingleTagPunishment; //megatag1 performs much worse with only one tag
         }
-        transStdDev -= Math.min(poseEstimate.tagCount, 4) * 0.15; //trust more with more tags
-        transStdDev += poseEstimate.avgTagDist * 0.1; //trust less when tags are further away
-        transStdDev += swerve.getSpeed() * 0.15; //trust less with higher speed
+        transStdDev -= Math.min(poseEstimate.tagCount, 4) * StdDevConstants.MegaTag1.kTagCountReward;
+        transStdDev += poseEstimate.avgTagDist * StdDevConstants.MegaTag1.kAverageDistancePunishment;
+        transStdDev += swerve.getSpeed() * StdDevConstants.MegaTag1.kRobotSpeedPunishment;
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
@@ -173,13 +174,13 @@ public class LimelightDevice extends SubsystemBase {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
         if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) 
             return Optional.empty(); //don't trust if turning too fast
-        if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
+        if (poseEstimate.avgTagDist > 8) return Optional.empty();
         
-        double transStdDev = 0.1; //very trustworthy to start
+        double transStdDev = StdDevConstants.MegaTag2.kInitialValue;
 
-        transStdDev += poseEstimate.avgTagDist * 0.075; //trust less when tags are further away
-        transStdDev += swerve.getSpeed() * 0.25; //trust less with higher speed
-        if (poseEstimate.tagCount > 1) transStdDev -= 0.05; //trust slightly more if multiple tags seen TODO: is this even needed?
+        if (poseEstimate.tagCount > 1) transStdDev -= StdDevConstants.MegaTag2.kMultipleTagsBonus; //TODO: is this even needed?
+        transStdDev += poseEstimate.avgTagDist * StdDevConstants.MegaTag2.kAverageDistancePunishment;
+        transStdDev += swerve.getSpeed() * StdDevConstants.MegaTag2.kRobotSpeedPunishment;
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
