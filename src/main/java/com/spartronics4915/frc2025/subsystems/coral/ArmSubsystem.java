@@ -39,8 +39,6 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     private Rotation2d mCurrentSetPoint = Rotation2d.fromRotations(0);;
     private State mCurrentState;
 
-    private double velocity;
-
     public ArmSubsystem() {
         
         SparkMax mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
@@ -89,7 +87,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private void initArmProfile() {
         mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
-        mCurrentState = new State(angleToRaw(getPosition()), velocity);
+        mCurrentState = new State(angleToRaw(getPosition()), 0.0);
     }
 
     private double getVelocity() {

@@ -179,8 +179,8 @@ public final class Constants {
         }
         
         public static final int kArmMotorID = 0;
-        public static final int kPositionConversionFactor = 0;
-        public static final int kVelocityConversionFactor = 0;
+        public static final int kPositionConversionFactor = 1;
+        public static final int kVelocityConversionFactor = 1;
 
         public static final class kArmPIDConstants {
             public static final double kP = 0;
@@ -200,9 +200,10 @@ public final class Constants {
         public static final double kG = 0.0;
         public static final double kV = 0.0;
         public static final double kA = 0.0;
-
-        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(0);
-        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(0);
+        
+        //The values set here are placeholders for sim
+        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(300);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(120);
 
 
 
