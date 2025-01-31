@@ -190,7 +190,7 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = null;
+        public static final Constraints constraints = new Constraints(0, 0);
 
         public static final double minHeight = 0;
         public static final double maxHeight = 0;
