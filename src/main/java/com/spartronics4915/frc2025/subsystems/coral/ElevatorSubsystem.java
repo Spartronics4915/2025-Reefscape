@@ -1,8 +1,11 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -14,7 +17,10 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
@@ -22,8 +28,13 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
     private SparkMaxConfig motorConfig;
     private SparkMax follower;
     private RelativeEncoder motorEncoder;
+    private SparkClosedLoopController elevatorClosedLoopController;
+    private ElevatorFeedforward FFCalculator;
+
+    private TrapezoidProfile elevatorProfile;
 
     private double currentSetPoint;
+    private State currentState;
     
     public ElevatorSubsystem() {
         // Main elevator motor init
@@ -68,12 +79,17 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         followerConfig.follow(motor);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        FFCalculator = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+        elevatorProfile = new TrapezoidProfile(ElevatorConstants.constraints);
+        elevatorClosedLoopController = motor.getClosedLoopController();
+
         resetMechanism();
     }
 
     public void resetMechanism() {
         double position = getPosition();
         currentSetPoint = position;
+        currentState = new State(position, 0);
     }
 
     private double getPosition() {
@@ -87,6 +103,10 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
     @Override
     public void periodic() {
         currentSetPoint = MathUtil.clamp(currentSetPoint, ElevatorConstants.minHeight, ElevatorConstants.maxHeight);
+
+        currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+
+        elevatorClosedLoopController.setReference(currentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FFCalculator.calculate(currentState.position, currentState.velocity));
     }
 
     public void moveToPosition(ElevatorSubsystemState value) {

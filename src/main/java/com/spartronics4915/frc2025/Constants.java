@@ -8,6 +8,7 @@ import com.spartronics4915.frc2025.util.Structures.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -187,8 +188,17 @@ public final class Constants {
         public static final int followerSmartCurrentLimit = 0;
         public static final int followerSecondaryCurrentLimit = 0;
 
+        public static final double dt = 0.02;
+
+        public static final Constraints constraints = null;
+
         public static final double minHeight = 0;
         public static final double maxHeight = 0;
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
 
         public static final class motorPIDConstants {
             public static final double kP = 0;
