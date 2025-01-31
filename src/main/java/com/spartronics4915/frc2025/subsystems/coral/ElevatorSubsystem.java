@@ -15,6 +15,7 @@ import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -128,6 +129,28 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
     public void incrementAngle(double delta){
         currentSetPoint += delta;
+    }
+
+    //commands
+
+    public Command manualMode(double delta){
+        return this.runEnd(() -> {
+            incrementAngle(delta);
+        }, () -> {
+            resetMechanism();
+        });
+    }
+
+    public Command setSetpointCommand(double newSetPoint){
+        return this.runOnce(() -> setSetPoint(newSetPoint));
+    }
+
+    public Command presetCommand(ElevatorSubsystemState preset){
+        return this.runOnce(() -> moveToPosition(preset));
+    }
+
+    public Command setMechanismAngleCommand(Rotation2d newAngle){
+        return this.runOnce(() -> setMechanismAngle(newAngle));
     }
 
     @Override
