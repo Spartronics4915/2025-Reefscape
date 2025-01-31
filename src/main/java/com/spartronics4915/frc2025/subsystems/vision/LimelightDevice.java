@@ -16,6 +16,7 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -100,12 +101,12 @@ public class LimelightDevice extends SubsystemBase {
      */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
         if (role == LimelightRole.NOTHING) return Optional.empty();
+        PoseEstimationMethod method = PoseEstimationMethod.MEGATAG_2;
         final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01);
         final boolean twoOrMoreTags = LimelightHelpers.getRawFiducials(name).length >= 2;
         double robotSpeed = swerve.getSpeed();
         final boolean movingSlowEnough = robotSpeed < VisionConstants.kMaxSpeedForMegaTag1;
         final boolean CAN_GET_GOOD_HEADING = twoOrMoreTags && movingSlowEnough;
-        PoseEstimationMethod method = PoseEstimationMethod.MEGATAG_2;
         if (BEFORE_MATCH || CAN_GET_GOOD_HEADING || LimelightVisionSubsystem.getMegaTag1Override()) method = PoseEstimationMethod.MEGATAG_1;
         return getVisionMeasurement(swerve, method);
     }
@@ -148,31 +149,22 @@ public class LimelightDevice extends SubsystemBase {
 
     private Optional<Matrix<N3, N1>> calculateStdDevsMegaTag1(LimelightHelpers.PoseEstimate poseEstimate, SwerveSubsystem swerve) {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
-        final boolean START_OF_AUTO = DriverStation.isAutonomous() && !Robot.AUTO_TIMER.hasElapsed(3);
-        double transStdDev = 0.5; //not very trustworthy to start
-
-        if (START_OF_AUTO) transStdDev -= 0.2; //trust more at the start of auto to get an initial pose
+        double transStdDev = 0.3; //trustworthy to start
         
-        if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) { //single tag
-            transStdDev += 0.2; //trust less if single tag
+        if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) { //single tag TODO: why are two checks needed?
             RawFiducial singleTag = poseEstimate.rawFiducials[0];
-            if (singleTag.ambiguity > 0.7 || singleTag.distToCamera > 5) {
+            if (singleTag.ambiguity > 0.7 || singleTag.distToCamera > 5) { //TODO: what does ambiguity measure?
                 return Optional.empty(); //don't trust if too ambiguous or too far
             }
-            if (singleTag.distToCamera < 3) transStdDev -= 0.2; //trust more if close
-        } else { //multi tag
-            double furthestDistance = Arrays.stream(poseEstimate.rawFiducials)
-                                            .map(el -> el.distToCamera)
-                                            .max(Double::compare)
-                                            .get();
-            if (poseEstimate.tagCount > 2) transStdDev -= 0.2; //trust more if more than two tags
-            if (furthestDistance > 7) transStdDev += 0.6; //trust less if at least one tag is very far
-            if (poseEstimate.avgTagDist < 3) transStdDev -= 0.2; //trust more if tags tend to be close
+            transStdDev += 0.3; //megatag1 performs much worse with only one tag
         }
+        transStdDev -= Math.min(poseEstimate.tagCount, 4) * 0.15; //trust more with more tags
+        transStdDev += poseEstimate.avgTagDist * 0.1; //trust less when tags are further away
+        transStdDev += swerve.getSpeed() * 0.15; //trust less with higher speed
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
 
-        double rotStdDev = 0.3; //we mainly use megatag1 for rotation
+        double rotStdDev = 0.3; //we want to get the rotation from megatag1
 
         return Optional.of(VecBuilder.fill(transStdDev, transStdDev, rotStdDev));
     }
@@ -181,12 +173,12 @@ public class LimelightDevice extends SubsystemBase {
         if (poseEstimate == null || poseEstimate.tagCount == 0) return Optional.empty();
         if (swerve.getAngularVelocity().abs(Units.DegreesPerSecond) > VisionConstants.kMaxAngularSpeed) 
             return Optional.empty(); //don't trust if turning too fast
+        if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
         
         double transStdDev = 0.1; //very trustworthy to start
 
-        if (poseEstimate.avgTagDist > 8) return Optional.empty(); //don't trust if too far
-        transStdDev += poseEstimate.avgTagDist * 0.075; //trust less and less the further away the tags are
-        transStdDev += swerve.getSpeed() * 0.25; //trust less and less the faster we are moving
+        transStdDev += poseEstimate.avgTagDist * 0.075; //trust less when tags are further away
+        transStdDev += swerve.getSpeed() * 0.25; //trust less with higher speed
         if (poseEstimate.tagCount > 1) transStdDev -= 0.05; //trust slightly more if multiple tags seen TODO: is this even needed?
 
         transStdDev = Math.max(transStdDev, 0.05); //make sure we aren't putting all our trust in vision
