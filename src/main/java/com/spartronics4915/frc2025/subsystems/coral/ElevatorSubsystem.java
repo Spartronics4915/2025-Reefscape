@@ -118,12 +118,8 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         currentSetPoint = setPoint;
     }
 
-    private double angleToRaw(Rotation2d angle) {
-        return angle.getRotations();
-    }
-
-    private void setMechanismAngle(Rotation2d angle){
-        motorEncoder.setPosition(angleToRaw(angle));
+    private void setMechanismPosition(double position){
+        motorEncoder.setPosition(position);
         resetMechanism();
     }
 
@@ -149,8 +145,8 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         return this.runOnce(() -> moveToPosition(preset));
     }
 
-    public Command setMechanismAngleCommand(Rotation2d newAngle){
-        return this.runOnce(() -> setMechanismAngle(newAngle));
+    public Command setMechanismAngleCommand(double position){
+        return this.runOnce(() -> setMechanismPosition(position));
     }
 
     @Override
