@@ -4,9 +4,10 @@
 
 package com.spartronics4915.frc2025;
 
-import com.spartronics4915.frc2025.util.Structures.*;
 import com.spartronics4915.frc2025.util.Structures.PIDConstants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -40,8 +41,27 @@ public final class Constants {
         public static double liftedAngle = 0.5;
         public static double stowAngle = 0.5;
 
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
 
-        public static final PIDConstants kPIDconstants = new PIDConstants(1.0, 0.0, 0.0);
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
+
+        public enum ClimberState {
+        
+        LIFTED(Rotation2d.fromDegrees(Constants.ClimberConstants.liftedAngle)),
+        STOW(Rotation2d.fromDegrees(Constants.ClimberConstants.stowAngle)),;
+        
+        public final Rotation2d angle;
+
+        private ClimberState(Rotation2d angle) {
+            this.angle = angle;
+            
+        }
+
+        
+
+    }
     }
 
     public static final class Drive {
