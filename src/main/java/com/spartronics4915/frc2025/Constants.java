@@ -39,7 +39,8 @@ public final class Constants {
         public static final int mPIDController = 0;
         public static final int kPIDConstants = 0;
 
-        public static final int kSensorID = 0;
+        public static final int kLaserCANID = 0;
+        public static final int laserCANDistance = 4000;
 
         public enum IntakeSpeed {
             IN (0.0),
