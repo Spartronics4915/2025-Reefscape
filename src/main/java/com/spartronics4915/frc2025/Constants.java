@@ -13,7 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
@@ -245,5 +247,58 @@ public final class Constants {
 
 
 
+    }
+
+    public static final class ElevatorConstants {
+
+        public enum ElevatorSubsystemState {
+
+            STOW(0),
+            L3(0),
+            L4(0);
+
+            public double meter;
+
+            private ElevatorSubsystemState(double meter) {
+                this.meter = meter;
+            }
+        }
+
+        public static final int elevatorMotorID = 20;
+        public static final int elevatorFollowerID = 16;
+        public static final boolean motorInverted = false;
+        public static final boolean followerInverted = false;
+        public static final double motorPositionConversionFactor = 0;
+        public static final double motorVelocityConversionFactor = 0;
+        public static final double followerPositionConversionFactor = 0;
+        public static final double followerVelocityConversionFactor = 0;
+        public static final int motorSmartCurrentLimit = 0;
+        public static final int motorSecondaryCurrentLimit = 0;
+        public static final int followerSmartCurrentLimit = 0;
+        public static final int followerSecondaryCurrentLimit = 0;
+
+        public static final double dt = 0.02;
+
+        public static final Constraints constraints = new Constraints(0, 0);
+
+        public static final double minHeight = 0;
+        public static final double maxHeight = 0;
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+
+        public static final class motorPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
+
+        public static final class followerPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
     }
 }
