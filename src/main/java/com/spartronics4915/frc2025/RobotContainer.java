@@ -12,6 +12,7 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef.BranchSide;
@@ -210,27 +211,27 @@ public class RobotContainer {
         chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
         chooser.addOption("Align with move", Commands.sequence(
-            new PathPlannerAuto("Coral-2"),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
             alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.LEFT),
-            new PathPlannerAuto("2-Coral"),
-            new PathPlannerAuto("Coral-2"),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
             alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.RIGHT),
-            new PathPlannerAuto("2-Coral"),
-            new PathPlannerAuto("Coral-3"),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE),
             alignmentCommandFactory.generateCommand(ReefSide.THREE, BranchSide.LEFT),
-            new PathPlannerAuto("3-Coral")
+            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL)
         ));
 
         chooser.addOption("Align Mirror with move", Commands.sequence(
-            new PathPlannerAuto("Coral-2", true),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
             alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.LEFT),
-            new PathPlannerAuto("2-Coral", true),
-            new PathPlannerAuto("Coral-2", true),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
             alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.RIGHT),
-            new PathPlannerAuto("2-Coral", true),
-            new PathPlannerAuto("Coral-3", true),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE, true),
             alignmentCommandFactory.generateCommand(ReefSide.THREE.mirror(), BranchSide.LEFT),
-            new PathPlannerAuto("3-Coral", true)
+            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL, true)
         ));
 
         SmartDashboard.putData("Auto Chooser", chooser);
