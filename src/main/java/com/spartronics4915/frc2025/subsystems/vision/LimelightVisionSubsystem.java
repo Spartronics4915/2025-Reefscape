@@ -25,10 +25,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem, ModeSwitchInterface {
     private final ArrayList<LimelightDevice> limelights;
+    private static boolean mt1Override = false;
 
     private LimelightDevice reefLL;
+    private LimelightDevice alignLL;
     private LimelightDevice stationLL;
-    private LimelightDevice observerLL;
 
     private final SwerveSubsystem swerveSubsystem;
     private final StructArrayPublisher<Pose3d> visionTargetPublisher;
@@ -39,42 +40,45 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         for (LimelightConstants config : VisionConstants.kLimelights) {
             LimelightDevice limelight = new LimelightDevice(config);
             limelights.add(limelight);
-            boolean diagnosticsNeeded = VisionConstants.kVisionMeasurementDiagnostics;
+            boolean diagnosticsNeeded = VisionConstants.kVisionDiagnostics;
             switch (config.role()) {
                 case REEF:
                     reefLL = limelight;
                     System.out.println("Setting reef limelight to " + config.id());
                     break;
+                case ALIGN:
+                    alignLL = limelight;
+                    System.out.println("Setting align limelight to " + config.id());
+                    break;
                 case STATION:
                     stationLL = limelight;
                     System.out.println("Setting station limelight to " + config.id());
-                    break;
-                case OBSERVER:
-                    observerLL = limelight;
-                    diagnosticsNeeded = false;
-                    System.out.println("Setting observer limelight to " + config.id());
                     break;
                 default:
                     diagnosticsNeeded = false;
                     System.out.println("Not setting " + config.id() + " to anything");
             }
             if (diagnosticsNeeded) {
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/stddev", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/count", -1);
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + config.name() + "/distance", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/stddev", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/count", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/distance", -1);
+                SmartDashboard.putNumber("VisionDiagnostics/limelight-" + config.name() + "/speed", -1);
+                SmartDashboard.putString("VisionDiagnostics/limelight-" + config.name() + "/method", "");
             }
         }
-
-        updateTagFilters();
 
         this.fieldLayout = fieldLayout;
         this.swerveSubsystem = swerveSubsystem;
 
-        NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-        StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic("vision targets",
-                Pose3d.struct);
-        visionTargetPublisher = visionTargetTopic.publish();
-        Shuffleboard.getTab("logging").addString("vision target ids", () -> this.getVisibleTagIDs().toString());
+        if (VisionConstants.kVisionDiagnostics) {
+            NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+            StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic(
+                "VisionDiagnostics/vision targets", Pose3d.struct);
+            visionTargetPublisher = visionTargetTopic.publish();
+            // Shuffleboard.getTab("logging").addString("VisionDiagnostics/vision target ids", () -> this.getVisibleTagIDs().toString());
+        } else visionTargetPublisher = null;
+
+        updateTagFilters();
     }
 
     private void updateTagFilters() {
@@ -126,20 +130,30 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     @Override
     public void periodic() {
         getVisionMeasurements().forEach((measurement) -> {
-            if (VisionConstants.kVisionMeasurementDiagnostics) {
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
-                SmartDashboard.putNumber("VisionMeasurementDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
-            }
             swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
+            if (VisionConstants.kVisionDiagnostics) {
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/stddev", measurement.stdDevs().get(0, 0));
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/count", measurement.diagTagCount());
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/distance", measurement.diagTagDistance());
+                SmartDashboard.putNumber("VisionDiagnostics/" + measurement.diagName() + "/speed", measurement.diagRobotSpeed());
+                SmartDashboard.putString("VisionDiagnostics/" + measurement.diagName() + "/method", measurement.diagMethod().toString());
+            }
         });
 
-        visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
+        if (VisionConstants.kVisionDiagnostics) visionTargetPublisher.set(getVisibleTagPoses().toArray(new Pose3d[0]));
     }
 
     @Override
     public void onModeSwitch() {
         updateTagFilters();
+    }
+
+    public static boolean getMegaTag1Override() {
+        return mt1Override;
+    }
+
+    public static void setMegaTag1Override(boolean b) {
+        mt1Override = b;
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
@@ -150,11 +164,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         return reefLL;
     }
 
+    public LimelightDevice getAlignLimelight() {
+        return alignLL;
+    }
+
     public LimelightDevice getStationLimelight() {
         return stationLL;
     }
 
-    public LimelightDevice getObserverLimelight() {
-        return observerLL;
-    }
 }
