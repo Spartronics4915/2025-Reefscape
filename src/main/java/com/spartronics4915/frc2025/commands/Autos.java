@@ -32,7 +32,8 @@ public final class Autos {
     }
 
     public enum AutoPaths{
-        CORAL_THREE("Coral-3"),
+        CORAL_ONE("Coral-1"),
+        ONE_CORAL("1-Coral"),
         CORAL_TWO("Coral-2"),
         TWO_CORAL("2-Coral"),
         CORAL_THREE("Coral-3"),
@@ -42,6 +43,30 @@ public final class Autos {
 
         //TODO create Mirroring so that we can switch different coral stations intuitively
         //TODO create "getReverse", ie Coral-2 reversed is 2-Coral
+
+        public AutoPaths getReverse(){
+            switch (this) {
+                case CORAL_ONE: return ONE_CORAL;
+                case CORAL_TWO: return TWO_CORAL;
+                case CORAL_THREE: return THREE_CORAL;
+                case ONE_CORAL: return CORAL_ONE;
+                case TWO_CORAL: return CORAL_TWO;
+                case THREE_CORAL: return CORAL_THREE;
+            }
+            return this;
+        }
+
+        public AutoPaths getMirror(){
+            switch (this) {
+                case CORAL_ONE: return CORAL_ONE;
+                case CORAL_TWO: return TWO_CORAL;
+                case CORAL_THREE: return THREE_CORAL;
+                case ONE_CORAL: return ONE_CORAL;
+                case TWO_CORAL: return CORAL_TWO;
+                case THREE_CORAL: return CORAL_THREE;
+            }
+            return this;
+        }
 
         private AutoPaths(String path) {
             pathName = path;
