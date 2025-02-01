@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.ClimberConstants;
+import com.spartronics4915.frc2025.Constants.ClimberConstants.ClimberState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -76,6 +77,14 @@ public class ClimberSubsystem extends SubsystemBase {
     private void setMechanismAngle(Rotation2d angle){
         mClimberEncoder.setPosition(angleToRaw(angle));
         resetMechanism();
+    }
+
+    public void setSetpoint(Rotation2d newSetpoint){
+        mCurrentSetPoint = newSetpoint;
+    }
+
+    public void setSetpoint(ClimberState newState) {
+        setSetpoint(newState.angle);
     }
 
 
