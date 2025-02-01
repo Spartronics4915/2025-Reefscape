@@ -132,6 +132,9 @@ public class ClimberSubsystem extends SubsystemBase {
         return this.runOnce(() -> setSetpoint(newSetpoint));
     }
 
+    public Command presetCommand(ClimberState preset){
+        return setSetpointCommand(preset.angle);
+    }
 
 
 }
