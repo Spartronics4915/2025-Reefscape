@@ -99,8 +99,6 @@ public class ClimberSubsystem extends SubsystemBase {
         return convertRaw(position);
     }
 
-    private double mCurrentSetpoint = 0.0;
-
     private void initClosedLoopController() {
         mClosedLoopController = mClimberMotor.getClosedLoopController();
     }
