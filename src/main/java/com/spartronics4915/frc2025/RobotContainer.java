@@ -213,9 +213,11 @@ public class RobotContainer {
             Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
             alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.LEFT),
             Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
             Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
             alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.RIGHT),
             Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
             Autos.getAutoPathCommand(AutoPaths.CORAL_THREE),
             alignmentCommandFactory.generateCommand(ReefSide.THREE, BranchSide.LEFT),
             Autos.getAutoPathCommand(AutoPaths.THREE_CORAL)
@@ -225,9 +227,11 @@ public class RobotContainer {
             Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
             alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.LEFT),
             Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
             Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
             alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.RIGHT),
             Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
             Autos.getAutoPathCommand(AutoPaths.CORAL_THREE, true),
             alignmentCommandFactory.generateCommand(ReefSide.THREE.mirror(), BranchSide.LEFT),
             Autos.getAutoPathCommand(AutoPaths.THREE_CORAL, true)
