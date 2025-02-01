@@ -35,6 +35,7 @@ public final class Autos {
         CORAL_THREE("Coral-3"),
         CORAL_TWO("Coral-2"),
         TWO_CORAL("2-Coral"),
+        CORAL_THREE("Coral-3"),
         THREE_CORAL("3-Coral"),
         ;
         public final String pathName;
