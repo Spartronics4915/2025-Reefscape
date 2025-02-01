@@ -4,31 +4,25 @@
 
 package com.spartronics4915.frc2025;
 
-import com.spartronics4915.frc2025.util.Structures.*;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.geometry.Rotation2d;
-
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import java.util.Arrays;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
+import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
+import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -56,6 +50,35 @@ public final class Constants {
 
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
+
+    }
+
+    public static final class ClimberConstants{
+
+        public static double liftedAngle = 0.5;
+        public static double stowAngle = 0.5;
+
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
+
+        public enum ClimberState {
+        
+        LIFTED(Rotation2d.fromDegrees(Constants.ClimberConstants.liftedAngle)),
+        STOW(Rotation2d.fromDegrees(Constants.ClimberConstants.stowAngle)),;
+        
+        public final Rotation2d angle;
+
+        private ClimberState(Rotation2d angle) {
+            this.angle = angle;
+            
+        }
+
+        
+
+    }
     }
 
     public static final class Drive {
