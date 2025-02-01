@@ -7,16 +7,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-// import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
-import com.spartronics4915.frc2025.Constants.IntakeConstants;
+import static com.spartronics4915.frc2025.Constants.IntakeConstants.*;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
-import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -33,20 +31,14 @@ public class IntakeSubsystem {
     private SparkClosedLoopController closedLoopController;
 
     // private var sensor;
-    LaserCan lc = new LaserCan(IntakeConstants.kLaserCANID);
+    LaserCan lc = new LaserCan(kLaserCANID);
 
     public IntakeSubsystem() {
         // mMotor1 = new SparkMax(IntakeConstants.kMotorID1, MotorType.kBrushless);
-        mMotor1 = new SparkMax(1, MotorType.kBrushless);
-        SparkMaxConfig config = new SparkMaxConfig();
-        closedLoopController = mMotor1.getClosedLoopController();
-
-        config.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(IntakeConstants.intakeP, IntakeConstants.intakeI, IntakeConstants.intakeD);
+        mMotor1 = new SparkMax(kMotorID, MotorType.kBrushless);
 
         //mMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        mMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        mMotor1.configure(kMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         try {
             lc.setRangingMode(LaserCan.RangingMode.SHORT);
@@ -68,7 +60,7 @@ public class IntakeSubsystem {
     public void detect() {
         LaserCan.Measurement measurement = lc.getMeasurement();
      
-        SmartDashboard.putBoolean("LaserCanDetect", measurement.distance_mm<=IntakeConstants.laserCANDistance);
+        SmartDashboard.putBoolean("LaserCanDetect", measurement.distance_mm<=laserCANDistance);
     }
 
     public void intakeMotors (IntakeSpeed preset) {

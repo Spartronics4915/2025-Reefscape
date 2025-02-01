@@ -53,15 +53,15 @@ import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 public final class Constants {
 
     public static final class IntakeConstants {
-        public static final int kMotorID1 = 0;
+        public static final int kMotorID = 20;
 
         public static final int mPIDController = 0;
         public static final int kPIDConstants = 0;
 
         public static final int kLaserCANID = 0;
-        public static final int laserCANDistance = 4000;
+        public static final int laserCANDistance = 100;
 
-        public static final SparkBaseConfig kSparkBaseConfig = new SparkMaxConfig()
+        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
             .inverted(true)
             .idleMode(IdleMode.kBrake);
             
@@ -71,7 +71,7 @@ public final class Constants {
 
         public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(IntakeConstants.intakeP, IntakeConstants.intakeI, IntakeConstants.intakeD);
+            .pid(0.0, 0.0, 0.0);
 
         public enum IntakeSpeed {
             IN (0.0),
@@ -84,10 +84,6 @@ public final class Constants {
                 this.intakeSpeed = intakeSpeed;
             }
         }
-
-        public static final double intakeP = 0;
-        public static final double intakeI = 0;
-        public static final double intakeD = 0;
     }
 
     public static final class OI {
