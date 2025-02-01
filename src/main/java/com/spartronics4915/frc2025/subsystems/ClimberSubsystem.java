@@ -87,6 +87,10 @@ public class ClimberSubsystem extends SubsystemBase {
         setSetpoint(newState.angle);
     }
 
+    public void incrementAngle(Rotation2d delta){
+        mCurrentSetPoint = mCurrentSetPoint.plus(delta);
+
+    }
 
     private Rotation2d getPosition() {
         double position = mClimberMotor.getEncoder().getPosition();
@@ -107,7 +111,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private double getVelocity() {
         double velocity = mClimberMotor.getEncoder().getVelocity();
-
         return velocity;
     }
 
