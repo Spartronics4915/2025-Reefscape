@@ -24,6 +24,13 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -37,6 +44,41 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+    public static final class IntakeConstants {
+        public static final int kMotorID = 20;
+
+        public static final int mPIDController = 0;
+        public static final int kPIDConstants = 0;
+
+        public static final int kLaserCANID = 0;
+        public static final int laserCANDistance = 100;
+
+        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
+            
+        public static final EncoderConfig kEncoderConfig = new EncoderConfig()
+            .positionConversionFactor(1000)
+            .velocityConversionFactor(1000);
+
+        public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(0.0, 0.0, 0.0);
+
+        public enum IntakeSpeed {
+            IN (0.0),
+            NEURTRAL (0.0),
+            OUT (-0.0);
+
+            public final double intakeSpeed;
+            
+            private IntakeSpeed(double intakeSpeed) {
+                this.intakeSpeed = intakeSpeed;
+            }
+        }
+    }
+
     public static final class OI {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
