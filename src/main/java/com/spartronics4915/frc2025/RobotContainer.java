@@ -89,7 +89,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     private final BlingSubsystem blingSubsystem;
-    
+
     private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
 
     private final IntakeSubsystem intake = new IntakeSubsystem();
@@ -119,7 +119,7 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(21, swerveSubsystem), new BlingShow("bling/funrainbow21.bling"));
+        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(42, swerveSubsystem, visionSubsystem));
     }
 
     /**
