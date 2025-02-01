@@ -50,6 +50,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
                 mClimberEncoder = mClimberMotor.getEncoder();
         
+        initClimberProfile();
         
         initClosedLoopController();
 
@@ -71,6 +72,12 @@ public class ClimberSubsystem extends SubsystemBase {
         mCurrentSetPoint = (position);
         mCurrentState = new State(angleToRaw(position), 0.0);
     }
+
+    private void setMechanismAngle(Rotation2d angle){
+        mClimberEncoder.setPosition(angleToRaw(angle));
+        resetMechanism();
+    }
+
 
     private Rotation2d getPosition() {
         double position = mClimberMotor.getEncoder().getPosition();
@@ -102,7 +109,7 @@ public class ClimberSubsystem extends SubsystemBase {
         mClosedLoopController = mClimberMotor.getClosedLoopController();
     }
 
-     private void initArmProfile() {
+     private void initClimberProfile() {
         mClimberProfile = new TrapezoidProfile(ClimberConstants.kConstraints);
         mCurrentState = new State(angleToRaw(getPosition()), 0.0);
     }
