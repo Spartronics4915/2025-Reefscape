@@ -19,6 +19,25 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.spartronics4915.frc2025.Constants.IntakeConstants;
+import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
+import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -41,6 +60,18 @@ public final class Constants {
 
         public static final int kLaserCANID = 0;
         public static final int laserCANDistance = 4000;
+
+        public static final SparkBaseConfig kSparkBaseConfig = new SparkMaxConfig()
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
+            
+        public static final EncoderConfig kEncoderConfig = new EncoderConfig()
+            .positionConversionFactor(1000)
+            .velocityConversionFactor(1000);
+
+        public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(IntakeConstants.intakeP, IntakeConstants.intakeI, IntakeConstants.intakeD);
 
         public enum IntakeSpeed {
             IN (0.0),

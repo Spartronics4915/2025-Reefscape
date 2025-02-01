@@ -33,7 +33,7 @@ public class IntakeSubsystem {
     private SparkClosedLoopController closedLoopController;
 
     // private var sensor;
-    LaserCan lc = new LaserCan(0);
+    LaserCan lc = new LaserCan(IntakeConstants.kLaserCANID);
 
     public IntakeSubsystem() {
         // mMotor1 = new SparkMax(IntakeConstants.kMotorID1, MotorType.kBrushless);
@@ -41,12 +41,6 @@ public class IntakeSubsystem {
         SparkMaxConfig config = new SparkMaxConfig();
         closedLoopController = mMotor1.getClosedLoopController();
 
-        config
-            .inverted(true)
-            .idleMode(IdleMode.kBrake);
-        config.encoder
-            .positionConversionFactor(1000)
-            .velocityConversionFactor(1000);
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(IntakeConstants.intakeP, IntakeConstants.intakeI, IntakeConstants.intakeD);
