@@ -9,6 +9,8 @@ import com.spartronics4915.frc2025.util.Structures.*;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -25,6 +27,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -195,5 +198,52 @@ public final class Constants {
 
     public static final class OdometryConstants {
         public static final double kMaxSwerveVisionPoseDifference = 1.0; //meters
+    }
+
+    public static final class ArmConstants {
+        //I dont know the numbers yet so 0 is a place holder
+        public enum ArmSubsystemState {
+
+            INTAKE(Rotation2d.fromDegrees(0)),
+            SCORE(Rotation2d.fromDegrees(0)),
+            STOW(Rotation2d.fromDegrees(0));
+
+            public Rotation2d angle;
+
+            private ArmSubsystemState(Rotation2d angle) {
+                this.angle = angle;
+            }
+
+        }
+        
+        public static final int kArmMotorID = 0;
+        public static final int kPositionConversionFactor = 1;
+        public static final int kVelocityConversionFactor = 1;
+
+        public static final class kArmPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
+        
+        public static final double kDt = 0.02;
+
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
+        public static final int kPeriodMs = 0;
+
+        public static final double kMaxAngleScore = 0.0;
+        public static final double kMaxAngleIntake = 0.0;
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+        
+        //The values set here are placeholders for sim
+        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(300);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(120);
+
+
+
     }
 }
