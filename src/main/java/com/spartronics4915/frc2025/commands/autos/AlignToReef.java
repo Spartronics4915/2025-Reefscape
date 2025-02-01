@@ -17,8 +17,8 @@ import com.pathplanner.lib.path.Waypoint;
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
-import com.spartronics4915.frc2025.Constants.VisionConstants.AprilTagRegion;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.util.AprilTagRegion;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -84,7 +84,7 @@ public class AlignToReef {
     public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
         this.mSwerve = mSwerve;
 
-        Arrays.stream(AprilTagRegion.REEF.blue()).forEach((i) -> {
+        Arrays.stream(AprilTagRegion.kReef.blue()).forEach((i) -> {
             field.getTagPose(i).ifPresent((p) -> {
                 blueReefTagPoses.add(new Pose2d(
                     p.getMeasureX(),
@@ -94,7 +94,7 @@ public class AlignToReef {
             });
         });
 
-        Arrays.stream(AprilTagRegion.REEF.red()).forEach((i) -> {
+        Arrays.stream(AprilTagRegion.kReef.red()).forEach((i) -> {
             field.getTagPose(i).ifPresent((p) -> {
                 redReefTagPoses.add(new Pose2d(
                     p.getMeasureX(),
@@ -104,7 +104,7 @@ public class AlignToReef {
             });
         });
 
-        Arrays.stream(AprilTagRegion.REEF.both()).forEach((i) -> {
+        Arrays.stream(AprilTagRegion.kReef.both()).forEach((i) -> {
             field.getTagPose(i).ifPresent((p) -> {
                 allReefTagPoses.add(new Pose2d(
                     p.getMeasureX(),
