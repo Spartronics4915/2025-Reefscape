@@ -38,6 +38,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -168,9 +169,7 @@ public class RobotContainer {
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
         driverController.rightTrigger().whileTrue(
             new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), 
-                    shouldFlip() ? new Translation2d(13.073, 4): new Translation2d(4.5, 4)
-                ), swerveSubsystem),
+                ChassisSpeedSuppliers.gotoAngle(ChassisSpeedSuppliers.orientTowardsReef(swerveSubsystem), swerveSubsystem),
                 ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
                 swerveSubsystem
             )
