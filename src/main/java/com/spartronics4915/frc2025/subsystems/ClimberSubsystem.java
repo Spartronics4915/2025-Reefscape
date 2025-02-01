@@ -128,5 +128,10 @@ public class ClimberSubsystem extends SubsystemBase {
         });
     }
 
+    public Command setSetpointCommand(Rotation2d newSetpoint){
+        return this.runOnce(() -> setSetpoint(newSetpoint));
+    }
+
+
 
 }
