@@ -107,6 +107,12 @@ public class ClimberSubsystem extends SubsystemBase {
         mCurrentState = new State(angleToRaw(getPosition()), 0.0);
     }
 
+    private double getVelocity() {
+        double velocity = mClimberMotor.getEncoder().getVelocity();
+
+        return velocity;
+    }
+
     @Override
     public void periodic() {
         
