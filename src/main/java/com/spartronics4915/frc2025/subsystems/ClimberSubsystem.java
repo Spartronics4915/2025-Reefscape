@@ -17,6 +17,7 @@ import com.spartronics4915.frc2025.Constants.ClimberConstants.ClimberState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -118,4 +119,14 @@ public class ClimberSubsystem extends SubsystemBase {
     public void periodic() {
         
     }
+
+    public Command manualMode(Rotation2d delta){
+        return this.runEnd(() -> {
+            incrementAngle(delta);
+        }, () -> {
+            resetMechanism();
+        });
+    }
+
+
 }
