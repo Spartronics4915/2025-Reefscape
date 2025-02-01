@@ -12,11 +12,14 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.VariableAutos;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
-import com.spartronics4915.frc2025.commands.autos.AlignToReef.ReefSide;
+import com.spartronics4915.frc2025.commands.VariableAutos.FieldBranch;
+import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
+import com.spartronics4915.frc2025.commands.VariableAutos.StationSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -87,6 +90,7 @@ public class RobotContainer {
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
 
     private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
+    private final VariableAutos variableAutoFactory = new VariableAutos(alignmentCommandFactory);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -210,17 +214,12 @@ public class RobotContainer {
         chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
         chooser.addOption("Align with move", Commands.sequence(
-            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
-            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.LEFT),
-            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
-            // Commands.waitUntil(debugController.a()::getAsBoolean),
-            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
-            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.RIGHT),
-            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
-            // Commands.waitUntil(debugController.a()::getAsBoolean),
-            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE),
-            alignmentCommandFactory.generateCommand(ReefSide.THREE, BranchSide.LEFT),
-            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL)
+            variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.LEFT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.LEFT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.LEFT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.LEFT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.LEFT)
         ));
 
         chooser.addOption("Align Mirror with move", Commands.sequence(
