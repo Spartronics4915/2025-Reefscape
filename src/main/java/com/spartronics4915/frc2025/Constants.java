@@ -117,6 +117,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
+        public static final double kMaxSpeedForMegaTag1 = 0.5; //meters
         public static final boolean kVisionDiagnostics = true;
         
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
@@ -124,8 +125,26 @@ public final class Constants {
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.ALIGN),
-                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION)
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.STATION),
+                new LimelightConstants("chucky", LimelightModel.LIMELIGHT_3, 14, LimelightRole.NOTHING),
+                new LimelightConstants("doug", LimelightModel.LIMELIGHT_3, 15, LimelightRole.NOTHING)
         };
+
+        public static final class StdDevConstants {
+            public static final class MegaTag1 {
+                public static final double kInitialValue = 0.3;
+                public static final double kTagCountReward = 0.15;
+                public static final double kAverageDistancePunishment = 0.1;
+                public static final double kRobotSpeedPunishment = 0.15;
+                public static final double kSingleTagPunishment = 0.3;
+            }
+            public static final class MegaTag2 {
+                public static final double kInitialValue = 0.1;
+                public static final double kAverageDistancePunishment = 0.075;
+                public static final double kRobotSpeedPunishment = 0.25;
+                public static final double kMultipleTagsBonus = 0.05;
+            }
+        }
 
         public enum LimelightModel {
             LIMELIGHT_3, LIMELIGHT_3G
