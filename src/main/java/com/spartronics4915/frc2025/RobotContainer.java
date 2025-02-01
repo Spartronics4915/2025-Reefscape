@@ -223,17 +223,12 @@ public class RobotContainer {
         ));
 
         chooser.addOption("Align Mirror with move", Commands.sequence(
-            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
-            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.LEFT),
-            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
-            // Commands.waitUntil(debugController.a()::getAsBoolean),
-            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
-            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.RIGHT),
-            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
-            // Commands.waitUntil(debugController.a()::getAsBoolean),
-            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE, true),
-            alignmentCommandFactory.generateCommand(ReefSide.THREE.mirror(), BranchSide.LEFT),
-            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL, true)
+            variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.RIGHT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.RIGHT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.RIGHT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.RIGHT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT),
+            variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT)
         ));
 
         SmartDashboard.putData("Auto Chooser", chooser);
