@@ -4,27 +4,33 @@
 
 package com.spartronics4915.frc2025;
 
-import com.spartronics4915.frc2025.util.Structures.*;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import java.util.Arrays;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
+import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
+import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -38,6 +44,41 @@ import com.pathplanner.lib.path.PathConstraints;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+    public static final class IntakeConstants {
+        public static final int kMotorID = 20;
+
+        public static final int mPIDController = 0;
+        public static final int kPIDConstants = 0;
+
+        public static final int kLaserCANID = 0;
+        public static final int laserCANDistance = 100;
+
+        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
+            
+        public static final EncoderConfig kEncoderConfig = new EncoderConfig()
+            .positionConversionFactor(1000)
+            .velocityConversionFactor(1000);
+
+        public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(0.0, 0.0, 0.0);
+
+        public enum IntakeSpeed {
+            IN (0.0),
+            NEURTRAL (0.0),
+            OUT (-0.0);
+
+            public final double intakeSpeed;
+            
+            private IntakeSpeed(double intakeSpeed) {
+                this.intakeSpeed = intakeSpeed;
+            }
+        }
+    }
+
     public static final class OI {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
@@ -51,6 +92,35 @@ public final class Constants {
 
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
+
+    }
+
+    public static final class ClimberConstants{
+
+        public static double liftedAngle = 0.5;
+        public static double stowAngle = 0.5;
+
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
+
+        public enum ClimberState {
+        
+        LIFTED(Rotation2d.fromDegrees(Constants.ClimberConstants.liftedAngle)),
+        STOW(Rotation2d.fromDegrees(Constants.ClimberConstants.stowAngle)),;
+        
+        public final Rotation2d angle;
+
+        private ClimberState(Rotation2d angle) {
+            this.angle = angle;
+            
+        }
+
+        
+
+    }
     }
 
     public static final class Drive {
@@ -157,43 +227,109 @@ public final class Constants {
         public enum PoseEstimationMethod {
             MEGATAG_1, MEGATAG_2
         }
-
-        public enum AprilTagRegion {
-            STATION(new int[]{1, 2}, new int[]{12, 13}),
-            PROCESSOR(new int[]{3}, new int[]{16}),
-            BARGE(new int[]{4, 5}, new int[]{14, 15}),
-            REEF(new int[]{6, 7, 8, 9, 10, 11}, new int[]{17, 18, 19, 20, 21, 22}),
-            EMPTY(new int[]{}, new int[]{});
-
-            private int[] red;
-            private int[] blue;
-
-            private AprilTagRegion(int[] red, int[] blue) {
-                this.red = red;
-                this.blue = blue;
-            }
-
-            public int[] red(){return red;}
-            public int[] blue(){return blue;}
-            public int[] both() {
-                int[] both = new int[red.length + blue.length];
-                System.arraycopy(red, 0, both, 0, red.length);
-                System.arraycopy(blue, 0, both, red.length, blue.length);
-                return both;
-            }
-            public AprilTagRegion and(AprilTagRegion other) {
-                int[] newRed = Arrays.copyOf(red, red.length + other.red.length);
-                System.arraycopy(other.red, 0, newRed, red.length, other.red.length);
-                red = newRed;
-                int[] newBlue = Arrays.copyOf(blue, blue.length + other.blue.length);
-                System.arraycopy(other.blue, 0, newBlue, blue.length, other.blue.length);
-                blue = newBlue;
-                return this;
-            }
-        }
     }
 
     public static final class OdometryConstants {
         public static final double kMaxSwerveVisionPoseDifference = 1.0; //meters
+    }
+
+    public static final class ArmConstants {
+        //I dont know the numbers yet so 0 is a place holder
+        public enum ArmSubsystemState {
+
+            INTAKE(Rotation2d.fromDegrees(0)),
+            SCORE(Rotation2d.fromDegrees(0)),
+            STOW(Rotation2d.fromDegrees(0));
+
+            public Rotation2d angle;
+
+            private ArmSubsystemState(Rotation2d angle) {
+                this.angle = angle;
+            }
+
+        }
+        
+        public static final int kArmMotorID = 0;
+        public static final int kPositionConversionFactor = 1;
+        public static final int kVelocityConversionFactor = 1;
+
+        public static final class kArmPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
+        
+        public static final double kDt = 0.02;
+
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
+        public static final int kPeriodMs = 0;
+
+        public static final double kMaxAngleScore = 0.0;
+        public static final double kMaxAngleIntake = 0.0;
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+        
+        //The values set here are placeholders for sim
+        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(300);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(120);
+
+
+
+    }
+
+    public static final class ElevatorConstants {
+
+        public enum ElevatorSubsystemState {
+
+            STOW(0),
+            L3(0),
+            L4(0);
+
+            public double meter;
+
+            private ElevatorSubsystemState(double meter) {
+                this.meter = meter;
+            }
+        }
+
+        public static final int elevatorMotorID = 20;
+        public static final int elevatorFollowerID = 16;
+        public static final boolean motorInverted = false;
+        public static final boolean followerInverted = false;
+        public static final double motorPositionConversionFactor = 0;
+        public static final double motorVelocityConversionFactor = 0;
+        public static final double followerPositionConversionFactor = 0;
+        public static final double followerVelocityConversionFactor = 0;
+        public static final int motorSmartCurrentLimit = 0;
+        public static final int motorSecondaryCurrentLimit = 0;
+        public static final int followerSmartCurrentLimit = 0;
+        public static final int followerSecondaryCurrentLimit = 0;
+
+        public static final double dt = 0.02;
+
+        public static final Constraints constraints = new Constraints(0, 0);
+
+        public static final double minHeight = 0;
+        public static final double maxHeight = 0;
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+
+        public static final class motorPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
+
+        public static final class followerPIDConstants {
+            public static final double kP = 0;
+            public static final double kI = 0;
+            public static final double kD = 0;
+        }
     }
 }
