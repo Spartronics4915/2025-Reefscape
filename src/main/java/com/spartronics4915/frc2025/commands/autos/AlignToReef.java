@@ -113,7 +113,7 @@ public class AlignToReef {
             waypoints, 
             kPathConstraints,
             new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
-            new GoalEndState(0.0, getBranchRotation(mSwerve))
+            new GoalEndState(0.0, waypoint.getRotation())
         );
 
         path.preventFlipping = true;
