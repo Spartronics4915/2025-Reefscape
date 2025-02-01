@@ -133,10 +133,9 @@ public class ClimberSubsystem extends SubsystemBase {
     public Command setMechanismAngleCommand(Rotation2d newAngle){
         return this.runOnce(() -> setMechanismAngle(newAngle));
     }
-    /*  
-    @Override
+      
     public void onModeSwitch() {
         resetMechanism();
     }
-    */
+    
 }
