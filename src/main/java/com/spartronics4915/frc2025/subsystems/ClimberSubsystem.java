@@ -85,24 +85,6 @@ public class ClimberSubsystem extends SubsystemBase {
         return convertRaw(position);
     }
 
-
-
-    public void setposition () {
-
-    }
-
-    public void moveUp () {
-
-    }
-
-    public void moveDown () {
-
-    }
-
-    public void manualControl (double newPosition) {
-
-    }
-
     private double mCurrentSetpoint = 0.0;
 
     private void initClosedLoopController() {
