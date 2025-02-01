@@ -155,6 +155,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         return swerveDrive.getGyro().getYawAngularVelocity();
     }
 
+    public double getSpeed() {
+        ChassisSpeeds fieldVelocity = getFieldVelocity();
+        return Math.sqrt(fieldVelocity.vxMetersPerSecond * fieldVelocity.vxMetersPerSecond + fieldVelocity.vyMetersPerSecond * fieldVelocity.vyMetersPerSecond);
+    }
+
     public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
         swerveDrive.addVisionMeasurement(pose, timestamp, stdDevs);
     }

@@ -4,15 +4,19 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ElementLocator;
+import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef.BranchSide;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef.ReefSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
@@ -34,6 +38,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -66,6 +71,8 @@ public class RobotContainer {
 
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
 
+    private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
     private final ElementLocator elementLocator = new ElementLocator();
     private final VisionDeviceSubystem visionSubsystem;
     private final OdometrySubsystem odometrySubsystem;
@@ -79,7 +86,7 @@ public class RobotContainer {
 
     public final BlingSubsystem blingSubsystem = new BlingSubsystem(0, BlingSegment.solid(Color.kYellow, 21), BlingSegment.solid(Color.kBlue, 21));
 
-    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, elementLocator.getFieldLayout());
+    private final AlignToReef alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -151,20 +158,18 @@ public class RobotContainer {
             );
 
         driverController.leftBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.LEFT), Set.of())
+            alignmentCommandFactory.generateCommand(BranchSide.LEFT)
         );
 
         driverController.rightBumper().whileTrue(
-            Commands.defer(() -> alignmentCommandFactory.generateCommand(BranchSide.RIGHT), Set.of())
+            alignmentCommandFactory.generateCommand(BranchSide.RIGHT)
         );
 
 
         //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
         driverController.rightTrigger().whileTrue(
             new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), 
-                    shouldFlip() ? new Translation2d(13.073, 4): new Translation2d(4.5, 4)
-                ), swerveSubsystem),
+                ChassisSpeedSuppliers.gotoAngle(ChassisSpeedSuppliers.orientTowardsReef(swerveSubsystem), swerveSubsystem),
                 ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
                 swerveSubsystem
             )
@@ -204,6 +209,34 @@ public class RobotContainer {
         chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
         chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
+        chooser.addOption("Align with move", Commands.sequence(
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.LEFT),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO, BranchSide.RIGHT),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE),
+            alignmentCommandFactory.generateCommand(ReefSide.THREE, BranchSide.LEFT),
+            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL)
+        ));
+
+        chooser.addOption("Align Mirror with move", Commands.sequence(
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.LEFT),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_TWO, true),
+            alignmentCommandFactory.generateCommand(ReefSide.TWO.mirror(), BranchSide.RIGHT),
+            Autos.getAutoPathCommand(AutoPaths.TWO_CORAL, true),
+            // Commands.waitUntil(debugController.a()::getAsBoolean),
+            Autos.getAutoPathCommand(AutoPaths.CORAL_THREE, true),
+            alignmentCommandFactory.generateCommand(ReefSide.THREE.mirror(), BranchSide.LEFT),
+            Autos.getAutoPathCommand(AutoPaths.THREE_CORAL, true)
+        ));
+
         SmartDashboard.putData("Auto Chooser", chooser);
 
         return chooser;
@@ -221,8 +254,8 @@ public class RobotContainer {
         return debugController;
     }
 
-    public AprilTagFieldLayout getFieldLayout() {
-        return elementLocator.getFieldLayout();
+    public static AprilTagFieldLayout getFieldLayout() {
+        return fieldLayout;
     }
 
 }

@@ -1,19 +1,25 @@
 package com.spartronics4915.frc2025.commands.drive;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+
 import static com.spartronics4915.frc2025.Constants.DriveCommandConstants.*;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface.Detection;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -191,7 +197,7 @@ public final class ChassisSpeedSuppliers {
             modifiedLinear.getY(), 
         in.omegaRadiansPerSecond);
     }
-    
+
     /**
      * get field relative angle based on controller joysticks and alliance
      */
@@ -217,6 +223,23 @@ public final class ChassisSpeedSuppliers {
 
     public static Rotation2d getFieldAngleBetween(Translation2d from, Translation2d to){
         return to.minus(from).getAngle();
+    }
+
+    public static Supplier<Rotation2d> orientTowardsReef(SwerveSubsystem swerve) {
+        //return () -> Rotation2d.fromDegrees(45);
+        return () -> {
+            if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+                Pose2d reef = new Pose2d(4.5, 4, Rotation2d.kZero);
+                if (Math.sqrt(Math.pow(reef.getX() - swerve.getPose().getX(), 2) + Math.pow(reef.getY() - swerve.getPose().getY(), 2)) < 6) 
+                    return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation();
+            }
+            if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+                Pose2d reef = new Pose2d(13, 4, Rotation2d.kZero);
+                if (Math.sqrt(Math.pow(reef.getX() - swerve.getPose().getX(), 2) + Math.pow(reef.getY() - swerve.getPose().getY(), 2)) < 6) 
+                    return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation();
+            }
+            return swerve.getHeading();
+        };
     }
 
     //#endregion
