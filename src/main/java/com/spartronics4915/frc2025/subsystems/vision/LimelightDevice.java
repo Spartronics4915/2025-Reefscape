@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.Constants.VisionConstants.StdDevConstants;
-import com.spartronics4915.frc2025.Constants.VisionConstants.AprilTagRegion;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
 import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
@@ -14,6 +13,7 @@ import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.LimelightHelpers.RawFiducial;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.util.AprilTagRegion;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
@@ -56,16 +56,16 @@ public class LimelightDevice extends SubsystemBase {
         AprilTagRegion region;
         switch (role) {
             case REEF:
-                region = AprilTagRegion.REEF.and(AprilTagRegion.PROCESSOR);
-                break;
+            region = AprilTagRegion.kReef.and(AprilTagRegion.kProcessor);
+            break;
             case ALIGN:
-                region = AprilTagRegion.REEF;
-                break;
+            region = AprilTagRegion.kReef;
+            break;
             case STATION:
-                region = AprilTagRegion.STATION;
-                break;
+            region = AprilTagRegion.kStation;
+            break;
             default:
-                region = AprilTagRegion.EMPTY;
+            region = AprilTagRegion.kEmpty;
         }
 
         if (alliance.isEmpty()) tagFilter = region.both();
