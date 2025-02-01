@@ -15,6 +15,7 @@ import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.spartronics4915.frc2025.RobotContainer;
+import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.Constants.VisionConstants.AprilTagRegion;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -34,11 +35,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class AlignToReef {
-
-    public enum BranchSide{
-        LEFT,
-        RIGHT;
-    } 
 
     public enum ReefSide{
         ONE(18, 7),
