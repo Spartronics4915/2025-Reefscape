@@ -113,10 +113,6 @@ public class ClimberSubsystem extends SubsystemBase {
         return velocity;
     }
 
-    @Override
-    public void periodic() {
-        
-    }
 
     public Command manualMode(Rotation2d delta){
         return this.runEnd(() -> {
@@ -137,7 +133,10 @@ public class ClimberSubsystem extends SubsystemBase {
     public Command setMechanismAngleCommand(Rotation2d newAngle){
         return this.runOnce(() -> setMechanismAngle(newAngle));
     }
-
-
-
+    /*  
+    @Override
+    public void onModeSwitch() {
+        resetMechanism();
+    }
+    */
 }
