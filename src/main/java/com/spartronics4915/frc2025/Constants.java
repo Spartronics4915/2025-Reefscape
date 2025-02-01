@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -205,7 +206,13 @@ public final class Constants {
         public static final Rotation2d kMinAngle = Rotation2d.fromRotations(300);
         public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(120);
 
-
-
+        public static final SlotConfigs kPIDConfigs = new SlotConfigs()
+            .withKP(0.0)
+            .withKI(0.0)
+            .withKD(0.0)
+            .withKG(0.0)
+            .withKS(0.0)
+            .withKV(0.0)
+            .withKA(0.0);
     }
 }
