@@ -41,9 +41,9 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     public ArmSubsystem() {
         
-        SparkMax mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
+        mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
 
-        RelativeEncoder mArmEncoder = mArmMotor.getEncoder();
+        mArmEncoder = mArmMotor.getEncoder();
         
         SparkMaxConfig config = new SparkMaxConfig();
 
@@ -60,6 +60,10 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
         mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
         
+        initArmProfile();
+
+        initClosedLoopController();
+
         resetMechanism();
     }
 

@@ -190,7 +190,7 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final Constraints kConstraints = null;
+        public static final Constraints kConstraints = new Constraints(1.0, 1.0);
         public static final int kPeriodMs = 0;
 
         public static final double kMaxAngleScore = 0.0;
