@@ -83,7 +83,6 @@ public class RobotContainer {
             visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
             ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
         }
-        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(42, swerveSubsystem));
 
         odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
 
