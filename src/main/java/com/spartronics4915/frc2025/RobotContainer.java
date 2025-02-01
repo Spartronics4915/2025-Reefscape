@@ -17,6 +17,7 @@ import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.Bling.*;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
@@ -69,6 +70,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private final BlingSubsystem blingSubsystem;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -92,9 +95,9 @@ public class RobotContainer {
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
         autoChooser =
-
                 buildAutoChooser();
 
+        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(21, swerveSubsystem), new BlingShow("bling/funrainbow21.bling"));
     }
 
     /**
