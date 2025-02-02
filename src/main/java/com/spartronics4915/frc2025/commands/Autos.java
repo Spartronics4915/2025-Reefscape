@@ -95,7 +95,7 @@ public final class Autos {
         return getAutoPathCommand(path, false);
     }
 
-    public static Command getAutoPathCommand(AutoPaths pathChoice, boolean mirrored){
+    public static PathPlannerPath getAutoPath(AutoPaths pathChoice, boolean mirrored){
         PathPlannerPath path;
         try {
             path = PathPlannerPath.fromPathFile(pathChoice.pathName);
@@ -105,8 +105,11 @@ public final class Autos {
         }
 
         if(mirrored) path = path.mirrorPath();
+        return path;
+    }
 
-        return AutoBuilder.followPath(path);
+    public static Command getAutoPathCommand(AutoPaths pathChoice, boolean mirrored){
+        return AutoBuilder.followPath(getAutoPath(pathChoice, mirrored));
     }
 
     public static Command driveToNote(SwerveSubsystem swerve, TargetDetectorInterface detector) {
