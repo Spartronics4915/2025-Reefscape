@@ -2,6 +2,7 @@ package com.spartronics4915.frc2025.commands.drive;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.spartronics4915.frc2025.Constants.Drive;
@@ -38,9 +39,11 @@ public final class ChassisSpeedSuppliers {
             .or(RobotModeTriggers.autonomous())
             .or(RobotModeTriggers.test())
             .onTrue(
-                Commands.runOnce(() -> {
-                    resetTeleopHeadingOffset();
-                })
+                Commands.defer(() -> {
+                    return Commands.runOnce(() -> {
+                        if (shouldResetHeading()) resetTeleopHeadingOffset();
+                    });
+                }, Set.of())
             );
     }
 
@@ -244,5 +247,18 @@ public final class ChassisSpeedSuppliers {
 
     //#endregion
 
+    //#region debug
+
+    private static boolean resetHeading = true;
+
+    private static boolean shouldResetHeading() {
+        return resetHeading;
+    }
+
+    public static void toggleResetHeading() {
+        resetHeading = !resetHeading;
+    }
+
+    //#endregion
 
 }

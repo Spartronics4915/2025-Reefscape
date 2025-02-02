@@ -183,6 +183,8 @@ public class RobotContainer {
         // DEBUG CONTROLLER
         debugController.leftBumper().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)));
         debugController.leftBumper().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
+
+        debugController.leftStick().onTrue(Commands.runOnce(() -> ChassisSpeedSuppliers.toggleResetHeading()));
     }
 
     /**
