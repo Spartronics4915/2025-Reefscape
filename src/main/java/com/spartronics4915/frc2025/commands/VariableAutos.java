@@ -130,6 +130,9 @@ public class VariableAutos {
         
         var align = alignmentGenerator.generateCommand(fieldReefSide, fieldBranchSide);
 
+        //The reason for the double mirroring here is a bit interesting
+        //Basically if we are using the opposite station from what we made the paths on we want to act like the starting positon is mirrored
+        //then the path to the coral station is correct, we then mirror it again so the starting position is the same and the path's end point is mirrored
         if (mirror) {
             fieldReefSide = fieldReefSide.mirror();
         }
