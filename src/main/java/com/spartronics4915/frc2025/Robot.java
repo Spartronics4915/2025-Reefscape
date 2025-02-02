@@ -4,6 +4,9 @@
 
 package com.spartronics4915.frc2025;
 
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -17,9 +20,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
+@Logged
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
+    @Logged(name = "Logging")
     private final RobotContainer m_robotContainer;
 
     public static final Timer AUTO_TIMER = new Timer();
@@ -33,6 +38,13 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+        Epilogue.configure(config -> {
+            if (isSimulation()) {
+                config.errorHandler = ErrorHandler.crashOnError();
+            }
+            config.root = "Epilogue";
+        });
+        Epilogue.bind(this); //"Epilogue cannot be resolved" error will go away when you build
     }
 
     @Override
