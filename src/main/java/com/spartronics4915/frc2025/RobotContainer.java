@@ -17,6 +17,7 @@ import com.spartronics4915.frc2025.commands.autos.CalibrateCommands;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.autos.LineFollower;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
+import com.spartronics4915.frc2025.commands.drive.ReefModeCommands;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
@@ -98,7 +99,8 @@ public class RobotContainer {
     public RobotContainer() {
 
         mechanismSim = new MotorSimulationSubsystem();
-        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); //TODO add any subsystems that extend ModeSwitchInterface
+        ModeSwitchHandler.EnableModeSwitchHandler(swerveSubsystem); // TODO add any subsystems that extend
+                                                                    // ModeSwitchInterface
 
         if (RobotBase.isSimulation()) {
             visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
@@ -140,41 +142,48 @@ public class RobotContainer {
 
         swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(driverController, swerveSubsystem));
 
+        // //switch field and robot relative
+        // driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
+        // () ->
+        // swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
+        // );}
+        // ,Set.of()));
 
-        //switch field and robot relative
-        driverController.a().onTrue(Commands.defer(() -> {return Commands.runOnce(
-                () -> swerveTeleopCommand.setFieldRelative(!swerveTeleopCommand.getFieldRelative())
-            );}
-        ,Set.of()));
+        driverController.a().whileTrue(
+                ReefModeCommands.chooseReefPoint(swerveSubsystem.getInternalSwerve().swerveDrivePoseEstimator,
+                        elementLocator));
 
-        driverController.b().onTrue(
-            Commands.defer(() -> {
-                return Commands.runOnce(() -> {
-                    swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
-                });
-            }, Set.of())
-        );
+        driverController.b().onTrue(ReefModeCommands
+                .chooseReefPoint(swerveSubsystem.getInternalSwerve().swerveDrivePoseEstimator, elementLocator));
+
+        // driverController.b().onTrue(
+        // Commands.defer(() -> {
+        // return Commands.runOnce(() -> {
+        // swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+        // });
+        // }, Set.of())
+        // );
 
         driverController.leftStick().onTrue(Commands.runOnce(() -> {
             swerveTeleopCommand.resetHeadingOffset();
         }));
-        
+
         driverController.leftTrigger()
-            .whileTrue(
-                Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
-            );
+                .whileTrue(
+                        Commands.run(swerveSubsystem::lockModules, swerveSubsystem));
 
-
-        //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
+        // this is a approximate version, we can do something more advanced by placing
+        // points at the center of the reef sides, then detecting which side it's
+        // closest to based on it's position
         driverController.rightTrigger().whileTrue(
-            new RotationIndependentControlCommand(
-                ChassisSpeedSuppliers.gotoAngle(() -> ChassisSpeedSuppliers.getFieldAngleBetween(swerveSubsystem.getPose().getTranslation(), 
-                    shouldFlip() ? new Translation2d(13.073, 4): new Translation2d(4.5, 4)
-                ), swerveSubsystem),
-                ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
-                swerveSubsystem
-            )
-        );
+                new RotationIndependentControlCommand(
+                        ChassisSpeedSuppliers.gotoAngle(
+                                () -> ChassisSpeedSuppliers.getFieldAngleBetween(
+                                        swerveSubsystem.getPose().getTranslation(),
+                                        shouldFlip() ? new Translation2d(13.073, 4) : new Translation2d(4.5, 4)),
+                                swerveSubsystem),
+                        ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
+                        swerveSubsystem));
 
         swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
     }
@@ -188,7 +197,10 @@ public class RobotContainer {
 
         // return Autos.driveToNote(swerveSubsystem, noteDetector);
         // return new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate();
-        return autoChooser.getSelected();
+        // return autoChooser.getSelected();
+        return new LineFollower(swerveSubsystem,
+                elementLocator.getApproachPoint(elementLocator.getLeftReefPose(11), 1));
+
 
     }
 
