@@ -179,12 +179,12 @@ public final class Constants {
 
         }
         
-        public static final int kArmMotorID = 0;
+        public static final int kArmMotorID = 13;
         public static final int kPositionConversionFactor = 1;
         public static final int kVelocityConversionFactor = 1;
 
         public static final class kArmPIDConstants {
-            public static final double kP = 0;
+            public static final double kP = 0.001;
             public static final double kI = 0;
             public static final double kD = 0;
         }
@@ -203,16 +203,12 @@ public final class Constants {
         public static final double kA = 0.0;
         
         //The values set here are placeholders for sim
-        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(300);
-        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(120);
+        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(0);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(360);
 
         public static final SlotConfigs kPIDConfigs = new SlotConfigs()
             .withKP(0.0)
             .withKI(0.0)
-            .withKD(0.0)
-            .withKG(0.0)
-            .withKS(0.0)
-            .withKV(0.0)
-            .withKA(0.0);
+            .withKD(0.0);
     }
 }

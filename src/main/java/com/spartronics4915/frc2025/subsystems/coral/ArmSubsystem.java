@@ -11,6 +11,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -26,6 +29,12 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private Rotation2d mCurrentSetPoint = Rotation2d.fromRotations(0);;
     private State mCurrentState;
+
+    private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("log").getDoubleTopic("applied out").publish();
+    private final StructPublisher<Rotation2d> positionPub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("position", Rotation2d.struct).publish();
+    private final StructPublisher<Rotation2d> desiredStatePub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("desiredState", Rotation2d.struct).publish();
+    private final StructPublisher<Rotation2d> setpointpub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("setpointpub", Rotation2d.struct).publish();
+
 
     public ArmSubsystem() {
         
@@ -84,7 +93,14 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         
         mArmMotor.setControl(m_request);
 
+        updateUserOuputs();
+    }
 
+    private void updateUserOuputs() {
+        appliedOutPub.accept(mArmMotor.getBridgeOutput().getValueAsDouble());
+        positionPub.accept(getPosition());
+        desiredStatePub.accept(convertRaw(mCurrentState.position));
+        setpointpub.accept(mCurrentSetPoint);
     }
     
     private void setMechanismAngle(Rotation2d angle){
