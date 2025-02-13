@@ -13,7 +13,7 @@ public class ElementLocator {
 
     public ElementLocator() {
 
-        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     }
 
     public Pose2d getLeftReefPoint(int tagID) {

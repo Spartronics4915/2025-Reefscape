@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightModel;
 import com.spartronics4915.frc2025.Constants.VisionConstants.LimelightRole;
+import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,7 +51,9 @@ public final class Structures {
         Matrix<N3, N1> stdDevs,
         String diagName,
         int diagTagCount,
-        double diagTagDistance
+        double diagTagDistance,
+        double diagRobotSpeed,
+        PoseEstimationMethod diagMethod
     ) {}
 
 

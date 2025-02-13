@@ -33,12 +33,15 @@
         }
       ],
       "axisCount": 6,
-      "buttonCount": 4,
+      "buttonCount": 7,
       "buttonKeys": [
         90,
         88,
         67,
-        86
+        86,
+        -1,
+        66,
+        -1
       ],
       "povConfig": [
         {
@@ -102,5 +105,6 @@
     {
       "useGamepad": true
     }
-  ]
+  ],
+  "useEnableDisableHotkeys": true
 }
