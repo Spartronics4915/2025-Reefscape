@@ -76,6 +76,13 @@ public class ClimberSubsystem extends SubsystemBase {
         resetMechanism();
     }
 
+    private void updateUserOuputs() {
+        appliedOutPub.accept(mClimberMotor.getAppliedOutput());
+        positionPub.accept(getPosition());
+        desiredStatePub.accept(convertRaw(mCurrentState.position));
+        setpointpub.accept(mCurrentSetPoint);
+    }
+
     private Rotation2d convertRaw(double rotation) {
         Rotation2d angle = Rotation2d.fromDegrees(rotation);
         return angle;
@@ -100,7 +107,7 @@ public class ClimberSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         
-        //need set points as a input
+        //need set points as an input
         mCurrentSetPoint = Rotation2d.fromRotations(
             MathUtil.clamp(mCurrentSetPoint.getRotations(), ClimberConstants.kMinAngle.getRotations(), ClimberConstants.kMaxAngle.getRotations()));
 
