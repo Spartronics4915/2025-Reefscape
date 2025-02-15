@@ -1,18 +1,14 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
+import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.MathUtil;
@@ -20,6 +16,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,53 +27,47 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{ 
     
-    private SparkMax mArmMotor;
-    private SparkClosedLoopController mArmClosedLoopController;
-    private SparkMaxConfig config;
+    private TalonFX mArmMotor;
     private ArmFeedforward mFFCalculator;
-    private RelativeEncoder mArmEncoder;
 
     private TrapezoidProfile mArmProfile;
 
     private Rotation2d mCurrentSetPoint = Rotation2d.fromRotations(0);;
     private State mCurrentState;
 
+    private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("log").getDoubleTopic("applied out").publish();
+    private final StructPublisher<Rotation2d> positionPub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("position", Rotation2d.struct).publish();
+    private final StructPublisher<Rotation2d> desiredStatePub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("desiredState", Rotation2d.struct).publish();
+    private final StructPublisher<Rotation2d> setpointpub = NetworkTableInstance.getDefault().getTable("log").getStructTopic("setpointpub", Rotation2d.struct).publish();
+
+
     public ArmSubsystem() {
         
-        mArmMotor = new SparkMax(ArmConstants.kArmMotorID, MotorType.kBrushless);
+        mFFCalculator = new ArmFeedforward(ArmConstants.kS,ArmConstants.kG,ArmConstants.kV,ArmConstants.kS);
 
-        mArmEncoder = mArmMotor.getEncoder();
-        
-        SparkMaxConfig config = new SparkMaxConfig();
-
-        config
-            .idleMode(IdleMode.kBrake)
-            .encoder.positionConversionFactor(ArmConstants.kPositionConversionFactor);
-        config
-            .encoder.velocityConversionFactor(ArmConstants.kVelocityConversionFactor);
-        config
-            .closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(ArmConstants.kArmPIDConstants.kP, ArmConstants.kArmPIDConstants.kI, ArmConstants.kArmPIDConstants.kD);
-    
-        mArmMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        mFFCalculator = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
+        initArmMotor();
         
         initArmProfile();
 
-        initClosedLoopController();
+        setMechanismAngle(Rotation2d.kZero);
+    
+        ModeSwitchHandler.EnableModeSwitchHandler(this);
+    }
 
-        resetMechanism();
+    private void initArmMotor() {
+        mArmMotor = new TalonFX(ArmConstants.kArmMotorID);
+        var mConfigurator = mArmMotor.getConfigurator();
+        mConfigurator.apply(ArmConstants.kPIDConfigs);
     }
 
     public void resetMechanism(){
         var position = getPosition();
-        mCurrentSetPoint = (position);
+        mCurrentSetPoint = position;
         mCurrentState = new State(angleToRaw(position), 0.0);
     }
 
-    private Rotation2d convertRaw(double rotation) {
-        Rotation2d angle = Rotation2d.fromDegrees(rotation);
+    private Rotation2d rawToAngle(double rotation) {
+        Rotation2d angle = Rotation2d.fromRotations(rotation);
         return angle;
     }
 
@@ -84,9 +77,9 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     }
 
     private Rotation2d getPosition() {
-        double position = mArmMotor.getEncoder().getPosition();
+        var position = mArmMotor.getRotorPosition().getValue().in(Rotations);
 
-        return convertRaw(position);
+        return rawToAngle(position);
     }
 
     private void initArmProfile() {
@@ -94,32 +87,36 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         mCurrentState = new State(angleToRaw(getPosition()), 0.0);
     }
 
-    private double getVelocity() {
-        double velocity = mArmMotor.getEncoder().getVelocity();
-
-        return velocity;
-    }
-
     @Override
     public void periodic() {
-        
+
         //need set points as a imput
         mCurrentSetPoint = Rotation2d.fromRotations(
-            MathUtil.clamp(mCurrentSetPoint.getRotations(), ArmConstants.kMinAngle.getRotations(), ArmConstants.kMaxAngle.getRotations()));
+            MathUtil.clamp(
+                mCurrentSetPoint.getRotations(), 
+                ArmConstants.kMinAngle.getRotations(), 
+                ArmConstants.kMaxAngle.getRotations()
+        ));
 
         mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((angleToRaw(mCurrentSetPoint)), 0.0));
 
-        mArmClosedLoopController.setReference(mCurrentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, mFFCalculator.calculate(mCurrentState.position, mCurrentState.velocity));
+        final PositionVoltage m_request = new PositionVoltage(mCurrentState.position).withFeedForward(mFFCalculator.calculate(mCurrentState.position, mCurrentState.velocity));
+        
+        mArmMotor.setControl(m_request);
 
+        updateUserOuputs();
+    }
+
+    private void updateUserOuputs() {
+        appliedOutPub.accept(mArmMotor.getMotorVoltage().getValue().in(Volts));
+        positionPub.accept(getPosition());
+        desiredStatePub.accept(rawToAngle(mCurrentState.position));
+        setpointpub.accept(mCurrentSetPoint);
     }
     
     private void setMechanismAngle(Rotation2d angle){
-        mArmEncoder.setPosition(angleToRaw(angle));
+        mArmMotor.setPosition(angleToRaw(angle));
         resetMechanism();
-    }
-
-    private void initClosedLoopController() {
-        mArmClosedLoopController = mArmMotor.getClosedLoopController();
     }
 
     public void setSetpoint(Rotation2d newSetpoint){

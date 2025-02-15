@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2025.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -40,7 +42,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public SwerveSubsystem(SwerveDirectories swerveDir) {
 
         try {
-            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed,
+            swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), swerveDir.directory)).createSwerveDrive(Drive.kMaxSpeed.in(MetersPerSecond),
             // new Pose2d(new Translation2d(Meter.of(2),
             //     Meter.of(5)),
             //     Rotation2d.fromDegrees(180)

@@ -9,6 +9,10 @@ import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.Constants.DriveCommandConstants.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface.Detection;
@@ -20,6 +24,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -48,6 +55,10 @@ public final class ChassisSpeedSuppliers {
 
     public static Rotation2d teleopHeadingOffset = Rotation2d.fromDegrees(0.0);
 
+    public static LinearVelocity maxSpeed = Drive.kMaxSpeed.copy();
+    public static AngularVelocity maxAngularVelocity = Drive.kMaxAngularSpeed.copy();
+
+
     /**
      * sets whether {@link #computeVelocitiesFromController computeVelocitiesFromController} is field or robot relative when not specified
      * @param newIsFieldRelative
@@ -57,6 +68,15 @@ public final class ChassisSpeedSuppliers {
             resetTeleopHeadingOffset();
         }
         isFieldRelative = newIsFieldRelative;
+    }
+
+    public static void resetMaxSpeed(){
+        setMaxSpeed(Drive.kMaxSpeed, Drive.kMaxAngularSpeed);
+    } 
+
+    public static void setMaxSpeed(LinearVelocity linear, AngularVelocity angular){
+        maxSpeed = linear;
+        maxAngularVelocity = angular;
     }
 
     public static void setTeleopHeadingOffset(Rotation2d offset){
@@ -111,9 +131,9 @@ public final class ChassisSpeedSuppliers {
             final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
             final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
     
-            cs.vxMetersPerSecond = inputx * Drive.kMaxSpeed;
-            cs.vyMetersPerSecond = inputy * Drive.kMaxSpeed;
-            cs.omegaRadiansPerSecond = inputomega * Drive.kMaxAngularSpeed;
+            cs.vxMetersPerSecond = inputx * maxSpeed.in(MetersPerSecond);
+            cs.vyMetersPerSecond = inputy * maxSpeed.in(MetersPerSecond);
+            cs.omegaRadiansPerSecond = inputomega * maxAngularVelocity.in(RadiansPerSecond);
 
             if (isFieldRelative) {
                 cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
@@ -140,7 +160,7 @@ public final class ChassisSpeedSuppliers {
             
             final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
             
-            return new ChassisSpeeds(0, 0, inputomega * Drive.kMaxAngularSpeed);
+            return new ChassisSpeeds(0, 0, inputomega * maxAngularVelocity.in(RadiansPerSecond));
         };
     }
 

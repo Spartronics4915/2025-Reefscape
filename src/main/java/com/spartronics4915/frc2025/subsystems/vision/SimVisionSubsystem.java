@@ -15,10 +15,10 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -41,7 +41,7 @@ public class SimVisionSubsystem extends SubsystemBase implements VisionDeviceSub
         swerveDrive = swerveSubsystem.getInternalSwerve();
         visionSim = new VisionSystemSim("main");
 
-        AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+        AprilTagFieldLayout tagLayout = RobotContainer.getFieldLayout();
         visionSim.addAprilTags(tagLayout);
         SimCameraProperties cameraProp = new SimCameraProperties();
         // The PhotonCamera used in the real robot code.
