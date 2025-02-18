@@ -44,6 +44,7 @@ import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
@@ -269,15 +270,8 @@ public class RobotContainer {
             debugController.x().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
         }
     
-        debugController.button(1).whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(1)));
-        debugController.button(2).whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-1)));
-        debugController.button(3).whileTrue(elevatorSubsystem.manualMode(0.01));
-        debugController.button(4).whileTrue(elevatorSubsystem.manualMode(-0.01));
-
-        debugController.button(5).onTrue(dynamics.stow());
-        debugController.button(6).onTrue(dynamics.gotoScore(DynaPreset.L4));
-        debugController.button(7).onTrue(dynamics.gotoScore(DynaPreset.L3));
-        // debugController.button(8).onTrue(dynamics.gotoScore(DynaPreset.L2));
+        debugController.x().whileTrue(Rumble.DEBUG.controller.continousRumble(RumblePresets.SOFT.rumble));
+        debugController.y().whileTrue(Rumble.DEBUG.controller.continousRumble(RumblePresets.STRONG.rumble));
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
