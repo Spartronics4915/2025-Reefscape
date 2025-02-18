@@ -4,6 +4,8 @@
 
 package com.spartronics4915.frc2025;
 
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
+
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -74,11 +76,14 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        RumbleFeedbackHandler.handleControllers();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        RumbleFeedbackHandler.onDisable();
+    }
 
     @Override
     public void disabledPeriodic() {}

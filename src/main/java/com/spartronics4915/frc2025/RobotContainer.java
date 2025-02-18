@@ -43,6 +43,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
@@ -90,6 +91,18 @@ public class RobotContainer {
         OI.kOperatorControllerPort);
         
     private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+
+    private enum Rumble{
+        DRIVER(driverController),
+        OPERATOR(operatorController),
+        DEBUG(debugController);
+
+        public final RumbleController controller;
+
+        private Rumble(CommandXboxController controller) {
+            this.controller = new RumbleController(controller);
+        }
+    }
 
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
