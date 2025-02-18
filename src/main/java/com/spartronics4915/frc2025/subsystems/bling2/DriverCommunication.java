@@ -2,9 +2,11 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Percent;
 
 import java.util.function.Supplier;
 
+import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
@@ -26,18 +28,18 @@ public class DriverCommunication extends BlingSegment {
             new Translation2d[] {new Translation2d(13.5, 4), new Translation2d(12.5, 4), new Translation2d(13, 4.5), new Translation2d(13, 4.5)}, 
             () -> {
                 if (RobotBase.isSimulation())
-                    return LEDPattern.solid(Color.kYellow);
+                    return LEDPattern.solid(Color.kYellow).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
                 if (((LimelightVisionSubsystem) vision).canSeeTags())
-                    return LEDPattern.solid(Color.kGreen);
+                    return LEDPattern.solid(Color.kGreen).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
                 else
-                    return LEDPattern.solid(Color.kRed);
+                    return LEDPattern.solid(Color.kRed).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
             }
         ),
         PROCESSOR(
             new Translation2d[] {new Translation2d(6, .5)}, 
             new Translation2d[] {new Translation2d(11.5, 7.5)}, 
             () -> {
-                return LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(MetersPerSecond.of(40), Meters.of(1));
+                return LEDPattern.rainbow(255, 255).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS)).scrollAtAbsoluteSpeed(MetersPerSecond.of(40), Meters.of(1));
             }
         ),
         BARGE(

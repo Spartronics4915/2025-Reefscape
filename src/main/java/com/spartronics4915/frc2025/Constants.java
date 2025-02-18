@@ -219,7 +219,7 @@ public final class Constants {
 
     public static final class OrientTowardsNearestPOIConstants {
         public static final Rotation2d REEF_OFFSET = Rotation2d.k180deg;
-        public static final double CORAL_STATION_ANGLE = 55;
+        public static final double CORAL_STATION_ANGLE = 55 + 180;
         public static final Translation2d[] BARGE_RED_CAGE_POSITIONS = {
             new Translation2d(8.8, 3),
             new Translation2d(8.8, 1.9),
@@ -230,6 +230,10 @@ public final class Constants {
             new Translation2d(8.8, 6.1),
             new Translation2d(8.8, 5)
         };
+    }
+
+    public static final class BlingConstants {
+        public static int BLING_BRIGHTNESS = 35; // 0-100
     }
 
     public static final class VisionConstants {

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import com.spartronics4915.frc2025.Constants.BlingConstants;
+
 import edu.wpi.first.wpilibj.Filesystem;
 
 /**
@@ -52,15 +55,15 @@ public class BlingShow extends BlingSegment {
     }
 
     public int getR(int index) {
-        return show[frame][index * 3] & 0xff;
+        return show[frame][index * 3] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     public int getG(int index) {
-        return show[frame][index * 3 + 1] & 0xff;
+        return show[frame][index * 3 + 1] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     public int getB(int index) {
-        return show[frame][index * 3 + 2] & 0xff;
+        return show[frame][index * 3 + 2] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     @Override
