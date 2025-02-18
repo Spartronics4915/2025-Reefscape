@@ -12,14 +12,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public final class RumbleFeedbackHandler{
-    public enum FeedbackControllers{
-        DRIVER,
-        OPERATOR,
-        DEBUG;
+    public enum RumblePresets{
+        SOFT(new RumbleFeedback(RumbleType.kBothRumble, 0.1)),
+        STRONG(new RumbleFeedback(RumbleType.kBothRumble, 0.3));
 
-        public RumbleController internal;
+        public final RumbleFeedback rumble;
 
-        private FeedbackControllers() {}
+        private RumblePresets(RumbleFeedback preset) {
+            this.rumble = preset;
+        }
     }
 
     public record RumbleFeedback(RumbleType type, double strength) {}
@@ -80,6 +81,14 @@ public final class RumbleFeedbackHandler{
                 return false;
             }
             return obj.mController.getPort() == this.mController.getPort();
+        }
+
+        public Command continousRumble(RumbleFeedback feedback){
+            return RumbleFeedbackHandler.getRumbleCommand(feedback, this);
+        }
+
+        public Command timedRumble(RumbleFeedback feedback, double seconds){
+            return RumbleFeedbackHandler.getRumbleCommand(feedback, seconds, this);
         }
     }
 
