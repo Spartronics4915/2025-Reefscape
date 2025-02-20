@@ -2,11 +2,15 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.spartronics4915.frc2025.Constants.BlingConstants;
+
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
 public abstract class BlingSegment {
+    protected int realFrame = 0;
     protected int frame = 0;
     protected int ledLength;
     protected int maxLength = -1;
@@ -17,13 +21,17 @@ public abstract class BlingSegment {
     }
 
     final private void incrementFrame() {
-        frame++;
+        realFrame++;
+        frame = realFrame / BlingConstants.FRAME_WAIT;
         if (maxLength > -1)
-            if (frame > maxLength) frame = 0;
+            if (frame > maxLength) realFrame = 1;
     }
 
     final public void update() {
-        updateLights();
+        if (realFrame % BlingConstants.FRAME_WAIT == 0) {
+            updateLights();
+            System.out.println(frame);
+        }
         incrementFrame();
     }
     abstract protected void updateLights();

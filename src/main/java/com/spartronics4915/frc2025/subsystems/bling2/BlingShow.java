@@ -24,8 +24,14 @@ public class BlingShow extends BlingSegment {
         this.ledLength = show[0].length / 3;
         this.maxLength = show.length - 1;
     }
+
+    public BlingShow(byte[][] show) {
+        this.show = show;
+        this.ledLength = show[0].length / 3;
+        this.maxLength = show.length - 1;
+    }
     
-    private byte[][] loadFromDeploy(String filename) throws IOException, OutOfMemoryError, SecurityException {
+    public static byte[][] loadFromDeploy(String filename) throws IOException, OutOfMemoryError, SecurityException {
         System.out.println("Attempting to load " + Filesystem.getDeployDirectory().getPath() + "/" + filename);
 
         byte[] arr = Files.readAllBytes(Path.of(Filesystem.getDeployDirectory().getPath() + "/" + filename));

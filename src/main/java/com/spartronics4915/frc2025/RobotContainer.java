@@ -184,7 +184,7 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-        blingSubsystem = new BlingSubsystem(0, BlingSegment.scrollingRainbow(42, 10));
+        blingSubsystem = new BlingSubsystem(0, new BlingShow("bling/spartronics21.bling"));
     }
 
     /**

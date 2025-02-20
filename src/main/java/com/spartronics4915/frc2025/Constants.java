@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.RobotBase;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -233,7 +234,8 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
-        public static int BLING_BRIGHTNESS = 35; // 0-100
+        public static int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static int FRAME_WAIT = 5; // Frames to wait before updating bling again
     }
 
     public static final class VisionConstants {
