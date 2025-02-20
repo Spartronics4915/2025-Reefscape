@@ -125,7 +125,7 @@ public class VariableAutos {
     }
 
     /**
-     * outputs the entire auto cycle from station to branch with mechanism movement
+     * Outputs the entire auto cycle from station to branch with mechanism movement
      */
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height){
         var pathPair = getPathPair(branch, side);

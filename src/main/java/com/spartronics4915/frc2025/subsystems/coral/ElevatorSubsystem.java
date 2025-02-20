@@ -14,6 +14,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
@@ -87,6 +88,11 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         elevatorClosedLoopController = motor.getClosedLoopController();
 
         setMechanismPosition(0.0);
+
+        SmartDashboard.putData("preset1elev", presetCommand(ElevatorSubsystemState.STOW));
+        SmartDashboard.putData("preset2elev", presetCommand(ElevatorSubsystemState.L1));
+        SmartDashboard.putData("preset3elev", presetCommand(ElevatorSubsystemState.L3));
+        SmartDashboard.putData("preset4elev", presetCommand(ElevatorSubsystemState.L4));
     }
 
     public void resetMechanism() {

@@ -83,9 +83,9 @@ public final class Constants {
             .secondaryCurrentLimit(secondaryCurrentLimit);
 
         public enum IntakeSpeed {
-            IN (500),
+            IN (-1000),
             NEUTRAL (0),
-            OUT (-1000);
+            OUT (1000);
 
             public final double intakeSpeed;
             
@@ -291,10 +291,10 @@ public final class Constants {
         //I dont know the numbers yet so 0 is a place holder
         public enum ArmSubsystemState {
 
-            INTAKE(Rotation2d.fromDegrees(0)),
-            SCORE(Rotation2d.fromDegrees(30)),
-            EH(Rotation2d.fromDegrees(90)),
-            STOW(Rotation2d.fromDegrees(180));
+            EH(Rotation2d.fromDegrees(270)),
+            INTAKE(Rotation2d.fromDegrees(225)),
+            SCORE(Rotation2d.fromDegrees(180)),
+            STOW(Rotation2d.fromDegrees(90));
 
             public Rotation2d angle;
 
@@ -310,7 +310,7 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final Constraints kConstraints = new Constraints(8.0, 10.0);
+        public static final Constraints kConstraints = new Constraints(1.5, 1.5); //8.0, 10
         public static final int kPeriodMs = 0;
 
         public static final double kS = 0.0;
@@ -319,8 +319,8 @@ public final class Constants {
         public static final double kA = 0.0;
         
         //The values set here are placeholders for sim
-        public static final Rotation2d kMinAngle = Rotation2d.fromRotations(-3);
-        public static final Rotation2d kMaxAngle = Rotation2d.fromRotations(3);
+        public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(5);
+        public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(330);
 
         public static final SlotConfigs kPIDConfigs = new SlotConfigs()
             .withKP(120)
@@ -357,17 +357,17 @@ public final class Constants {
         public static final boolean followerInverted = true;
         public static final double motorPositionConversionFactor = (1/20.0) * 0.14044 * 2;
         public static final double motorVelocityConversionFactor = (1/20.0) * 0.14044 * 2;
-        public static final int motorSmartCurrentLimit = 18;
-        public static final int motorSecondaryCurrentLimit = 20;
-        public static final int followerSmartCurrentLimit = 18;
-        public static final int followerSecondaryCurrentLimit = 20;
+        public static final int motorSmartCurrentLimit = 35; //18
+        public static final int motorSecondaryCurrentLimit = 40; //20
+        public static final int followerSmartCurrentLimit = 35;
+        public static final int followerSecondaryCurrentLimit = 40;
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(1.0, 1.0);
+        public static final Constraints constraints = new Constraints(3.0, 2.5); //12, 7.5
 
         public static final double minHeight = 0;
-        public static final double maxHeight = 1.4;
+        public static final double maxHeight = 1.3;
 
         // Not using elevator feedforward constants for now, so just commenting them out.
         
@@ -384,14 +384,14 @@ public final class Constants {
     }
 
     public static final class DynamicsConstants {
-        public static final Angle kArmAngleTolerance = Degrees.of(10);
-        public static final double kElevatorHeightTolerance = Inches.of(5).in(Meters);
-        public static final Angle kSafeArmAngle = Degrees.of(270); //TODO this is currently straight up, this might change
+        public static final Angle kArmAngleTolerance = Degrees.of(2.5);
+        public static final double kElevatorHeightTolerance = Inches.of(2.5).in(Meters);
+        public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
         public static final Angle kMoveableArmAngle = Degrees.of(276.198611); //used in cos math, so this is equivalent to ~80 degrees either side of the left horizon //TODO this is currently straight up, this might change
     
-        public static final double kMinSafeElevHeight = Inches.of(17.352524).in(Meters); // height of the elevator for when the arm is stowed and needs to move
+        public static final double kMinSafeElevHeight = Inches.of(4.631).in(Meters); // height of the elevator for when the arm is stowed and needs to move
 
-        public static final double laserCanDebounce = 0.3; //seconds
+        public static final double kScoreLaserCanDebounce = 0.5; //seconds
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Inches.of(1.0);

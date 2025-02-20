@@ -90,7 +90,7 @@ public class AlignToReef {
     }
 
 
-    public Command generateCommand(ReefSide reefTag, BranchSide side) {
+    public Command generateCommand(final ReefSide reefTag, BranchSide side) {
         return Commands.defer(() -> {
             var branch = getBranchFromTag(reefTag.getCurrent(), side);
             desiredBranchPublisher.accept(branch);
@@ -128,9 +128,9 @@ public class AlignToReef {
      * @return
      */
     private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
-        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.01 ) {
+        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.05 ) {
             var diff =  mSwerve.getPose().minus(target).getTranslation();
-            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();
+            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle().rotateBy(Rotation2d.k180deg);
         }
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
     }

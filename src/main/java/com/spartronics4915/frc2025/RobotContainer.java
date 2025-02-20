@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
+import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
@@ -81,7 +82,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 @Logged
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
+    public final SwerveSubsystem swerveSubsystem = null; //new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
@@ -203,39 +204,21 @@ public class RobotContainer {
      */
     private void configureBindings() {
         
-        operatorController.leftTrigger().onTrue(climberSubsystem.presetCommand(Constants.ClimberConstants.ClimberState.STOW));
-        operatorController.leftBumper().onTrue(climberSubsystem.presetCommand(Constants.ClimberConstants.ClimberState.LIFTED));
+
+        //#region driver controls
 
         if (swerveSubsystem != null) {
-            //switch field and robot relative
-            driverController.a().toggleOnTrue(Commands.startEnd(() -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);}, () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}));
-    
-            driverController.b().onTrue(
-                Commands.defer(() -> {
-                    return Commands.runOnce(() -> {
-                        swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
-                    });
-                }, Set.of())
-            );
-    
+            swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
+
             driverController.leftStick().onTrue(Commands.runOnce(() -> {
                 swerveTeleopCommand.resetHeadingOffset();
             }));
-            
+
             driverController.leftTrigger()
                 .whileTrue(
                     Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
                 );
-    
-            driverController.leftBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.LEFT)
-            );
-    
-            driverController.rightBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.RIGHT)
-            );
-    
-    
+
             //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
             driverController.rightTrigger().whileTrue(
                 new RotationIndependentControlCommand(
@@ -244,33 +227,73 @@ public class RobotContainer {
                     swerveSubsystem
                 )
             );
-    
-            swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
-    
-            // DEBUG CONTROLLER
-            debugController.leftBumper().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)));
-            debugController.leftBumper().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
 
-            debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)));
-            debugController.x().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+            driverController.b().toggleOnTrue(Commands.startEnd(() -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);}, () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}));
+
+            driverController.a().onTrue(
+                Commands.defer(() -> {
+                    return Commands.runOnce(() -> {
+                        swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+                    });
+                }, Set.of())
+            );
+
+            driverController.leftBumper().whileTrue(
+                alignmentCommandFactory.generateCommand(BranchSide.LEFT)
+            );
+    
+            driverController.rightBumper().whileTrue(
+                alignmentCommandFactory.generateCommand(BranchSide.RIGHT)
+            );
         }
-    
-        debugController.button(1).whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(1)));
-        debugController.button(2).whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-1)));
-        debugController.button(3).whileTrue(elevatorSubsystem.manualMode(0.01));
-        debugController.button(4).whileTrue(elevatorSubsystem.manualMode(-0.01));
 
-        debugController.button(5).onTrue(dynamics.stow());
-        debugController.button(6).onTrue(dynamics.gotoScore(DynaPreset.L4));
-        debugController.button(7).onTrue(dynamics.gotoScore(DynaPreset.L3));
-        // debugController.button(8).onTrue(dynamics.gotoScore(DynaPreset.L2));
+        //#endregion
 
-        SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
-        SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
-        SmartDashboard.putData("preset3elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L3));
-        SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
+        //#region automated controls
 
-    
+        dynamics.hasScoredTrigger.onTrue(dynamics.stow());
+
+        new Trigger(intakeSubsystem::detect).debounce(0.02).onTrue(
+            Commands.parallel(
+                dynamics.stow()
+            ));
+
+        new Trigger(dynamics::funnelDetect).onTrue(
+            dynamics.intake()
+        );
+
+        //#endregion
+
+        //#region Operator Controls
+
+        operatorController.rightTrigger().whileTrue(
+            dynamics.score()
+        ).onFalse(Commands.parallel(
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
+            dynamics.stow()
+        ));
+
+        operatorController.leftTrigger().onTrue(dynamics.stow());
+
+        operatorController.back().onTrue(dynamics.loadStow()); //windows button
+
+        operatorController.y().onTrue(dynamics.gotoScore(DynaPreset.L4));
+
+        operatorController.x().onTrue(dynamics.gotoScore(DynaPreset.L3));
+
+        operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        //#endregion
+
+        SmartDashboard.putData("stowLoad", dynamics.loadStow());
+        SmartDashboard.putData("stowPreScore", dynamics.prescoreStow());
+        SmartDashboard.putData("stow", dynamics.stow());
+        SmartDashboard.putData("score", dynamics.score());
+
+        SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
+        SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
+
+
     }
 
     /**
@@ -291,6 +314,22 @@ public class RobotContainer {
         SendableChooser<Command> chooser = new SendableChooser<Command>();
 
         NamedCommands.registerCommand("print", Commands.print("ping"));
+
+        Command blockingIntakeCommand = dynamics.blockingIntake();
+        blockingIntakeCommand.addRequirements(intakeSubsystem);
+
+        chooser.addOption("GartronicsDynamicsScoreL3", Commands.sequence(
+            blockingIntakeCommand,
+            dynamics.gotoScore(BranchHeight.L3.preset),
+            dynamics.score(),
+            dynamics.stow()
+        ));
+        chooser.addOption("GartronicsDynamicsScoreL4", Commands.sequence(
+            dynamics.blockingIntake(),
+            dynamics.gotoScore(BranchHeight.L4.preset),
+            dynamics.score(),
+            dynamics.stow()
+        ));
 
         chooser.setDefaultOption("None", Commands.none());
 

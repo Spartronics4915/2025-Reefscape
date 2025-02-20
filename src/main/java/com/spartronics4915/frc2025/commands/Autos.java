@@ -51,7 +51,7 @@ public final class Autos {
         //TODO create "getReverse", ie Coral-2 reversed is 2-Coral
 
         /**
-         * @return inverse of current path (return to approach and vise versa)
+         * @return The inverse of the current path (return to approach and vise versa)
          */
         public AutoPaths getReverse(){
             switch (this) {
@@ -72,7 +72,7 @@ public final class Autos {
         }
 
         /**
-         * @return get the apporach / return path for the mirroed side 
+         * @return The apporach / return path for the mirrored side 
          */
         public AutoPaths getMirror(){
             switch (this) {

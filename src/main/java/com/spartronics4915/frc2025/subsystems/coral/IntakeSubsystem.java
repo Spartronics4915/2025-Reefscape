@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -76,7 +77,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
 
         SmartDashboard.putData("IntakeSpeed: IN", setPresetSpeedCommand(IntakeSpeed.IN));
-        SmartDashboard.putData("IntakeSpeed: NEURTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
+        SmartDashboard.putData("IntakeSpeed: NEUTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
         SmartDashboard.putData("IntakeSpeed: OUT", setPresetSpeedCommand(IntakeSpeed.OUT));
 
         var lcTrigger = new Trigger(() -> detect()).onTrue(setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
@@ -111,11 +112,11 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public Command setSpeedCommand(double newSpeed){
-        return this.runOnce(() -> setSpeed(newSpeed));
+        return Commands.runOnce(() -> setSpeed(newSpeed));
     }
 
     public Command setPresetSpeedCommand(IntakeSpeed preset){
-        return this.runOnce(() -> intakeMotors(preset));
+        return Commands.runOnce(() -> intakeMotors(preset));
     }
 
     public AngularVelocity getSpeed(){

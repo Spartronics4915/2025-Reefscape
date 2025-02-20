@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 public final class ModeSwitchHandler {
     public interface ModeSwitchInterface {
         /**
-         * this method will trigger whenever the robot is enabled, or switches mode (ie from autonomous to teleoperated) 
+         * This method will trigger whenever the robot is enabled or switches mode (e.g., from autonomous to teleoperated) 
          */
         default void onModeSwitch(){}
 
         /**
-         * this method will trigger whenever the robot is disabled
+         * This method will trigger whenever the robot is disabled
          */
         default void onDisable(){}
     }

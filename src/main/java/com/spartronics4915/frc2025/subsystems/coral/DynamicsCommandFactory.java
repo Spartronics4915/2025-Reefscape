@@ -20,6 +20,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeter;
 import static edu.wpi.first.units.Units.Radians;
 
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
+
 public class DynamicsCommandFactory {
 
     private IntakeSubsystem intakeSubsystem;
@@ -27,6 +29,7 @@ public class DynamicsCommandFactory {
     private ArmSubsystem armSubsystem;
 
     private LaserCan funnelLC;
+    public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
 
     public DynamicsCommandFactory(ArmSubsystem armSubsystem, ElevatorSubsystem elevatorSubsystem, IntakeSubsystem intakeSubsystem) {
         this.armSubsystem = armSubsystem;
@@ -34,21 +37,17 @@ public class DynamicsCommandFactory {
         this.intakeSubsystem = intakeSubsystem;
 
         this.funnelLC = new LaserCan(kFunnelLaserCanID);
-
-        if (RobotBase.isReal()) {
-            throw new RuntimeException("This is currently only working in sim, change the way it gets the position");
-        }
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
     }
 
     public enum DynaPreset{
-        LOAD(0.0, Rotation2d.fromDegrees(122.210182)),
-        PRESCORE(0.0, Rotation2d.fromDegrees(245.826889)),
-        // L2(0.0, Rotation2d.fromDegrees(319.357058)),
-        L3(Inches.of(21.826948).in(Meters), Rotation2d.fromDegrees(301.896888)),
-        L4(Inches.of(53.312356).in(Meters), Rotation2d.fromDegrees(359));
+        LOAD(0.0, Rotation2d.fromDegrees(237.789818)),
+        PRESCORE(0.0, Rotation2d.fromDegrees(114.173111)),
+        L2(0.0, Rotation2d.fromDegrees(319.357058)),
+        L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
+        L4(Meters.of(1.25).in(Meters), Rotation2d.fromDegrees(10));
 
         private final DynamicsSetpoint setpoint;
 
@@ -64,29 +63,38 @@ public class DynamicsCommandFactory {
 
     /**
      * 
-     * @return whether the elevator is safe to move (based on the arm's position)
+     * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
-        var currAngle =  armSubsystem.getTargetPosition();
+        var currAngle =  armSubsystem.getPosition();
         return currAngle.getCos() < Math.cos(kMoveableArmAngle.in(Radians));
     }
 
     private boolean isElevAtSetpoint(double setpoint){
-        System.out.println(Math.abs(setpoint - elevatorSubsystem.getDesiredPosition().in(Meters)));
-        return Math.abs(setpoint - elevatorSubsystem.getDesiredPosition().in(Meters)) < 2*kElevatorHeightTolerance;
+        System.out.println(Math.abs(setpoint - elevatorSubsystem.getPosition()));
+        return Math.abs(setpoint - elevatorSubsystem.getPosition()) < 2*kElevatorHeightTolerance;
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
-        return armSubsystem.getTargetPosition().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
+        return armSubsystem.getPosition().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
     }
 
-    // is the arm below the horizon and is the elevator too low to allow movement
+    /**
+     * @return Whether the arm is below the horizon and the elevator is too low to allow movement
+     */
+    private boolean isArmBelowHorizon(){
+        return (armSubsystem.getPosition().getDegrees() > 180);
+    }
+
+    /**
+     * @return Whether the arm is below the horizon and the elevator is too low to allow movement
+     */
     private boolean isArmStowed(){
-        return (armSubsystem.getTargetPosition().getDegrees() < 180) && isElevStowed();
+        return isArmBelowHorizon() && isElevStowed();
     }
 
     private boolean isElevStowed(){
-        return  elevatorSubsystem.getDesiredPosition().in(Meters) + kElevatorHeightTolerance < kMinSafeElevHeight;
+        return  elevatorSubsystem.getPosition() + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
     private boolean isCoralInArm(){
@@ -106,34 +114,35 @@ public class DynamicsCommandFactory {
     }
 
     /**
-     * Make sure the elevator is not in the load position, if it is goto the safe Elevator height, otherwise it's fine to move the arm
-     * Then move the arm to make it safe to move
-     * 
-     * @return Command to do above actions
+     * If the elevator is not in the load position, go to the safe elevator height.
+     * Then, move the arm such that it is safe to move (meaning it won't hit the reef).
      */
     private Command makeSystemSafeToMove(boolean forceMinSafeHeightMove){ 
         //note to self, careful about when data gets read here
         return Commands.either(
             Commands.sequence(
+                armSubsystem.setSetpointCommand(new Rotation2d(kSafeArmAngle)),
                 Commands.either(
-                    elevatorSubsystem.setSetPointCommand(kMinSafeElevHeight).andThen(
+                    Commands.waitUntil(this::isElevSafeToMove).andThen(
+                        elevatorSubsystem.setSetPointCommand(kMinSafeElevHeight).andThen(
                         Commands.waitUntil(() -> !this.isElevStowed()) //ensures elevator is at a height so it can move
-                    ), 
+                    )), 
                     Commands.none(), 
                     () -> {return this.isArmStowed() || forceMinSafeHeightMove;}
-                ),
-                armSubsystem.setSetpointCommand(new Rotation2d(kSafeArmAngle))
+                )
             ), 
             Commands.none(),
             () -> {return !this.isElevSafeToMove() || (this.isArmStowed() || forceMinSafeHeightMove);}
         ).andThen(
-            Commands.waitUntil(() -> {return this.isElevSafeToMove() && !this.isElevStowed();}).withTimeout(1.0)
+            Commands.waitUntil(() -> {
+                boolean isArmSafeToMove = !(this.isElevStowed() || this.isArmBelowHorizon()); //make sure the elevator isn't stowed or the arm isn't below the horizon
+                return this.isElevSafeToMove() && !isArmSafeToMove;
+            }).withTimeout(1.0)
         );
     }
 
     /**
      * Moves the elevator first before moving the arm
-     * @return Command to do above actions
      */
     private Command elevatorPriorityMove(DynamicsSetpoint setpoint){
         return Commands.parallel(
@@ -146,7 +155,6 @@ public class DynamicsCommandFactory {
 
     /**
      * Moves the arm first before moving the elevator
-     * @return Command to do above actions
      */
     private Command armPriorityMove(DynamicsSetpoint setpoint){
         return Commands.parallel(
@@ -161,21 +169,21 @@ public class DynamicsCommandFactory {
 
     //#region small Commands
 
-    private Command scoreHeight(DynamicsSetpoint scoringPoint){
+    public Command scoreHeight(DynamicsSetpoint scoringPoint){
         return Commands.sequence(
             makeSystemSafeToMove(false),
             elevatorPriorityMove(scoringPoint)
         );
     }
 
-    private Command loadStow(){
+    public Command loadStow(){
         return Commands.sequence(
-            makeSystemSafeToMove(true),
+            makeSystemSafeToMove(false),
             armPriorityMove(DynaPreset.LOAD.setpoint) //brings arm to the load angle, then drops the elevator
         );
     }
 
-    private Command prescoreStow(){
+    public Command prescoreStow(){
         return Commands.sequence(
             makeSystemSafeToMove(false),
             armPriorityMove(DynaPreset.PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
@@ -200,20 +208,33 @@ public class DynamicsCommandFactory {
     public Command score(){
         return Commands.deadline(
             Commands.waitUntil(
-                new Trigger(this::isCoralInArm).negate().debounce(laserCanDebounce)
+                hasScoredTrigger
             ).withTimeout(1.0),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
         ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
     }
 
     /**
-     * this tells the intake to start intaking, it'll end when the funnel Lasercan has detected a coral
-     * @return
+     * Starts the intake immediately and ends the command once the funnel or manipulator LaserCAN detects coral. This will not stop the intake
      */
     public Command blockingIntake(){
-        return Commands.deadline(
-            Commands.waitUntil(this::funnelDetect).withTimeout(1.0), //TODO remove this timeout outside of sim
-            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
+        return Commands.sequence(
+            intake(),
+            Commands.waitUntil(
+                () -> funnelDetect() || isCoralInArm()
+            ).withTimeout(1.5)
+        );
+    }
+
+    /**
+     * Intakes if there is no coral in the manipulator
+     * @return a Command that will do the above actions 
+     */
+    public Command intake(){
+        return Commands.either(
+            Commands.none(),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
+            this::isCoralInArm
         );
     }
 }
