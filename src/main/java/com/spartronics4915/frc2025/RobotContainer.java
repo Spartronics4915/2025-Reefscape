@@ -61,6 +61,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -240,11 +241,15 @@ public class RobotContainer {
             );
 
             driverController.leftBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.LEFT)
+                alignmentCommandFactory.generateCommand(BranchSide.LEFT).finallyDo((boolean interrupted) -> {
+                    dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+                })
             );
     
             driverController.rightBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.RIGHT)
+                alignmentCommandFactory.generateCommand(BranchSide.RIGHT).finallyDo((boolean interrupted) -> {
+                    dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+                })
             );
         }
 
@@ -254,7 +259,7 @@ public class RobotContainer {
 
         dynamics.hasScoredTrigger.onTrue(dynamics.stow());
 
-        new Trigger(intakeSubsystem::detect).debounce(0.02).onTrue(
+        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop).debounce(0.02).onTrue(
             Commands.parallel(
                 dynamics.stow()
             ));
@@ -267,22 +272,32 @@ public class RobotContainer {
 
         //#region Operator Controls
 
-        operatorController.rightTrigger().whileTrue(
+        operatorController.rightTrigger().onTrue( //whileTrue
             dynamics.score()
-        ).onFalse(Commands.parallel(
+        );/*.onFalse(Commands.parallel(
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
             dynamics.stow()
-        ));
+        ));*/
 
         operatorController.leftTrigger().onTrue(dynamics.stow());
 
         operatorController.back().onTrue(dynamics.loadStow()); //windows button
 
-        operatorController.y().onTrue(dynamics.gotoScore(DynaPreset.L4));
+        operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
 
-        operatorController.x().onTrue(dynamics.gotoScore(DynaPreset.L3));
+        operatorController.x().onTrue(dynamics.operatorScore(DynaPreset.L3));
+
+        operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
         operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+
+        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+
+        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
+
+        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
 
         //#endregion
 
@@ -291,9 +306,22 @@ public class RobotContainer {
         SmartDashboard.putData("stow", dynamics.stow());
         SmartDashboard.putData("score", dynamics.score());
 
+        SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
+        SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
 
+        SmartDashboard.putData("intake", dynamics.intake());
+
+        SmartDashboard.putNumber("elevator setpoint", 0);
+        SmartDashboard.putNumber("arm setpoint", 270);
+
+        SmartDashboard.putData("ManualElevator", Commands.defer(() -> {
+            return elevatorSubsystem.setSetPointCommand(SmartDashboard.getNumber("elevator setpoint", 0.0));
+        }, Set.of()));
+        SmartDashboard.putData("ManualArm", Commands.defer(() -> {
+            return armSubsystem.setSetpointCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("arm setpoint", 270.0)));
+        }, Set.of()));
 
     }
 
@@ -316,21 +344,31 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("print", Commands.print("ping"));
 
-        Command blockingIntakeCommand = dynamics.blockingIntake();
-        blockingIntakeCommand.addRequirements(intakeSubsystem);
 
         chooser.addOption("GartronicsDynamicsScoreL3", Commands.sequence(
-            blockingIntakeCommand,
+            dynamics.stow(),
+            dynamics.blockingIntake(),
             dynamics.gotoScore(BranchHeight.L3.preset),
-            dynamics.score(),
+            dynamics.autoScore(BranchHeight.L3.preset),
             dynamics.stow()
         ));
+
+        chooser.addOption("GartronicsDynamicsScoreL2", Commands.sequence(
+            dynamics.stow(),
+            dynamics.blockingIntake(),
+            dynamics.gotoScore(BranchHeight.L2.preset),
+            dynamics.autoScore(BranchHeight.L2.preset),
+            dynamics.stow()
+        ));
+
         chooser.addOption("GartronicsDynamicsScoreL4", Commands.sequence(
+            dynamics.stow(),
             dynamics.blockingIntake(),
             dynamics.gotoScore(BranchHeight.L4.preset),
-            dynamics.score(),
+            dynamics.autoScore(BranchHeight.L4.preset),
             dynamics.stow()
         ));
+        
 
         chooser.setDefaultOption("None", Commands.none());
 

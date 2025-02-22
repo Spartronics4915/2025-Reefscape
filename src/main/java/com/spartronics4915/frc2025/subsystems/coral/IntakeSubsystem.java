@@ -56,7 +56,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         lc = new LaserCan(kLaserCANID);
         try {
             lc.setRangingMode(LaserCan.RangingMode.SHORT);
-            lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            // lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
             lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);

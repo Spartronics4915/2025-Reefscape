@@ -163,7 +163,8 @@ public final class Constants {
     public static final class Drive {
         public enum SwerveDirectories{
             NEO("swerve/neo"),
-            PROGRAMMER_CHASSIS("swerve/programmer-chassis");
+            PROGRAMMER_CHASSIS("swerve/programmer-chassis"),
+            COMP_CHASSIS("swerve/comp-chassis");
 
             public String directory;
 

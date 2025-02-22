@@ -17,8 +17,8 @@ public class VariableAutos {
 
     public enum BranchHeight{
         L4(DynaPreset.L4),
-        L3(DynaPreset.L3);
-        // L2(DynaPreset.L2),
+        L3(DynaPreset.L3),
+        L2(DynaPreset.L2),
         ;
 
         public final DynaPreset preset;

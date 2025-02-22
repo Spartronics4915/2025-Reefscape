@@ -1,0 +1,698 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Step 1",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Score on...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 1/Score on...",
+                  "period": 0.06,
+                  "sort_options": true
+                }
+              },
+              {
+                "title": "At...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 1/At...",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Step 2",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Score on...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 2/Score on...",
+                  "period": 0.06,
+                  "sort_options": true
+                }
+              },
+              {
+                "title": "At...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 2/At...",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Step 3",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Score on...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 3/Score on...",
+                  "period": 0.06,
+                  "sort_options": true
+                }
+              },
+              {
+                "title": "At...",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 3/At...",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Field",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 384.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Crescendo",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "Station",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Variable Autos/Station",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Using Custom?",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Using Variable Auto?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Initial Pose?",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Initial Pose Set?",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vision",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "limelight-alex",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "RIGHT"
+            },
+            "children": [
+              {
+                "title": "Tags Seen",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/count",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Average Distance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/distance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Robot Speed",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/speed",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Standard Deviation",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/stddev",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Method",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/method",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Pose",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 256.0,
+                "type": "Field",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-alex/pose",
+                  "period": 0.06,
+                  "field_game": "Crescendo",
+                  "robot_width": 2.5,
+                  "robot_length": 2.5,
+                  "show_other_objects": true,
+                  "show_trajectories": true,
+                  "field_rotation": 0.0,
+                  "robot_color": 4294198070,
+                  "trajectory_color": 4294967295
+                }
+              }
+            ]
+          },
+          {
+            "title": "limelight-ben",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "RIGHT"
+            },
+            "children": [
+              {
+                "title": "Tags Seen",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/count",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Average Distance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/distance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Robot Speed",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/speed",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Standard Deviation",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/stddev",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Method",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/method",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Pose",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 256.0,
+                "type": "Field",
+                "properties": {
+                  "topic": "/SmartDashboard/VisionDiagnostics/limelight-ben/pose",
+                  "period": 0.06,
+                  "field_game": "Crescendo",
+                  "robot_width": 2.5,
+                  "robot_length": 2.5,
+                  "show_other_objects": true,
+                  "show_trajectories": true,
+                  "field_rotation": 0.0,
+                  "robot_color": 4294198070,
+                  "trajectory_color": 4294967295
+                }
+              }
+            ]
+          },
+          {
+            "title": "Camera Streams",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "HIDDEN"
+            },
+            "children": [
+              {
+                "title": "limelight-alex",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 256.0,
+                "type": "Camera Stream",
+                "properties": {
+                  "topic": "/CameraPublisher/limelight-alex",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "limelight-ben",
+                "x": 1152.0,
+                "y": 384.0,
+                "width": 256.0,
+                "height": 256.0,
+                "type": "Camera Stream",
+                "properties": {
+                  "topic": "/CameraPublisher/limelight-ben",
+                  "period": 0.06
+                }
+              }
+            ]
+          }
+        ],
+        "containers": []
+      }
+    },
+    {
+      "name": "Manual Controls",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "IntakeSpeed: IN",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeSpeed: IN",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "IntakeSpeed: NEUTRAL",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeSpeed: NEUTRAL",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "IntakeSpeed: OUT",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeSpeed: OUT",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset1Arm",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset1Arm",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset2Arm",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset2Arm",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset3Arm",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset3Arm",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset4Arm",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset4Arm",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset1elev",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset1elev",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset2elev",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset2elev",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset3elev",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset3elev",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "preset4elev",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/preset4elev",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "L3",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L3",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "L4",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L4",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "stow",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/stow",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "stowLoad",
+            "x": 640.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/stowLoad",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "stowPreScore",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/stowPreScore",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "L2",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L2",
+              "period": 0.06,
+              "show_type": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
