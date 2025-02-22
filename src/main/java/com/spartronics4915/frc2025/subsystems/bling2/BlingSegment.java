@@ -2,6 +2,7 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 
@@ -20,17 +21,19 @@ public abstract class BlingSegment {
         return this.ledLength;
     }
 
-    final private void incrementFrame() {
-        realFrame++;
+    final protected void incrementFrame(int amount) {
+        realFrame += amount;
         frame = realFrame / BlingConstants.FRAME_WAIT;
         if (maxLength > -1)
             if (frame > maxLength) realFrame = 1;
     }
+    protected final void incrementFrame() {
+        this.incrementFrame(1);
+    }
 
-    final public void update() {
+    final protected void update() {
         if (realFrame % BlingConstants.FRAME_WAIT == 0) {
             updateLights();
-            System.out.println(frame);
         }
         incrementFrame();
     }
@@ -48,8 +51,11 @@ public abstract class BlingSegment {
     public static final BlingLEDPattern rainbow(int length) {
         return new BlingLEDPattern(LEDPattern.rainbow(255,255), length);
     }
-    public static final BlingLEDPattern scrollingRainbow(int length, float speed) {
+    public static final BlingLEDPattern scrollingRainbow(int length, double speed) {
         return new BlingLEDPattern(LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), Meters.of(1)), length);
+    }
+    public static final BlingLEDPattern pulseColor(int length, Color color, double pulseLength) {
+        return new BlingLEDPattern(LEDPattern.solid(color).breathe(Seconds.of(pulseLength)), length);
     }
 
 }

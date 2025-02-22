@@ -11,6 +11,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
@@ -82,7 +83,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 @Logged
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = null; //new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
+    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
@@ -185,7 +186,7 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-        blingSubsystem = new BlingSubsystem(0, new BlingShow("bling/spartronics21.bling"));
+        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, null));
     }
 
     /**

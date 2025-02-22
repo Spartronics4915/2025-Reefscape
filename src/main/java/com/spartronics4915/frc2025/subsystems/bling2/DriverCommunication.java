@@ -19,28 +19,19 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class DriverCommunication extends BlingSegment {
-    private static SwerveSubsystem swerve;
-    private static VisionDeviceSubystem vision;
+    private SwerveSubsystem swerve;
+    private VisionDeviceSubystem vision;
     
+    private BlingSegment current;
+
     public static enum Region {
         REEF(
             new Translation2d[] {new Translation2d(5, 4), new Translation2d(4, 4), new Translation2d(4.5, 4.5), new Translation2d(4.5, 3.5)}, 
-            new Translation2d[] {new Translation2d(13.5, 4), new Translation2d(12.5, 4), new Translation2d(13, 4.5), new Translation2d(13, 4.5)}, 
-            () -> {
-                if (RobotBase.isSimulation())
-                    return LEDPattern.solid(Color.kYellow).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
-                if (((LimelightVisionSubsystem) vision).canSeeTags())
-                    return LEDPattern.solid(Color.kGreen).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
-                else
-                    return LEDPattern.solid(Color.kRed).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS));
-            }
+            new Translation2d[] {new Translation2d(13.5, 4), new Translation2d(12.5, 4), new Translation2d(13, 4.5), new Translation2d(13, 4.5)}
         ),
         PROCESSOR(
             new Translation2d[] {new Translation2d(6, .5)}, 
-            new Translation2d[] {new Translation2d(11.5, 7.5)}, 
-            () -> {
-                return LEDPattern.rainbow(255, 255).atBrightness(Percent.of(BlingConstants.BLING_BRIGHTNESS)).scrollAtAbsoluteSpeed(MetersPerSecond.of(40), Meters.of(1));
-            }
+            new Translation2d[] {new Translation2d(11.5, 7.5)}
         ),
         BARGE(
             new Translation2d[] {
@@ -52,22 +43,19 @@ public class DriverCommunication extends BlingSegment {
                 new Translation2d(8.8, 3),
                 new Translation2d(8.8, 1.9),
                 new Translation2d(8.8, .8)
-            }, 
-            null
+            }
         ),
         CORAL_STATION(
             new Translation2d[] {new Translation2d(.5, 7.5), new Translation2d(.5, .5)}, 
-            new Translation2d[] {new Translation2d(17, 7.5), new Translation2d(17, .5)}, 
-        null);
+            new Translation2d[] {new Translation2d(17, 7.5), new Translation2d(17, .5)}
+        );
 
         final Translation2d[] redPositions;        
         final Translation2d[] bluePositions;
-        final Supplier<LEDPattern> pattern;
 
-        private Region(Translation2d[] blue, Translation2d[] red, Supplier<LEDPattern> pattern) {
+        private Region(Translation2d[] blue, Translation2d[] red) {
             this.bluePositions = blue;
             this.redPositions = red;
-            this.pattern = pattern;
         }
     }
 
@@ -94,12 +82,20 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         Region closest = getClosestRegion(this.swerve);
-        if (closest.pattern != null)
-            closest.pattern.get().applyTo(buffer);
-        else 
-            LEDPattern.kOff.applyTo(buffer);
-
-        //System.out.println((DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get().name() : "No Alliance") + ", " + closest);
+        switch (closest) {
+            case REEF:
+                current = BlingConstants.GOOD;
+                break;
+            case CORAL_STATION:
+            case BARGE:
+            case PROCESSOR:
+            default:
+                current = BlingConstants.OFF;
+        }
+        System.out.println(closest);
+        current.incrementFrame();
+        current.buffer = this.buffer;
+        current.updateLights();
     }
 
 }

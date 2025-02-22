@@ -10,6 +10,8 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
 
@@ -22,7 +24,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.util.Color;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -234,8 +238,15 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
-        public static int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
-        public static int FRAME_WAIT = 5; // Frames to wait before updating bling again
+        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
+
+        public static final int BLING_LENGTH = 42;
+
+        public static final BlingLEDPattern OFF = new BlingLEDPattern(LEDPattern.kOff, BLING_LENGTH);
+        public static final BlingLEDPattern GOOD = BlingSegment.pulseColor(BLING_LENGTH, Color.kLime, .8);
+        public static final BlingLEDPattern WARN = BlingSegment.pulseColor(BLING_LENGTH, Color.kYellow, .4);
+        public static final BlingLEDPattern BAD = BlingSegment.pulseColor(BLING_LENGTH, Color.kRed, .2);
     }
 
     public static final class VisionConstants {
