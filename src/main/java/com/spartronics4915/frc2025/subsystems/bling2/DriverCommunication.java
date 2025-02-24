@@ -1,28 +1,26 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Percent;
-
-import java.util.function.Supplier;
-
 import com.spartronics4915.frc2025.Constants.BlingConstants;
+import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
-import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriverCommunication extends BlingSegment {
     private SwerveSubsystem swerve;
-    private VisionDeviceSubystem vision;
+    private LimelightVisionSubsystem vision;
+    private ArmSubsystem arm;
+    private ElevatorSubsystem elevator;
+    private IntakeSubsystem intake;
     
-    private BlingSegment current;
+    private BlingSegment current = BlingConstants.OFF;
 
     public static enum Region {
         REEF(
@@ -59,10 +57,15 @@ public class DriverCommunication extends BlingSegment {
         }
     }
 
-    public DriverCommunication(int length, SwerveSubsystem swerve, VisionDeviceSubystem vision) {
+    public DriverCommunication(int length, SubsystemBase... subsystems) {
         this.ledLength = length;
-        this.swerve = swerve;
-        this.vision = vision;
+        for (SubsystemBase subsystem : subsystems) {
+            if (subsystem instanceof SwerveSubsystem) this.swerve = (SwerveSubsystem) subsystem;
+            if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
+            if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
+            if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
+            if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
+        }
     }
 
     public static Region getClosestRegion(SwerveSubsystem swerve) {
@@ -81,18 +84,37 @@ public class DriverCommunication extends BlingSegment {
 
     @Override
     protected void updateLights() {
-        Region closest = getClosestRegion(this.swerve);
-        switch (closest) {
-            case REEF:
-                current = BlingConstants.GOOD;
-                break;
-            case CORAL_STATION:
-            case BARGE:
-            case PROCESSOR:
-            default:
-                current = BlingConstants.OFF;
+        if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
+            current = vision.isInitialPoseSet() ? BlingConstants.SHOW_SPARTRONICS42 : BlingConstants.WARN;
+        } else {
+            Region closest = getClosestRegion(this.swerve);
+            switch (closest) {
+                case PROCESSOR: // Extension of Reef zone
+                case REEF:
+                    /* Couple Ideas:
+                        Coral Level Indication
+                            Blue for l4
+                            Green for l3
+                            Yellow for l2
+                            I don’t think we are doing l1?
+                        Red if not ready to score?
+                        Can see limelight (Red/Green)
+                        Ready to score (red/green)
+                     */
+
+                    current = BlingConstants.GOOD;
+                    break;
+                case CORAL_STATION:
+                    // Purple when ready to move on
+                    // Green when waiting for coral
+                    // Yellow when waiting for robot to move
+                    // Red if in wrong position
+                case BARGE:
+                    // Fun lights
+                default:
+                    current = BlingConstants.OFF;
+            }
         }
-        System.out.println(closest);
         current.incrementFrame();
         current.buffer = this.buffer;
         current.updateLights();

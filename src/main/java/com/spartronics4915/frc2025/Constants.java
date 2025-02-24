@@ -12,6 +12,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
 
@@ -248,6 +249,10 @@ public final class Constants {
         public static final BlingLEDPattern GOOD = BlingSegment.pulseColor(BLING_LENGTH, Color.kLime, .8);
         public static final BlingLEDPattern WARN = BlingSegment.pulseColor(BLING_LENGTH, Color.kYellow, .4);
         public static final BlingLEDPattern BAD = BlingSegment.pulseColor(BLING_LENGTH, Color.kRed, .2);
+
+        public static final BlingLEDPattern PURPLE = BlingSegment.pulseColor(BLING_LENGTH, Color.kPurple, .2);
+
+        public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
     }
 
     public static final class VisionConstants {

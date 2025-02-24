@@ -187,7 +187,7 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, null));
+        blingSubsystem = new BlingSubsystem(0, new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem));
     }
 
     /**
