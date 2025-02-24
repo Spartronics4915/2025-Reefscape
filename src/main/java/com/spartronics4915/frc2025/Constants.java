@@ -71,6 +71,8 @@ public final class Constants {
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
 
+        public static final double kLaserCanDebounce = 0.1;
+
         public static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1/4.0)
             .velocityConversionFactor(1/4.0);
@@ -384,7 +386,7 @@ public final class Constants {
         public static final Constraints constraints = new Constraints(3.0, 2.5); //12, 7.5
 
         public static final double minHeight = 0;
-        public static final double maxHeight = 1.3;
+        public static final double maxHeight = 1.24;
 
         // Not using elevator feedforward constants for now, so just commenting them out.
         

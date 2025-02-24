@@ -2,10 +2,9 @@ package com.spartronics4915.frc2025.commands;
 
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
-import com.spartronics4915.frc2025.subsystems.coral.DynamicsCommandFactory;
-import com.spartronics4915.frc2025.subsystems.coral.DynamicsCommandFactory.DynaPreset;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;

@@ -16,9 +16,11 @@ import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.commands.Autos;
 import com.spartronics4915.frc2025.commands.ComplexAutoChooser;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.ElementLocator;
 import com.spartronics4915.frc2025.commands.VariableAutos;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
@@ -37,9 +39,7 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.bling2.*;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
-import com.spartronics4915.frc2025.subsystems.coral.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
-import com.spartronics4915.frc2025.subsystems.coral.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
@@ -84,7 +84,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 @Logged
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.PROGRAMMER_CHASSIS);
+    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.COMP_CHASSIS);
 
     private static final CommandXboxController driverController = new CommandXboxController(OI.kDriverControllerPort);
 
@@ -180,7 +180,7 @@ public class RobotContainer {
         // Configure the trigger bindings
         configureBindings();
 
-        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 3);
+        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 4);
 
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
@@ -219,6 +219,7 @@ public class RobotContainer {
             driverController.leftTrigger()
                 .whileTrue(
                     Commands.run(swerveSubsystem::lockModules, swerveSubsystem)
+                    .withName("X Brake Swerve")
                 );
 
             //this is a approximate version, we can do something more advanced by placing points at the center of the reef sides, then detecting which side it's closest to based on it's position
@@ -228,9 +229,16 @@ public class RobotContainer {
                     ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
                     swerveSubsystem
                 )
+                .withName("Orient Towards Nearest POI")
             );
 
-            driverController.b().toggleOnTrue(Commands.startEnd(() -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);}, () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}));
+            driverController.b().toggleOnTrue(
+                Commands.startEnd(
+                    () -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);},
+                    () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}
+                )
+                .withName("Toggle Field Relative")
+            );
 
             driverController.a().onTrue(
                 Commands.defer(() -> {
@@ -244,12 +252,14 @@ public class RobotContainer {
                 alignmentCommandFactory.generateCommand(BranchSide.LEFT).finallyDo((boolean interrupted) -> {
                     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
                 })
+                .withName("Align Left Branch")
             );
     
             driverController.rightBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(BranchSide.RIGHT).finallyDo((boolean interrupted) -> {
                     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
                 })
+                .withName("Align Right Branch")
             );
         }
 

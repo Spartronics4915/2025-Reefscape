@@ -1,6 +1,9 @@
-package com.spartronics4915.frc2025.subsystems.coral;
+package com.spartronics4915.frc2025.commands;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
+import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,7 +63,7 @@ public class DynamicsCommandFactory {
         L1(0.1, Rotation2d.fromDegrees(47.900)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
-        L4(Meters.of(1.25).in(Meters), Rotation2d.fromDegrees(15));
+        L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33));
 
         private final DynamicsSetpoint setpoint;
 
@@ -175,7 +178,8 @@ public class DynamicsCommandFactory {
                 moveElevatorIfNeeded,
                 WaitUntilSafeToMove
             );
-        }, Set.of());
+        }, Set.of())
+        .withName("Make System Safe");
     }
 
     /**
@@ -235,15 +239,18 @@ public class DynamicsCommandFactory {
             prescoreStow(), 
             loadStow(), 
             this::isCoralInArm
-        );
+        )
+        .withName("Stow");
     }
 
     public Command gotoScore(DynaPreset scorePreset){
-        return scoreHeight(scorePreset);
+        return scoreHeight(scorePreset)
+        .withName("Goto " + scorePreset);
     }
 
     public Command gotoLastInputtedScore() {
-        return Commands.defer(() -> gotoScore(lastInputtedPreset), Set.of());
+        return Commands.defer(() -> gotoScore(lastInputtedPreset), Set.of())
+        .withName("Goto Last");
     }
 
     /**
@@ -251,7 +258,8 @@ public class DynamicsCommandFactory {
      */
     public Command operatorScore(DynaPreset preset) {
         return Commands.runOnce(() -> lastInputtedPreset = preset)
-                       .andThen(gotoScore(preset));
+                       .andThen(gotoScore(preset))
+                       .withName("Operator Goto " + preset);
     }
 
     public Command score(){
@@ -260,7 +268,8 @@ public class DynamicsCommandFactory {
                 hasScoredTrigger
             ).withTimeout(1.0),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
-        ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
+        ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
+        .withName("Score");
     }
 
     public Command autoScore(DynaPreset scoringLocation){
@@ -270,7 +279,8 @@ public class DynamicsCommandFactory {
                 isElevAtSetpoint(scoringLocation.setpoint.heightMeters)
             ),
             score()
-        );
+        )
+        .withName("Autonomous Score");
     }
 
     /**
@@ -282,7 +292,8 @@ public class DynamicsCommandFactory {
             Commands.waitUntil(
                 () -> funnelDetect() || isCoralInArm()
             ).withTimeout(3) //TODO remove for comps
-        );
+        )
+        .withName("Blocking Intake");
     }
 
     /**
@@ -294,6 +305,7 @@ public class DynamicsCommandFactory {
             Commands.none(),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
             this::isCoralInArm
-        );
+        )
+        .withName("Intake");
     }
 }
