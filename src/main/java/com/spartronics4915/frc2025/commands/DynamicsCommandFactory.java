@@ -82,24 +82,24 @@ public class DynamicsCommandFactory {
      * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
-        var currAngle =  armSubsystem.getPosition();
+        var currAngle =  armSubsystem.getTargetPosition();
         return currAngle.getCos() < Math.cos(kMoveableArmAngle.in(Radians)); //TODO measure this so it's only if it's above the horizon (for climb)
     }
 
     private boolean isElevAtSetpoint(double setpoint){
-        System.out.println(Math.abs(setpoint - elevatorSubsystem.getPosition()));
-        return Math.abs(setpoint - elevatorSubsystem.getPosition()) < 2*kElevatorHeightTolerance;
+        System.out.println(Math.abs(setpoint - elevatorSubsystem.getDesiredPosition().in(Meters)));
+        return Math.abs(setpoint - elevatorSubsystem.getDesiredPosition().in(Meters)) < 2*kElevatorHeightTolerance;
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
-        return armSubsystem.getPosition().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
+        return armSubsystem.getTargetPosition().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
     }
 
     /**
      * @return Whether the arm is below the horizon and the elevator is too low to allow movement
      */
     private boolean isArmBelowHorizon(){
-        return (armSubsystem.getPosition().getDegrees() > 180);
+        return (armSubsystem.getTargetPosition().getDegrees() > 180);
     }
 
     /**
@@ -110,7 +110,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isElevStowed(){
-        return  elevatorSubsystem.getPosition() + kElevatorHeightTolerance < kMinSafeElevHeight;
+        return  elevatorSubsystem.getDesiredPosition().in(Meters) + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
     private boolean isCoralInArm(){

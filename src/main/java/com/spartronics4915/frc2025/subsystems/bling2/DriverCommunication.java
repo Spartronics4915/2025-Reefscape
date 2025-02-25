@@ -1,6 +1,10 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
 import com.spartronics4915.frc2025.Constants.BlingConstants;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
@@ -11,7 +15,6 @@ import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriverCommunication extends BlingSegment {
     private SwerveSubsystem swerve;
@@ -19,7 +22,8 @@ public class DriverCommunication extends BlingSegment {
     private ArmSubsystem arm;
     private ElevatorSubsystem elevator;
     private IntakeSubsystem intake;
-    
+    private DynamicsCommandFactory dynamics;
+
     private BlingSegment current = BlingConstants.OFF;
 
     public static enum Region {
@@ -57,14 +61,16 @@ public class DriverCommunication extends BlingSegment {
         }
     }
 
-    public DriverCommunication(int length, SubsystemBase... subsystems) {
+    public DriverCommunication(int length, Object... subsystems) {
         this.ledLength = length;
-        for (SubsystemBase subsystem : subsystems) {
+        for (Object subsystem : subsystems) {
             if (subsystem instanceof SwerveSubsystem) this.swerve = (SwerveSubsystem) subsystem;
             if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
             if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
             if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
+            if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
+            if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
     }
 
@@ -91,31 +97,23 @@ public class DriverCommunication extends BlingSegment {
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
-                    /* Couple Ideas:
-                        Coral Level Indication
-                            Blue for l4
-                            Green for l3
-                            Yellow for l2
-                            I don’t think we are doing l1?
-                        Red if not ready to score?
-                        Can see limelight (Red/Green)
-                        Ready to score (red/green)
-                     */
-
                     current = BlingConstants.GOOD;
                     break;
                 case CORAL_STATION:
-                    // Purple when ready to move on
-                    // Green when waiting for coral
-                    // Yellow when waiting for robot to move
-                    // Red if in wrong position
+                    if (dynamics.funnelDetect()) current = BlingConstants.PURPLE;
+                    else if (Math.abs(arm.getPosition().minus(arm.getTargetPosition()).getDegrees()) < BlingConstants.ARM_THRESHOLD
+                            && Math.abs(elevator.getPosition() - elevator.getDesiredPosition().abs(Meters)) <  BlingConstants.ELEVATOR_THRESHOLD) current = BlingConstants.GOOD;
+                    else if (false) current = BlingConstants.WARN; // TODO If robot in wrong position
+                    else current = BlingConstants.BAD;
+                    break;
                 case BARGE:
-                    // Fun lights
+                    current = BlingConstants.SHOW_SPARTRONICS42;
+                    break;
                 default:
                     current = BlingConstants.OFF;
             }
         }
-        current.incrementFrame();
+        current.incrementFrame(BlingConstants.FRAME_WAIT);
         current.buffer = this.buffer;
         current.updateLights();
     }

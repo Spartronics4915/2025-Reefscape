@@ -25,7 +25,7 @@ public abstract class BlingSegment {
         realFrame += amount;
         frame = realFrame / BlingConstants.FRAME_WAIT;
         if (maxLength > -1)
-            if (frame > maxLength) realFrame = 1;
+            if (frame >= maxLength) realFrame = 1;
     }
     protected final void incrementFrame() {
         this.incrementFrame(1);
