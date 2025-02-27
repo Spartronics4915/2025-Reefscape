@@ -100,11 +100,13 @@ public class DriverCommunication extends BlingSegment {
         } else {
             Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
-            Rotation2d armRotation = arm.getTargetPosition();
+            Rotation2d armRotation = arm.getPosition();
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
-                    current = BlingConstants.PURPLE;
+                    if (vision != null)
+                        current = vision.canSeeTags() ? BlingConstants.GOOD : BlingConstants.WARN;
+                    else current = BlingConstants.SHOW_SPARTRONICS42;
                     break;
                 case CORAL_STATION:
                     boolean subsystemsInCorrectSpot = Math.abs(armRotation.minus(LOAD.getArmAngle()).getDegrees()) < BlingConstants.ARM_THRESHOLD // If arm in correct spot
@@ -121,7 +123,7 @@ public class DriverCommunication extends BlingSegment {
 
                     break;
                 case BARGE:
-                    current = BlingConstants.SHOW_SPARTRONICS42;
+                    current = BlingConstants.RAINBOW;
                     break;
                 default:
                     current = BlingConstants.OFF;

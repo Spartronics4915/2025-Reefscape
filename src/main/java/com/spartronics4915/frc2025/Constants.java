@@ -250,7 +250,7 @@ public final class Constants {
         public static final double ARM_THRESHOLD = 10; // Degrees
         public static final double ELEVATOR_THRESHOLD = .1; // Meters
 
-        public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 1);
+        public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 20);
 
         public static final BlingLEDPattern OFF = new BlingLEDPattern(LEDPattern.kOff, BLING_LENGTH);
         public static final BlingLEDPattern GOOD = BlingSegment.pulseColor(BLING_LENGTH, Color.kLime, .8);
