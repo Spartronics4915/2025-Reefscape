@@ -2,6 +2,9 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
+
+import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -12,8 +15,10 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class DriverCommunication extends BlingSegment {
@@ -94,17 +99,26 @@ public class DriverCommunication extends BlingSegment {
             current = vision.isInitialPoseSet() ? BlingConstants.SHOW_SPARTRONICS42 : BlingConstants.WARN;
         } else {
             Region closest = getClosestRegion(this.swerve);
+            double elevHeight = elevator.getPosition();
+            Rotation2d armRotation = arm.getTargetPosition();
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
-                    current = BlingConstants.GOOD;
+                    current = BlingConstants.PURPLE;
                     break;
                 case CORAL_STATION:
-                    if (dynamics.funnelDetect()) current = BlingConstants.PURPLE;
-                    else if (Math.abs(arm.getPosition().minus(arm.getTargetPosition()).getDegrees()) < BlingConstants.ARM_THRESHOLD
-                            && Math.abs(elevator.getPosition() - elevator.getDesiredPosition().abs(Meters)) <  BlingConstants.ELEVATOR_THRESHOLD) current = BlingConstants.GOOD;
-                    else if (false) current = BlingConstants.WARN; // TODO If robot in wrong position
-                    else current = BlingConstants.BAD;
+                    boolean subsystemsInCorrectSpot = Math.abs(armRotation.minus(LOAD.getArmAngle()).getDegrees()) < BlingConstants.ARM_THRESHOLD // If arm in correct spot
+                                    && Math.abs(elevHeight - LOAD.getElevatorHeight()) < BlingConstants.ELEVATOR_THRESHOLD; // And elevator in correct spot
+                    boolean robotInRightSpot = true; // TODO: Figure out robot in right spot
+
+                    if (dynamics.funnelDetect()) current = BlingConstants.RAINBOW;
+                    else {
+                        if (subsystemsInCorrectSpot && robotInRightSpot) current = BlingConstants.GOOD;
+                        else if (subsystemsInCorrectSpot) current = BlingConstants.PURPLE; // Robot needs to move
+                        else if (robotInRightSpot) current = BlingConstants.WARN; // Mechanisms need to move
+                        else current = BlingConstants.OFF;
+                    }
+
                     break;
                 case BARGE:
                     current = BlingConstants.SHOW_SPARTRONICS42;

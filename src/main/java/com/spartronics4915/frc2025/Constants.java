@@ -247,15 +247,17 @@ public final class Constants {
 
         public static final int BLING_LENGTH = 42;
 
-        public static final double ARM_THRESHOLD = 5; // Degrees
+        public static final double ARM_THRESHOLD = 10; // Degrees
         public static final double ELEVATOR_THRESHOLD = .1; // Meters
+
+        public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 1);
 
         public static final BlingLEDPattern OFF = new BlingLEDPattern(LEDPattern.kOff, BLING_LENGTH);
         public static final BlingLEDPattern GOOD = BlingSegment.pulseColor(BLING_LENGTH, Color.kLime, .8);
         public static final BlingLEDPattern WARN = BlingSegment.pulseColor(BLING_LENGTH, Color.kYellow, .4);
         public static final BlingLEDPattern BAD = BlingSegment.pulseColor(BLING_LENGTH, Color.kRed, .2);
 
-        public static final BlingLEDPattern PURPLE = BlingSegment.pulseColor(BLING_LENGTH, Color.kPurple, .2);
+        public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kPurple, BLING_LENGTH);
 
         public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
     }

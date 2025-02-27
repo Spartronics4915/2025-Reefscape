@@ -67,6 +67,13 @@ public class DynamicsCommandFactory {
 
         private final DynamicsSetpoint setpoint;
 
+        public Rotation2d getArmAngle() {
+            return this.setpoint.armAngle;
+        }
+        public double getElevatorHeight() {
+            return this.setpoint.heightMeters;
+        }
+
         private DynaPreset(double meters, Rotation2d angle) {
             this.setpoint = new DynamicsSetpoint(meters, angle);
         }
