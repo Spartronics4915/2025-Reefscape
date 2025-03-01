@@ -2,12 +2,9 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
-import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
-
-import static edu.wpi.first.units.Units.Meters;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -15,13 +12,18 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class DriverCommunication extends BlingSegment {
     private SwerveSubsystem swerve;
@@ -30,6 +32,9 @@ public class DriverCommunication extends BlingSegment {
     private ElevatorSubsystem elevator;
     private IntakeSubsystem intake;
     private DynamicsCommandFactory dynamics;
+
+    private RumbleController[] controllers;
+    private double rumbleTime = 0;
 
     private BlingSegment current = BlingConstants.OFF;
 
@@ -79,6 +84,14 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
+        dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
+            rumbleTime = 10;
+            rumble(RumblePresets.SOFT);
+        }));
+    }
+
+    public void setRumbleControllers(RumbleController... controllers) {
+        this.controllers = controllers;
     }
 
     public static Region getClosestRegion(SwerveSubsystem swerve) {
@@ -108,7 +121,6 @@ public class DriverCommunication extends BlingSegment {
                 case REEF:
                     Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
                     int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
-                    System.out.println(index);
                     switch(index) {
                         case 1:
                         case 7:
@@ -141,12 +153,19 @@ public class DriverCommunication extends BlingSegment {
                                     && Math.abs(elevHeight - LOAD.getElevatorHeight()) < BlingConstants.ELEVATOR_THRESHOLD; // And elevator in correct spot
                     boolean robotInRightSpot = true; // TODO: Figure out robot in right spot
 
-                    if (dynamics.funnelDetect()) current = BlingConstants.RAINBOW;
-                    else {
-                        if (subsystemsInCorrectSpot && robotInRightSpot) current = BlingConstants.GOOD;
+                    if (dynamics.funnelDetect()) {
+                        current = BlingConstants.RAINBOW;
+                        rumble(RumblePresets.STRONG);
+                        rumbleTime = 5;
+                    } else {
+                        if (subsystemsInCorrectSpot && robotInRightSpot) {
+                            current = BlingConstants.GOOD;
+                        }
                         else if (subsystemsInCorrectSpot) current = BlingConstants.PURPLE; // Robot needs to move
                         else if (robotInRightSpot) current = BlingConstants.WARN; // Mechanisms need to move
-                        else current = BlingConstants.OFF;
+                        else {
+                            current = BlingConstants.OFF;
+                        }
                     }
 
                     break;
@@ -157,9 +176,19 @@ public class DriverCommunication extends BlingSegment {
                     current = BlingConstants.OFF;
             }
         }
+
         current.incrementFrame(BlingConstants.FRAME_WAIT);
         current.buffer = this.buffer;
         current.updateLights();
+
+        rumbleTime--;
+        if (rumbleTime == 0) rumble(RumblePresets.OFF);
+    }
+
+    private void rumble(RumblePresets feedback) {
+        for (RumbleController controller : controllers) {
+            controller.setFeedback(feedback.rumble);
+        }
     }
 
 }

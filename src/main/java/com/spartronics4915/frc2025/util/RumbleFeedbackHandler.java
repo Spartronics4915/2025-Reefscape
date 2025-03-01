@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public final class RumbleFeedbackHandler{
     public enum RumblePresets{
         SOFT(new RumbleFeedback(RumbleType.kBothRumble, 0.1)),
-        STRONG(new RumbleFeedback(RumbleType.kBothRumble, 0.3));
+        STRONG(new RumbleFeedback(RumbleType.kBothRumble, 0.3)),
+        OFF(new RumbleFeedback(RumbleType.kBothRumble, 0));
 
         public final RumbleFeedback rumble;
 
@@ -64,11 +65,11 @@ public final class RumbleFeedbackHandler{
             if (change) {
                 //this means that the controller should stop rumbling (allows it to take in a setting to one of the rumbles)
                 mController.setRumble(RumbleType.kBothRumble, 0.0);
-                System.out.println(mController.getPort() + " : set " + mCurrentFeedback.type + " to 0.0");
+                //System.out.println(mController.getPort() + " : set " + mCurrentFeedback.type + " to 0.0");
 
                 //this means that the controller should start vibrating
                 if (isActive) {
-                    System.out.println(mController.getPort() + " : set " + mCurrentFeedback.type + " to " + mCurrentFeedback.strength);
+                    //System.out.println(mController.getPort() + " : set " + mCurrentFeedback.type + " to " + mCurrentFeedback.strength);
                     mController.setRumble(mCurrentFeedback.type, mCurrentFeedback.strength);
                 }
             }
