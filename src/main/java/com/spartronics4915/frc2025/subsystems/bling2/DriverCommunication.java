@@ -3,6 +3,7 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
 
@@ -15,6 +16,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -104,9 +106,35 @@ public class DriverCommunication extends BlingSegment {
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
-                    if (vision != null)
-                        current = vision.canSeeTags() ? BlingConstants.GOOD : BlingConstants.WARN;
-                    else current = BlingConstants.SHOW_SPARTRONICS42;
+                    Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
+                    int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
+                    System.out.println(index);
+                    switch(index) {
+                        case 1:
+                        case 7:
+                            current = BlingConstants.RED;
+                            break;
+                        case 0:
+                        case 2:
+                        case 8:
+                        case 6:
+                            current = BlingConstants.GREEN;
+                            break;
+                        case 3:
+                        case 5:
+                        case 9:
+                        case 11:
+                            current = BlingConstants.BLUE;
+                            break;
+                        case 4:
+                        case 10:
+                            current = BlingConstants.PURPLE;
+                            break;
+                        default:
+                            current = BlingConstants.OFF;
+                            break;
+                    }
+
                     break;
                 case CORAL_STATION:
                     boolean subsystemsInCorrectSpot = Math.abs(armRotation.minus(LOAD.getArmAngle()).getDegrees()) < BlingConstants.ARM_THRESHOLD // If arm in correct spot

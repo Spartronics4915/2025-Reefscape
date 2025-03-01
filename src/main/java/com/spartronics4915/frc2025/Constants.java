@@ -257,6 +257,10 @@ public final class Constants {
         public static final BlingLEDPattern WARN = BlingSegment.pulseColor(BLING_LENGTH, Color.kYellow, .4);
         public static final BlingLEDPattern BAD = BlingSegment.pulseColor(BLING_LENGTH, Color.kRed, .2);
 
+        public static final BlingLEDPattern RED = BlingSegment.solid(Color.kRed, BLING_LENGTH);
+        public static final BlingLEDPattern ORANGE = BlingSegment.solid(Color.kOrange, BLING_LENGTH);
+        public static final BlingLEDPattern GREEN = BlingSegment.solid(Color.kLime, BLING_LENGTH);
+        public static final BlingLEDPattern BLUE = BlingSegment.solid(Color.kBlue, BLING_LENGTH);
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kPurple, BLING_LENGTH);
 
         public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
