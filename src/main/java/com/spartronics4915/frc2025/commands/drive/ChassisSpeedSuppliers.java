@@ -272,9 +272,9 @@ public final class ChassisSpeedSuppliers {
                     int location = DriverStation.getLocation().getAsInt() - 1;
                     System.out.println(location);
                     if (isBlue)
-                        return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle();
+                        return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                     else 
-                        return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle();
+                        return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 }
             }
             return swerve.getHeading();

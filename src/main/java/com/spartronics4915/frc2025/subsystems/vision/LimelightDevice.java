@@ -103,7 +103,7 @@ public class LimelightDevice extends SubsystemBase {
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
         if (role == LimelightRole.NOTHING) return Optional.empty();
         PoseEstimationMethod method = PoseEstimationMethod.MEGATAG_2;
-        final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01);
+        final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01);
         final PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (!LimelightHelpers.validPoseEstimate(poseEstimate)) return Optional.empty();
         final boolean twoOrMoreTags = poseEstimate.tagCount >= 2;

@@ -91,6 +91,10 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         );
     }
 
+    private void setPercentage(double newPercentage) {
+        mMotor1.set(newPercentage);
+    }
+
 // Not sure if it works with being void, when it outputs if something is detected.
     // public void detect() {
     //     LaserCan.Measurement measurement = lc.getMeasurement();
@@ -108,7 +112,8 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public void intakeMotors (IntakeSpeed preset) {
-        setSpeed(preset.intakeSpeed);
+        // setSpeed(preset.intakeSpeed);
+        setPercentage(preset.intakePercentage);
     }
 
     public Command setSpeedCommand(double newSpeed){
@@ -129,6 +134,6 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     @Override
     public void onModeSwitch() {
-        setSpeed(0.0);
+        intakeMotors(IntakeSpeed.NEUTRAL);
     }
 }

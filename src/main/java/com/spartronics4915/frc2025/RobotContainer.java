@@ -246,20 +246,87 @@ public class RobotContainer {
                     ChassisSpeedSuppliers.getSwerveTeleopCSSupplier(driverController.getHID(), swerveSubsystem),
                     swerveSubsystem
                 )
+                .withName("Orient Towards Nearest POI")
+            );
+
+            driverController.b().toggleOnTrue(
+                Commands.startEnd(
+                    () -> {swerveTeleopCommand.setFieldRelative(!OI.kStartFieldRel);},
+                    () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}
+                )
+                .withName("Toggle Field Relative")
+            );
+
+            driverController.a().onTrue(
+                Commands.defer(() -> {
+                    return Commands.runOnce(() -> {
+                        swerveTeleopCommand.setHeadingOffset(swerveSubsystem.getPose().getRotation());
+                    });
+                }, Set.of())
+            );
+
+            driverController.leftBumper().whileTrue(
+                alignmentCommandFactory.generateCommand(BranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
+                //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+                // })
+                .withName("Align Left Branch")
             );
     
-            swerveSubsystem.setDefaultCommand(swerveTeleopCommand);
-    
-            // DEBUG CONTROLLER
-            debugController.leftBumper().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)));
-            debugController.leftBumper().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
-
-            debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)));
-            debugController.x().onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+            driverController.rightBumper().whileTrue(
+                alignmentCommandFactory.generateCommand(BranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
+                //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+                // })
+                .withName("Align Right Branch")
+            );
         }
-    
-        debugController.x().whileTrue(Rumble.DEBUG.controller.continousRumble(RumblePresets.SOFT.rumble));
-        debugController.y().whileTrue(Rumble.DEBUG.controller.continousRumble(RumblePresets.STRONG.rumble));
+
+        //#endregion
+
+        //#region automated controls
+
+        dynamics.hasScoredTrigger.onTrue(dynamics.stow());
+
+        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop).debounce(0.02).onTrue(
+            Commands.parallel(
+                dynamics.stow()
+            ));
+
+        new Trigger(dynamics::funnelDetect).onTrue(
+            dynamics.intake()
+        );
+
+        //#endregion
+
+        //#region Operator Controls
+
+        operatorController.rightTrigger().onTrue( //whileTrue
+            dynamics.score()
+        );/*.onFalse(Commands.parallel(
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
+            dynamics.stow()
+        ));*/
+
+        operatorController.leftTrigger().onTrue(dynamics.stow());
+
+        operatorController.back().onTrue(dynamics.loadStow()); //windows button
+
+        operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
+
+        operatorController.x().onTrue(dynamics.operatorScore(DynaPreset.L3));
+
+        operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
+
+        operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+
+        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+
+        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
+
+        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
+
+        //#endregion
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));

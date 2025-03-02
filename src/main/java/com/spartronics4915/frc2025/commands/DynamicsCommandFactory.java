@@ -5,6 +5,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
+import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -40,6 +41,14 @@ public class DynamicsCommandFactory {
 
         this.funnelLC = new LaserCan(kFunnelLaserCanID);
 
+        try {
+            funnelLC.setRangingMode(LaserCan.RangingMode.SHORT);
+            funnelLC.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); // prev numbers that worked(8, 8, 4, 4)
+            funnelLC.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+          } catch (ConfigurationFailedException e) {
+            System.out.println("Configuration failed! " + e);
+          }
+
         var tab = Shuffleboard.getTab("dynamicsLogging");
         tab.addBoolean("armBelowHorizon", this::isArmBelowHorizon);
         tab.addBoolean("armStowed", this::isArmStowed);
@@ -58,7 +67,7 @@ public class DynamicsCommandFactory {
     }
 
     public enum DynaPreset{
-        LOAD(0.0, Rotation2d.fromDegrees(237.789818)),
+        LOAD(0.0, Rotation2d.fromDegrees(234.4421)),
         PRESCORE(0.0, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
         L1(0.1, Rotation2d.fromDegrees(47.900)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
@@ -201,6 +210,12 @@ public class DynamicsCommandFactory {
         );
     }
 
+    public Command waitUntilPreset(DynaPreset setpoint){
+        return Commands.waitUntil(() -> {
+            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle);
+        });
+    }
+
     /**
      * Moves the arm first before moving the elevator
      */
@@ -298,7 +313,7 @@ public class DynamicsCommandFactory {
             intake(),
             Commands.waitUntil(
                 () -> funnelDetect() || isCoralInArm()
-            ).withTimeout(3) //TODO remove for comps
+            ).withTimeout(7.5) //TODO remove for comps
         )
         .withName("Blocking Intake");
     }
