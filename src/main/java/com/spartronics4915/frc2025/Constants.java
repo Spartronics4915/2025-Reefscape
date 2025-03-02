@@ -254,9 +254,12 @@ public final class Constants {
 
         public static final int BLING_LENGTH = 42;
 
+        // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
         public static final double ELEVATOR_THRESHOLD = .1; // Meters
+        public static final double BARGE_ALIGNMMENT_THRESHOLD = .2; // Distance that the robot can be, in meters, from the barge starting position.
 
+        // Segment constants
         public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 20);
 
         public static final BlingLEDPattern OFF = new BlingLEDPattern(LEDPattern.kOff, BLING_LENGTH);

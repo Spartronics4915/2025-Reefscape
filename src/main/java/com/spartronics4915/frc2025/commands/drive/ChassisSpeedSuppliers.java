@@ -270,7 +270,6 @@ public final class ChassisSpeedSuppliers {
                 }
                 case BARGE: {
                     int location = DriverStation.getLocation().getAsInt() - 1;
-                    System.out.println(location);
                     if (isBlue)
                         return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                     else 

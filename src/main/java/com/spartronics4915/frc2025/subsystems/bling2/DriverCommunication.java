@@ -1,10 +1,11 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
-import com.spartronics4915.frc2025.Constants.BlingConstants;
+import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -12,9 +13,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,8 +21,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
 
 public class DriverCommunication extends BlingSegment {
     private SwerveSubsystem swerve;
@@ -36,7 +36,7 @@ public class DriverCommunication extends BlingSegment {
     private RumbleController[] controllers;
     private double rumbleTime = 0;
 
-    private BlingSegment current = BlingConstants.OFF;
+    private BlingSegment current = OFF;
 
     public static enum Region {
         REEF(
@@ -111,7 +111,7 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
-            current = vision.isInitialPoseSet() ? BlingConstants.SHOW_SPARTRONICS42 : BlingConstants.WARN;
+            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN;
         } else {
             Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
@@ -124,60 +124,75 @@ public class DriverCommunication extends BlingSegment {
                     switch(index) {
                         case 1:
                         case 7:
-                            current = BlingConstants.RED;
+                            current = RED;
                             break;
                         case 0:
                         case 2:
                         case 8:
                         case 6:
-                            current = BlingConstants.GREEN;
+                            current = GREEN;
                             break;
                         case 3:
                         case 5:
                         case 9:
                         case 11:
-                            current = BlingConstants.BLUE;
+                            current = BLUE;
                             break;
                         case 4:
                         case 10:
-                            current = BlingConstants.PURPLE;
+                            current = PURPLE;
                             break;
                         default:
-                            current = BlingConstants.OFF;
+                            current = OFF;
                             break;
                     }
 
                     break;
                 case CORAL_STATION:
-                    boolean subsystemsInCorrectSpot = Math.abs(armRotation.minus(LOAD.getArmAngle()).getDegrees()) < BlingConstants.ARM_THRESHOLD // If arm in correct spot
-                                    && Math.abs(elevHeight - LOAD.getElevatorHeight()) < BlingConstants.ELEVATOR_THRESHOLD; // And elevator in correct spot
+                    boolean subsystemsInCorrectSpot = Math.abs(armRotation.minus(LOAD.getArmAngle()).getDegrees()) < ARM_THRESHOLD // If arm in correct spot
+                                    && Math.abs(elevHeight - LOAD.getElevatorHeight()) < ELEVATOR_THRESHOLD; // And elevator in correct spot
                     boolean robotInRightSpot = true; // TODO: Figure out robot in right spot
 
                     if (dynamics.funnelDetect()) {
-                        current = BlingConstants.RAINBOW;
+                        current = RAINBOW;
                         rumble(RumblePresets.STRONG);
                         rumbleTime = 5;
                     } else {
                         if (subsystemsInCorrectSpot && robotInRightSpot) {
-                            current = BlingConstants.GOOD;
+                            current = GOOD;
                         }
-                        else if (subsystemsInCorrectSpot) current = BlingConstants.PURPLE; // Robot needs to move
-                        else if (robotInRightSpot) current = BlingConstants.WARN; // Mechanisms need to move
-                        else {
-                            current = BlingConstants.OFF;
-                        }
+                        else if (subsystemsInCorrectSpot) current = PURPLE; // Robot needs to move
+                        else if (robotInRightSpot) current = WARN; // Mechanisms need to move
+                        else current = OFF;
                     }
 
                     break;
                 case BARGE:
-                    current = BlingConstants.RAINBOW;
+                    if (DriverStation.getLocation().isEmpty()) {
+                        current = OFF;
+                        break;
+                    }
+                    int location = DriverStation.getLocation().getAsInt() - 1;
+                    double distance;
+                    boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
+
+                    if (isBlue) distance = OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getMeasureY().in(Meters);
+                    else  distance = OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getMeasureY().in(Meters);
+                
+                    // If showing red, too far right, go further left.
+                    // If showing blue, too far left, go further right.
+
+                    if (distance <= -BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? BLUE : RED;
+                    else if (distance >= BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? RED : BLUE;
+                    else current = RAINBOW; // It's climbin' time.
+
                     break;
                 default:
-                    current = BlingConstants.OFF;
+                    current = OFF;
             }
         }
 
-        current.incrementFrame(BlingConstants.FRAME_WAIT);
+        current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;
         current.updateLights();
 
