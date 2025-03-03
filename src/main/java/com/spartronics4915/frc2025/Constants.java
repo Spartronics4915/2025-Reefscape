@@ -306,6 +306,8 @@ public final class Constants {
         public static final double kMaxDistanceForMegaTag1 = 3.75; //meters
         public static final boolean kVisionDiagnostics = true;
         
+        public static final Time newMegaTag1ReadingThreshold = Seconds.of(10);
+        
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
