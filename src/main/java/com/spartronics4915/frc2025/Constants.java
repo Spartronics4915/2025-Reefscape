@@ -269,9 +269,11 @@ public final class Constants {
 
         public static final BlingLEDPattern RED = BlingSegment.solid(Color.kRed, BLING_LENGTH);
         public static final BlingLEDPattern ORANGE = BlingSegment.solid(Color.kOrange, BLING_LENGTH);
+        public static final BlingLEDPattern YELLOW = BlingSegment.solid(Color.kYellow, BLING_LENGTH);
         public static final BlingLEDPattern GREEN = BlingSegment.solid(Color.kLime, BLING_LENGTH);
         public static final BlingLEDPattern BLUE = BlingSegment.solid(Color.kBlue, BLING_LENGTH);
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kPurple, BLING_LENGTH);
+        public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
         public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
     }

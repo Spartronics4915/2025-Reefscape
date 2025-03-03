@@ -59,3 +59,31 @@ this controller will have tools for debugging
 | L Bumper | Force vision to use MegaTag 1 |
 | Push Left Stick | Toggle resetting heading on mode switch |
 |     |     |
+
+# Bling/Driver Communication
+
+Autos: Flashes Yellow if can't see 2 tags, will do a Spartronics themed light show once it can.
+
+If a MegaTag1 reading is needed it'll be solid yellow, overriding all other bling, other than autos.
+
+Reef Zone:
+| Color | Meaning |
+| --- | --- |
+| White |  Closest reef side is the closest to the drivers |
+| Orange | Closest reef side is the 2nd closest to the drivers |
+| Green | Closest reef side is the 2nd furthest to the drivers |
+| Purple | Closest reef side is the furthest from drivers |
+
+Coral Station:
+| Color | Meaning |
+| --- | --- |
+| Rainbow | Ready to go |
+| Green Flashing | Awaiting Coral |
+| Yellow Flashing | Mechanisms need to move |
+
+Barge:
+| Color | Meaning |
+| --- | --- |
+| Rainbow | CLIMB CLIMB CLIMB GO GO GO |
+| Blue | Move to the right |
+| Red | Move to the left |

@@ -112,7 +112,10 @@ public class DriverCommunication extends BlingSegment {
     protected void updateLights() {
         if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN;
-        } else {
+        } //else if (LimelightVisionSubsystem.newMegaTag1Reading()) {
+           // current = YELLOW;
+        //}
+        else {
             Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
@@ -124,19 +127,19 @@ public class DriverCommunication extends BlingSegment {
                     switch(index) {
                         case 1:
                         case 7:
-                            current = RED;
+                            current = WHITE;
                             break;
                         case 0:
                         case 2:
                         case 8:
                         case 6:
-                            current = GREEN;
+                            current = ORANGE;
                             break;
                         case 3:
                         case 5:
                         case 9:
                         case 11:
-                            current = BLUE;
+                            current = GREEN;
                             break;
                         case 4:
                         case 10:
