@@ -2,12 +2,15 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class BlingSubsystem extends SubsystemBase {
     private AddressableLED strip;
     private AddressableLEDBuffer buffer;
     private BlingSegment[] segments;
+    private String[] hexStrings;
 
     public void updateSegments(BlingSegment... segments) {
         this.segments = segments;
@@ -19,6 +22,8 @@ public class BlingSubsystem extends SubsystemBase {
 
         strip.setLength(ledLength);
         buffer = new AddressableLEDBuffer(ledLength);
+
+        hexStrings = new String[ledLength];
 
         int index = 0;
         for (BlingSegment x : segments) {
@@ -34,12 +39,21 @@ public class BlingSubsystem extends SubsystemBase {
         updateSegments(shows);
     }
 
+    private void logLEDs() {
+        for(int i = 0; i < hexStrings.length; i++) {
+            Color ledColor = buffer.getLED(i);
+            hexStrings[i] = ledColor.toHexString();
+        }
+        SmartDashboard.putStringArray("Bling", hexStrings);
+    }
+
     @Override
     public void periodic() {
         for (BlingSegment show : segments) {
             show.update();
         }
         strip.setData(buffer);
+        logLEDs();
     }
 
 }
