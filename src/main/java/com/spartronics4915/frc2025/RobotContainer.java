@@ -22,6 +22,7 @@ import com.spartronics4915.frc2025.commands.VariableAutos;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+import com.spartronics4915.frc2025.commands.autos.AlignToReef.FieldBranchSide;
 import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
@@ -262,14 +263,14 @@ public class RobotContainer {
             );
 
             driverController.leftBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
+                alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
                 //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
                 // })
                 .withName("Align Left Branch")
             );
     
             driverController.rightBumper().whileTrue(
-                alignmentCommandFactory.generateCommand(BranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
+                alignmentCommandFactory.generateCommand(FieldBranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
                 //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
                 // })
                 .withName("Align Right Branch")

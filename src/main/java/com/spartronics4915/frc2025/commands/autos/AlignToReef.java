@@ -79,9 +79,32 @@ public class AlignToReef {
         });
     }
 
+    /**
+     * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
+     */
+    public enum FieldBranchSide{
+        LEFT(BranchSide.LEFT),
+        RIGHT(BranchSide.RIGHT);
+
+        public BranchSide branchSide;
+
+        public FieldBranchSide getOpposite(){
+            switch (this){
+                case LEFT: return FieldBranchSide.RIGHT;
+                case RIGHT: return FieldBranchSide.LEFT;
+            }
+            System.out.println("Error, switch case failed to catch the field branch side");
+            return this;
+        }
+
+        private FieldBranchSide(BranchSide internal) {
+            this.branchSide = internal;
+        }
+    }
+
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
-    public Command generateCommand(BranchSide side) {
+    public Command generateCommand(FieldBranchSide side) {
         return Commands.defer(() -> {
             var branch = getClosestBranch(side, mSwerve);
             desiredBranchPublisher.accept(branch);
@@ -168,10 +191,22 @@ public class AlignToReef {
         return getClosestReefAprilTag(swerve.getPose()).getRotation().rotateBy(Rotation2d.k180deg);
     }
 
-    public static Pose2d getClosestBranch(BranchSide side, SwerveSubsystem swerve){
-        Pose2d tag = getClosestReefAprilTag(swerve.getPose());
+    public static Pose2d getClosestBranch(FieldBranchSide fieldSide, SwerveSubsystem swerve){
+        Pose2d swervePose = swerve.getPose();
         
-        return getBranchFromTag(tag, side);
+        Pose2d tag = getClosestReefAprilTag(swervePose);
+        
+        BranchSide tagSide = fieldSide.branchSide;
+
+        if (
+            swervePose.getX() > 4.500
+            &&
+            swervePose.getX() < 13
+        ) {
+            tagSide = fieldSide.getOpposite().branchSide;
+        }
+
+        return getBranchFromTag(tag, tagSide);
     }
 
 
