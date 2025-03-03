@@ -20,10 +20,10 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Right Trigger | Reef / coral station auto orient |
 | Left Bumper | Auto-align to left branch |
 | Right Bumper | Auto-align to right branch |
-| D-pad Up | *None* |
-| D-pad Down | *None* |
-| D-pad Left | *None* |
-| D-pad Right | *None* |
+| D-pad Up | Nudge forwards |
+| D-pad Down | Nudge backwards |
+| D-pad Left | Nudge left |
+| D-pad Right | Nudge right |
 | Windows | *None* |
 | Menu | *None* |
 
@@ -31,10 +31,10 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | input   | action |
 | -------- | ------- |
 | Left Stick | *None* |
-| Push Left Stick | *None* |
+| Push Left Stick | High algae preset |
 | Right Stick | *None* |
-| Push Right Stick | *None* |
-| A | *None* |
+| Push Right Stick | Low algae preset |
+| A | Arm algae angle |
 | B | L2 scoring preset |
 | X | L3 scoring preset |
 | Y | L4 scoring preset |
@@ -46,7 +46,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |
 | D-pad Right | (Manual) Arm CW |
-| Windows | Force load preset |
+| Windows | Unstuck coral |
 | Menu | Intake |
 
 ## Debug controller

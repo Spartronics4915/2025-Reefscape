@@ -265,8 +265,8 @@ public final class ChassisSpeedSuppliers {
                     }
                 }
                 case CORAL_STATION: {
-                    if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1));
-                    else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1));
+                    if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
+                    else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
                 case BARGE: {
                     int location = DriverStation.getLocation().getAsInt() - 1;

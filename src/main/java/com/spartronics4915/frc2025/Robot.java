@@ -4,32 +4,29 @@
 
 package com.spartronics4915.frc2025;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 
 import au.grapplerobotics.CanBridge;
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-@Logged
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
-    @Logged(name = "Logging")
     private final RobotContainer m_robotContainer;
 
     public static final Timer AUTO_TIMER = new Timer();
@@ -48,18 +45,12 @@ public class Robot extends TimedRobot {
         DriverStation.startDataLog(DataLogManager.getLog(), true);
 
         CanBridge.runTCP();
-        Epilogue.configure(config -> {
-            if (isSimulation()) {
-                config.errorHandler = ErrorHandler.crashOnError();
-            }
-            config.root = "Epilogue";
-        });
-        Epilogue.bind(this); //"Epilogue cannot be resolved" error will go away when you build
     }
 
     @Override
     public void robotInit() {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+        FollowPathCommand.warmupCommand().schedule();
     }
 
     /**
@@ -76,7 +67,6 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        RumbleFeedbackHandler.handleControllers();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

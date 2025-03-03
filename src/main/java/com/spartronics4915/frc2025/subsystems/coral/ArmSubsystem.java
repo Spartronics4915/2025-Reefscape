@@ -36,7 +36,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private TrapezoidProfile mArmProfile;
 
-    private Rotation2d mCurrentSetPoint = Rotation2d.fromRotations(0);;
+    private Rotation2d mCurrentSetPoint = ArmConstants.kStartingAngle;
     private State mCurrentState;
 
     private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("logArm").getDoubleTopic("applied out").publish();
@@ -53,7 +53,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         
         initArmProfile();
 
-        setMechanismAngle(Rotation2d.fromDegrees(270));
+        setMechanismAngle(ArmConstants.kStartingAngle);
     
         ModeSwitchHandler.EnableModeSwitchHandler(this);
 

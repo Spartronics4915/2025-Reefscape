@@ -50,13 +50,12 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -83,7 +82,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-@Logged
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(Drive.SwerveDirectories.COMP_CHASSIS);
@@ -116,7 +114,7 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
-    public final ClimberSubsystem climberSubsystem;
+    // public final ClimberSubsystem climberSubsystem;
 
     
     public final DynamicsCommandFactory dynamics;
@@ -129,10 +127,8 @@ public class RobotContainer {
     private AlignToReef alignmentCommandFactory = null;
     private VariableAutos variableAutoFactory = null;
 
-    @NotLogged
     private final SendableChooser<Command> autoChooser;
 
-    @NotLogged
     private final ComplexAutoChooser complexAutoChooser;
 
     /**
@@ -143,7 +139,7 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         armSubsystem = new ArmSubsystem();
         elevatorSubsystem = new ElevatorSubsystem();
-        climberSubsystem = new ClimberSubsystem();
+        // climberSubsystem = new ClimberSubsystem();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
@@ -180,7 +176,7 @@ public class RobotContainer {
         if (swerveSubsystem != null) {
             swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
             alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
-            variableAutoFactory = new VariableAutos(alignmentCommandFactory, dynamics);
+            variableAutoFactory = new VariableAutos(alignmentCommandFactory, dynamics, swerveSubsystem);
             if (RobotBase.isSimulation()) {
                 visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
             } else {
@@ -194,7 +190,7 @@ public class RobotContainer {
         // Configure the trigger bindings
         configureBindings();
 
-        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 4);
+        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 3);
 
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
@@ -278,6 +274,30 @@ public class RobotContainer {
                 // })
                 .withName("Align Right Branch")
             );
+
+            driverController.povUp().whileTrue(
+                Commands.run(() -> {
+                    swerveSubsystem.drive(new ChassisSpeeds(0.25, 0, 0));
+                })
+            );
+
+            driverController.povLeft().whileTrue(
+                Commands.run(() -> {
+                    swerveSubsystem.drive(new ChassisSpeeds(0, 0.25, 0));
+                })
+            );
+
+            driverController.povRight().whileTrue(
+                Commands.run(() -> {
+                    swerveSubsystem.drive(new ChassisSpeeds(0, -0.25, 0));
+                })
+            );
+
+            driverController.povDown().whileTrue(
+                Commands.run(() -> {
+                    swerveSubsystem.drive(new ChassisSpeeds(-0.25, 0, 0));
+                })
+            );
         }
 
         //#endregion
@@ -286,10 +306,12 @@ public class RobotContainer {
 
         dynamics.hasScoredTrigger.onTrue(dynamics.stow());
 
-        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop).debounce(0.02).onTrue(
-            Commands.parallel(
-                dynamics.stow()
-            ));
+        new Trigger(intakeSubsystem::detect)//.and(DriverStation::isTeleop)
+            .debounce(0.02).onTrue(
+                Commands.parallel(
+                    dynamics.stow()
+                )
+            );
 
         new Trigger(dynamics::funnelDetect).onTrue(
             dynamics.intake()
@@ -308,7 +330,11 @@ public class RobotContainer {
 
         operatorController.leftTrigger().onTrue(dynamics.stow());
 
-        operatorController.back().onTrue(dynamics.loadStow()); //windows button
+        operatorController.back().onTrue(
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK)
+        ).onFalse(
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
+        ); //windows button
 
         operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
 
@@ -317,6 +343,31 @@ public class RobotContainer {
         operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
         operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        // operatorController.rightStick().whileTrue(
+        //     Commands.repeatingSequence(
+        //         Commands.sequence(
+        //             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT),
+        //             Commands.waitSeconds(.25)
+        //         ).onlyIf(() -> !intakeSubsystem.detect()),
+        //         Commands.sequence(
+        //             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
+        //             Commands.waitSeconds(.25)
+        //         ).onlyIf(() -> !intakeSubsystem.detect())
+        //     )
+        //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
+
+        operatorController.leftStick().onTrue(
+            dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
+        );
+
+        operatorController.rightStick().onTrue(
+            dynamics.gotoScore(DynaPreset.ALGAE_LOW)
+        );
+
+        operatorController.a().onTrue(
+            dynamics.removeAlgaeArm()
+        );
 
         operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
 
@@ -327,6 +378,10 @@ public class RobotContainer {
         operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
 
         //#endregion
+
+        SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
+
+        SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
@@ -355,35 +410,14 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("print", Commands.print("ping"));
 
-
-        chooser.addOption("GartronicsDynamicsScoreL3", Commands.sequence(
-            dynamics.stow(),
-            dynamics.blockingIntake(),
-            dynamics.gotoScore(BranchHeight.L3.preset),
-            dynamics.autoScore(BranchHeight.L3.preset),
-            dynamics.stow()
-        ));
-
-        chooser.addOption("GartronicsDynamicsScoreL2", Commands.sequence(
-            dynamics.stow(),
-            dynamics.blockingIntake(),
-            dynamics.gotoScore(BranchHeight.L2.preset),
-            dynamics.autoScore(BranchHeight.L2.preset),
-            dynamics.stow()
-        ));
-
-        chooser.addOption("GartronicsDynamicsScoreL4", Commands.sequence(
-            dynamics.stow(),
-            dynamics.blockingIntake(),
-            dynamics.gotoScore(BranchHeight.L4.preset),
-            dynamics.autoScore(BranchHeight.L4.preset),
-            dynamics.stow()
-        ));
-        
-
         chooser.setDefaultOption("None", Commands.none());
 
         if (swerveSubsystem != null) {
+            var variableAuto = Commands.defer(complexAutoChooser::getAuto, Set.of(swerveSubsystem));
+            variableAuto.setName("variableAuto");
+
+            chooser.addOption("Create auto...", variableAuto);
+
             chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
             chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
             chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
@@ -409,11 +443,6 @@ public class RobotContainer {
                 variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT, BranchHeight.L4),
                 variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT, BranchHeight.L4)
             ));
-
-            var variableAuto = Commands.defer(complexAutoChooser::getAuto, Set.of(swerveSubsystem));
-            variableAuto.setName("variableAuto");
-
-            chooser.addOption("Create auto...", variableAuto);
         }
 
         chooser.onChange((c) -> {

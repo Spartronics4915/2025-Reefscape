@@ -97,9 +97,6 @@ public class LimelightDevice extends SubsystemBase {
         return LimelightHelpers.getTV(name);
     }
 
-    /**
-     * Use MegaTag1 if it's within the first three seconds of auto, otherwise use MegaTag2
-     */
     public Optional<VisionMeasurement> getVisionMeasurement(SwerveSubsystem swerve) {
         if (role == LimelightRole.NOTHING) return Optional.empty();
         PoseEstimationMethod method = PoseEstimationMethod.MEGATAG_2;
@@ -111,7 +108,8 @@ public class LimelightDevice extends SubsystemBase {
         double robotSpeed = swerve.getSpeed();
         final boolean movingSlowEnough = robotSpeed < VisionConstants.kMaxSpeedForMegaTag1;
         final boolean CAN_GET_GOOD_HEADING = twoOrMoreTags && movingSlowEnough && closeEnough;
-        if (BEFORE_MATCH || CAN_GET_GOOD_HEADING || LimelightVisionSubsystem.getMegaTag1Override()) method = PoseEstimationMethod.MEGATAG_1;
+        if (BEFORE_MATCH && !CAN_GET_GOOD_HEADING) return Optional.empty(); //we only want the best for our inital pose
+        if (CAN_GET_GOOD_HEADING || LimelightVisionSubsystem.getMegaTag1Override()) method = PoseEstimationMethod.MEGATAG_1;
         return getVisionMeasurement(swerve, method);
     }
 
@@ -157,7 +155,8 @@ public class LimelightDevice extends SubsystemBase {
         
         if (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1) { //single tag TODO: why are two checks needed?
             RawFiducial singleTag = poseEstimate.rawFiducials[0];
-            if (singleTag.ambiguity > 0.7 || singleTag.distToCamera > 5) { //TODO: what does ambiguity measure?
+            if (VisionConstants.kVisionDiagnostics) SmartDashboard.putNumber("VisionDiagnostics/" + name + "/single tag pose ambiguity", singleTag.ambiguity);
+            if (singleTag.ambiguity > 0.7 || singleTag.distToCamera > 5) {
                 return Optional.empty(); //don't trust if too ambiguous or too far
             }
             transStdDev += StdDevConstants.MegaTag1.kSingleTagPunishment; //megatag1 performs much worse with only one tag

@@ -72,7 +72,10 @@ public class DynamicsCommandFactory {
         L1(0.1, Rotation2d.fromDegrees(47.900)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
-        L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33));
+        L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
+        CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
+        ALGAE_HIGH(0.78, Rotation2d.fromDegrees(90)),
+        ALGAE_LOW(0.375, Rotation2d.fromDegrees(90));
 
         private final DynamicsSetpoint setpoint;
 
@@ -103,7 +106,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isElevAtSetpoint(double setpoint){
-        System.out.println(Math.abs(setpoint - elevatorSubsystem.getPosition()));
+        // System.out.println(Math.abs(setpoint - elevatorSubsystem.getPosition()));
         return Math.abs(setpoint - elevatorSubsystem.getPosition()) < 2*kElevatorHeightTolerance;
     }
 
@@ -329,5 +332,10 @@ public class DynamicsCommandFactory {
             this::isCoralInArm
         )
         .withName("Intake");
+    }
+
+    public Command removeAlgaeArm() {
+        return armSubsystem.setSetpointCommand(new Rotation2d(kRemoveAlgaeArmAngle))
+               .onlyIf(() -> !isArmStowed());
     }
 }

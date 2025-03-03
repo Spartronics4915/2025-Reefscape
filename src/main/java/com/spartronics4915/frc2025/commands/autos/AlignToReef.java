@@ -1,7 +1,9 @@
 package com.spartronics4915.frc2025.commands.autos;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAlignmentAdjustmentTimeout;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +107,12 @@ public class AlignToReef {
         );
 
         if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
-            return Commands.none();
+            return 
+            Commands.sequence(
+                Commands.print("start position PID loop"),
+                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+                Commands.print("end position PID loop")
+            );
         }
 
         PathPlannerPath path = new PathPlannerPath(
@@ -117,7 +124,11 @@ public class AlignToReef {
 
         path.preventFlipping = true;
 
-        return AutoBuilder.followPath(path);
+        return AutoBuilder.followPath(path).andThen(
+            Commands.print("start position PID loop"),
+            PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+            Commands.print("end position PID loop")
+        );
     }
     
 
@@ -127,9 +138,9 @@ public class AlignToReef {
      * @return
      */
     private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
-        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.05 ) {
-            var diff =  mSwerve.getPose().minus(target).getTranslation();
-            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle().rotateBy(Rotation2d.k180deg);
+        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
+            var diff = target.minus(mSwerve.getPose()).getTranslation();
+            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
         }
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
     }

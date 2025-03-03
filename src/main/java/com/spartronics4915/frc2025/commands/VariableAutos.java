@@ -1,13 +1,21 @@
 package com.spartronics4915.frc2025.commands;
 
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -59,8 +67,8 @@ public class VariableAutos {
     }
 
     public enum BranchSide{
-        LEFT(new Translation2d(0.14 - 0.0508 + 0.0635, 0.54 + 0.0381)),
-        RIGHT(new Translation2d(0.25 - 0.0508 - 0.0254, 0.54 + 0.0381));
+        LEFT(new Translation2d(0.1527 - 0.00635, 0.5273 + 0.0254 - 0.00635)),
+        RIGHT(new Translation2d(0.1738, 0.5273 + 0.0254 - 0.00635));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -122,18 +130,31 @@ public class VariableAutos {
 
     private AlignToReef alignmentGenerator;
     private DynamicsCommandFactory dynamics;
+    private SwerveSubsystem swerve;
 
+    private final ChassisSpeeds reverseIntoStation;
 
-    public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics) {
+    public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
         super();
         this.alignmentGenerator = alignmentGenerator;
         this.dynamics = dynamics;
+        this.swerve = swerve;
+
+        reverseIntoStation = new ChassisSpeeds(kStationApproachSpeed.unaryMinus().in(MetersPerSecond), 0, 0);
+    }
+
+    public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height) {
+        return generateAutoCycle(branch, side, height, Seconds.of(0));
+    }
+
+    public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height) {
+        return generateStartingAutoCycle(branch, side, height, Seconds.of(0));
     }
 
     /**
      * Outputs the entire auto cycle from station to branch with mechanism movement
      */
-    public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height){
+    public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
@@ -142,31 +163,42 @@ public class VariableAutos {
                 pathPair.autoAlign,
                 dynamics.gotoScore(height.preset)
             ),
-            dynamics.score(),
             dynamics.waitUntilPreset(height.preset),
-            Commands.parallel(
+            dynamics.score(),
+            Commands.sequence(
                 dynamics.stow(),
+                Commands.waitTime(delay),
                 pathPair.returnPath
             ),
-            dynamics.blockingIntake()
+            Commands.deadline(
+                dynamics.blockingIntake(),
+                Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
+            )
         );
     }
 
-    public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height){
+    public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
             Commands.sequence(
-                pathPair.autoAlign,
+                Commands.parallel(
+                    pathPair.autoAlign,
+                    dynamics.stow()
+                ),
                 dynamics.gotoScore(height.preset)
             ),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
-            Commands.parallel(
+            Commands.sequence(
                 dynamics.stow(),
+                Commands.waitTime(delay),
                 pathPair.returnPath
             ),
-            dynamics.blockingIntake()
+            Commands.deadline(
+                dynamics.blockingIntake(),
+                Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
+            )
         );
     }
 

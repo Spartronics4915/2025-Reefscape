@@ -1,5 +1,5 @@
 {
-  "version": 1.2,
+  "version": 1.3,
   "grid_size": 128,
   "tabs": [
     {
@@ -49,6 +49,23 @@
                   "period": 0.06,
                   "sort_options": false
                 }
+              },
+              {
+                "title": "Then wait...",
+                "x": 128.0,
+                "y": 128.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 1/Then wait...",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 3.0,
+                  "divisions": 2,
+                  "update_continuously": false
+                }
               }
             ]
           },
@@ -88,6 +105,23 @@
                   "period": 0.06,
                   "sort_options": false
                 }
+              },
+              {
+                "title": "Then wait...",
+                "x": 256.0,
+                "y": 128.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 2/Then wait...",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 3.0,
+                  "divisions": 2,
+                  "update_continuously": false
+                }
               }
             ]
           },
@@ -126,6 +160,23 @@
                   "topic": "/SmartDashboard/Variable Autos/Step 3/At...",
                   "period": 0.06,
                   "sort_options": false
+                }
+              },
+              {
+                "title": "Then wait...",
+                "x": 384.0,
+                "y": 128.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Step 3/Then wait...",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 3.0,
+                  "divisions": 2,
+                  "update_continuously": false
                 }
               }
             ]
