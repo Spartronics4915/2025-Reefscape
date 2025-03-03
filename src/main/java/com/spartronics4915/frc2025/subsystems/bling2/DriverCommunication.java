@@ -36,6 +36,8 @@ public class DriverCommunication extends BlingSegment {
     private RumbleController[] controllers;
     private double rumbleTime = 0;
 
+    private int alertFrames = 0;
+
     private BlingSegment current = OFF;
 
     public static enum Region {
@@ -112,9 +114,13 @@ public class DriverCommunication extends BlingSegment {
     protected void updateLights() {
         if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN;
-        } //else if (LimelightVisionSubsystem.newMegaTag1Reading()) {
-           // current = YELLOW;
-        //}
+        } else if (vision.newMegaTag1Reading()) {
+            current = YELLOW;
+            alertFrames = 10;
+        } else if (alertFrames > 0 && alertFrames % 2 == 0) {
+            current = YELLOW;
+            rumble(RumblePresets.LEFT_WEAK);
+        }
         else {
             Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
@@ -200,6 +206,7 @@ public class DriverCommunication extends BlingSegment {
         current.updateLights();
 
         rumbleTime--;
+        alertFrames--;
         if (rumbleTime == 0) rumble(RumblePresets.OFF);
     }
 

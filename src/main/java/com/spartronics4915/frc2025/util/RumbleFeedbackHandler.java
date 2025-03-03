@@ -15,6 +15,7 @@ public final class RumbleFeedbackHandler{
     public enum RumblePresets{
         SOFT(new RumbleFeedback(RumbleType.kBothRumble, 0.1)),
         STRONG(new RumbleFeedback(RumbleType.kBothRumble, 0.3)),
+        LEFT_WEAK(new RumbleFeedback(RumbleType.kLeftRumble, 0.1)),
         OFF(new RumbleFeedback(RumbleType.kBothRumble, 0));
 
         public final RumbleFeedback rumble;
