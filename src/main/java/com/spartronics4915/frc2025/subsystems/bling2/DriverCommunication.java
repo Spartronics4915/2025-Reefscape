@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
@@ -39,6 +40,8 @@ public class DriverCommunication extends BlingSegment {
     private int alertFrames = 0;
 
     private BlingSegment current = OFF;
+
+    private static BlingSegment autoSegment = RAINBOW;
 
     public static enum Region {
         REEF(
@@ -75,6 +78,10 @@ public class DriverCommunication extends BlingSegment {
         }
     }
 
+    /**
+     * @param length Length of the segment
+     * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, IntakeSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
+     */
     public DriverCommunication(int length, Object... subsystems) {
         this.ledLength = length;
         for (Object subsystem : subsystems) {
@@ -83,7 +90,6 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
             if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
-            if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
         dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
@@ -113,12 +119,14 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
-            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN;
+            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN; 
+        } else if (DriverStation.isAutonomous()) {
+            current = autoSegment;
         } else if (vision.newMegaTag1Reading()) {
-            current = YELLOW;
+            current = CYAN;
             alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
-            current = YELLOW;
+            current = CYAN;
             rumble(RumblePresets.LEFT_WEAK);
         }
         else {
@@ -214,6 +222,10 @@ public class DriverCommunication extends BlingSegment {
         for (RumbleController controller : controllers) {
             controller.setFeedback(feedback.rumble);
         }
+    }
+
+    public static Command setAutoSegmentCommand(BlingSegment segment) {
+        return Commands.runOnce(() -> autoSegment = segment);
     }
 
 }

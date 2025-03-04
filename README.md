@@ -62,9 +62,9 @@ this controller will have tools for debugging
 
 # Bling/Driver Communication
 
-Autos: Flashes Yellow if can't see 2 tags, will do a Spartronics themed light show once it can.
+Before match start: Flashes Yellow if can't see 2 tags, will do a Spartronics themed light show once it can.
 
-If a MegaTag1 reading is needed it'll be solid yellow, overriding all other bling, other than autos.
+If a MegaTag1 reading is needed it'll be a rapidly flashing cyan, overriding all other bling, other than autos.
 
 Reef Zone:
 | Color | Meaning |

@@ -274,7 +274,7 @@ public final class Constants {
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
-        public static final int BLING_LENGTH = 42;
+        public static final int BLING_LENGTH = 24 * 2;
 
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
@@ -294,7 +294,8 @@ public final class Constants {
         public static final BlingLEDPattern YELLOW = BlingSegment.solid(Color.kYellow, BLING_LENGTH);
         public static final BlingLEDPattern GREEN = BlingSegment.solid(Color.kLime, BLING_LENGTH);
         public static final BlingLEDPattern BLUE = BlingSegment.solid(Color.kBlue, BLING_LENGTH);
-        public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kPurple, BLING_LENGTH);
+        public static final BlingLEDPattern CYAN = BlingSegment.solid(Color.kCyan, BLING_LENGTH);
+        public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
         public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
