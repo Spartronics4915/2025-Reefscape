@@ -68,8 +68,8 @@ public class VariableAutos {
     }
 
     public enum BranchSide{
-        LEFT(new Translation2d(0.1311035, 0.5152845)),
-        RIGHT(new Translation2d(0.199132, 0.5154565));
+        LEFT(new Translation2d(0.108759, 0.5152845)),
+        RIGHT(new Translation2d(0.218062, 0.5154565));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
