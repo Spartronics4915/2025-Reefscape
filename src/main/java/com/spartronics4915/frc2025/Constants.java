@@ -271,10 +271,12 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
+        public static boolean LIGHTS_ENABLED = false; // Turn this off for rumble but no LED strips.
+
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
-        public static final int BLING_LENGTH = 24 * 2;
+        public static final int BLING_LENGTH = 48;
 
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees

@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
+import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,7 +22,7 @@ public class BlingSubsystem extends SubsystemBase {
             ledLength += x.getStripLength();
         }
 
-        strip.setLength(ledLength);
+        if (LIGHTS_ENABLED) strip.setLength(ledLength);
         buffer = new AddressableLEDBuffer(ledLength);
 
         hexStrings = new String[ledLength];
@@ -31,17 +33,18 @@ public class BlingSubsystem extends SubsystemBase {
             index += x.ledLength;
         }
         
-        strip.start();
+        if (LIGHTS_ENABLED) strip.start();
     }
 
     public BlingSubsystem(int port, BlingSegment... shows) {
-        strip = new AddressableLED(port);
+        if (LIGHTS_ENABLED) strip = new AddressableLED(port);
         updateSegments(shows);
     }
 
     private void logLEDs() {
         for(int i = 0; i < hexStrings.length; i++) {
-            Color ledColor = buffer.getLED(i);
+            int brightnessMultiplier = (100/BLING_BRIGHTNESS);
+            Color ledColor = new Color(buffer.getRed(i) * brightnessMultiplier, buffer.getGreen(i) * brightnessMultiplier,buffer.getBlue(i) * brightnessMultiplier);
             hexStrings[i] = ledColor.toHexString();
         }
         SmartDashboard.putStringArray("Bling", hexStrings);
@@ -52,7 +55,7 @@ public class BlingSubsystem extends SubsystemBase {
         for (BlingSegment show : segments) {
             show.update();
         }
-        strip.setData(buffer);
+        if (LIGHTS_ENABLED) strip.setData(buffer);
         logLEDs();
     }
 

@@ -122,7 +122,7 @@ public class DriverCommunication extends BlingSegment {
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS42 : WARN; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
-        } else if (vision.newMegaTag1Reading()) {
+        } else if (vision != null && vision.newMegaTag1Reading()) {
             current = CYAN;
             alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
