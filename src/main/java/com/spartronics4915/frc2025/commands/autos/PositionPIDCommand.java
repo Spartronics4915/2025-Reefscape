@@ -20,6 +20,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,7 +31,7 @@ public class PositionPIDCommand extends Command{
     
     public SwerveSubsystem mSwerve;
     public final Pose2d goalPose;
-    private PPHolonomicDriveController mDriveController = Drive.AutoConstants.kDriveController;
+    private PPHolonomicDriveController mDriveController = Drive.AutoConstants.kAutoAlignPIDController;
 
     private final Trigger endTrigger;
     private final Trigger endTriggerDebounced;
@@ -38,6 +39,10 @@ public class PositionPIDCommand extends Command{
     private final Timer timer = new Timer();
 
     private final BooleanPublisher endTriggerLogger = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("PositionPIDEndTrigger").publish();
+    private final DoublePublisher xErrLogger = NetworkTableInstance.getDefault().getTable("logging").getDoubleTopic("X Error").publish();
+    private final DoublePublisher yErrLogger = NetworkTableInstance.getDefault().getTable("logging").getDoubleTopic("Y Error").publish();
+
+
 
     private PositionPIDCommand(SwerveSubsystem mSwerve, Pose2d goalPose) {
         this.mSwerve = mSwerve;
@@ -91,6 +96,9 @@ public class PositionPIDCommand extends Command{
                 mSwerve.getPose(), goalState
             )
         );
+
+        xErrLogger.accept(mSwerve.getPose().getX() - goalPose.getX());
+        yErrLogger.accept(mSwerve.getPose().getY() - goalPose.getY());
     }
 
     @Override

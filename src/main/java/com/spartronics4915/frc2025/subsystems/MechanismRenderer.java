@@ -81,7 +81,7 @@ public class MechanismRenderer extends SubsystemBase {
     @Override
     public void periodic() {
         elev.setLength(elevatorHeightSupplier.get().in(Meters));
-        arm.setAngle(90-(armAngleSupplier.get().in(Degrees)));
+        arm.setAngle(-(90-(armAngleSupplier.get().in(Degrees))));
         intakeBB.setColor(intakeTrigger.getAsBoolean() ? new Color8Bit(Color.kGreen) : new Color8Bit(Color.kRed));
         
         double t = MathUtil.inverseInterpolate(

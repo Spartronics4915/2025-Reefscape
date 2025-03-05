@@ -24,7 +24,7 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Filesystem;
-
+import edu.wpi.first.wpilibj.RobotBase;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -103,6 +103,10 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     // }
 
     public boolean detect(){
+        if (RobotBase.isSimulation()) {
+            return true;
+        }
+
         LaserCan.Measurement measurement = lc.getMeasurement();
         if (measurement == null) {
             return false;

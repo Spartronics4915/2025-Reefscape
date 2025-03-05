@@ -1,0 +1,90 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Single Run",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Single Run Settings",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Branch",
+                "x": 384.0,
+                "y": 0.0,
+                "width": 768.0,
+                "height": 128.0,
+                "type": "Split Button Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Single Run/Branch",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "Height",
+                "x": 640.0,
+                "y": 128.0,
+                "width": 384.0,
+                "height": 128.0,
+                "type": "Split Button Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Single Run/Height",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "Station",
+                "x": 768.0,
+                "y": 128.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Split Button Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Station",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "Repeat",
+                "x": 384.0,
+                "y": 256.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/SmartDashboard/Variable Autos/Single Run/Repeat",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Auto Chooser",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

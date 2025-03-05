@@ -1,9 +1,10 @@
 package com.spartronics4915.frc2025.commands.autos;
 
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlginAdjustTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlignPredict;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAlignmentAdjustmentTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopAlginAdjustTimeout;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,17 +14,15 @@ import java.util.Set;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
-import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.AprilTagRegion;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -43,6 +42,8 @@ public class AlignToReef {
     public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
+
+    public boolean isPIDLoopRunning = false;
 
 
     public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
@@ -104,6 +105,12 @@ public class AlignToReef {
 
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
+    private PathConstraints pathConstraints = kPathConstraints;
+
+    public void changePathConstraints(PathConstraints newPathConstraints){
+        this.pathConstraints = newPathConstraints;
+    }
+
     public Command generateCommand(FieldBranchSide side) {
         return Commands.defer(() -> {
             var branch = getClosestBranch(side, mSwerve);
@@ -133,25 +140,33 @@ public class AlignToReef {
             return 
             Commands.sequence(
                 Commands.print("start position PID loop"),
-                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAutoAlginAdjustTimeout),
                 Commands.print("end position PID loop")
             );
         }
 
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
-            kPathConstraints,
+            pathConstraints,
             new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
             new GoalEndState(0.0, waypoint.getRotation())
         );
 
         path.preventFlipping = true;
 
-        return AutoBuilder.followPath(path).andThen(
+        return (AutoBuilder.followPath(path).andThen(
             Commands.print("start position PID loop"),
-            PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+            PositionPIDCommand.generateCommand(mSwerve, waypoint, (
+                DriverStation.isAutonomous() ? kAutoAlginAdjustTimeout : kTeleopAlginAdjustTimeout
+            ))
+                .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
+                .finallyDo(() -> {isPIDLoopRunning = false;}),
             Commands.print("end position PID loop")
-        );
+        )).finallyDo((interupt) -> {
+            if (interupt) { //if this is false then the position pid would've X braked & called the same method
+                mSwerve.drive(new ChassisSpeeds(0,0,0));
+            }
+        });
     }
     
 
@@ -192,7 +207,7 @@ public class AlignToReef {
     }
 
     public static Pose2d getClosestBranch(FieldBranchSide fieldSide, SwerveSubsystem swerve){
-        Pose2d swervePose = swerve.getPose();
+        Pose2d swervePose = swerve.predict(kAutoAlignPredict);
         
         Pose2d tag = getClosestReefAprilTag(swervePose);
         

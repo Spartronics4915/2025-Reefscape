@@ -69,6 +69,46 @@ public class ComplexAutoChooser {
         }
     }
 
+    private static class SingleRun {
+        private static SendableChooser<FieldBranch> branchChooser = new SendableChooser<>();
+        private static SendableChooser<BranchHeight> heightChooser = new SendableChooser<>();
+        private static boolean initialized = false;
+
+        protected static void initSingleRun() {
+            if (initialized) return;
+            branchChooser.setDefaultOption("A", FieldBranch.A);
+            branchChooser.addOption("B", FieldBranch.B);
+            branchChooser.addOption("C", FieldBranch.C);
+            branchChooser.addOption("D", FieldBranch.D);
+            branchChooser.addOption("E", FieldBranch.E);
+            branchChooser.addOption("F", FieldBranch.F);
+            branchChooser.addOption("G", FieldBranch.G);
+            branchChooser.addOption("H", FieldBranch.H);
+            branchChooser.addOption("I", FieldBranch.I);
+            branchChooser.addOption("J", FieldBranch.J);
+            branchChooser.addOption("K", FieldBranch.K);
+            branchChooser.addOption("L", FieldBranch.L);
+
+            heightChooser.setDefaultOption("L4", BranchHeight.L4);
+            heightChooser.addOption("L3", BranchHeight.L3);
+            heightChooser.addOption("L2", BranchHeight.L2);
+
+            SmartDashboard.putData("Variable Autos/Single Run/Branch", branchChooser);
+            SmartDashboard.putData("Variable Autos/Single Run/Height", heightChooser);
+            SmartDashboard.putBoolean("Variable Autos/Single Run/Repeat", false);
+
+            initialized = true;
+        }
+
+        private static Command getSingleRun(VariableAutos factory, StationSide side) {
+            Command run = factory.generateAutoCycle(branchChooser.getSelected(), side, heightChooser.getSelected());
+            if (SmartDashboard.getBoolean("Variable Autos/Single Run/Repeat", false)) {
+                return Commands.repeatingSequence(run);
+            }
+            return run;
+        }
+    }
+
     private VariableAutoSegment[] segments;
     private VariableAutos factory;
     private SendableChooser<StationSide> stationChooser = new SendableChooser<>();
@@ -81,6 +121,8 @@ public class ComplexAutoChooser {
         for (int i = 0; i < length; i++) {
             segments[i] = new VariableAutoSegment();
         }
+
+        SingleRun.initSingleRun();
     }
 
     private void buildStationChooser() {
@@ -109,6 +151,9 @@ public class ComplexAutoChooser {
             }
         }
         return Commands.sequence(commands);
+    }
 
+    public Command getSingleRun() {
+        return SingleRun.getSingleRun(factory, stationChooser.getSelected());
     }
 }

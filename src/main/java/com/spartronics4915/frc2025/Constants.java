@@ -46,6 +46,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -222,7 +223,25 @@ public final class Constants {
                     new Translation2d(Inches.of(12.125), Inches.of(-12.5)),
                     new Translation2d(Inches.of(-12), Inches.of(12.5)),
                     new Translation2d(Inches.of(-12.125), Inches.of(-12.4375))
-                ));
+                )),
+                COMP_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
+                    Kilogram.of(125), 
+                    KilogramSquareMeters.of(4.86247863),
+                    new ModuleConfig(
+                        Inches.of(3.75/2.0),
+                        MetersPerSecond.of(4),
+                        1.3, //CHECKUP guess
+                        DCMotor.getNEO(1),
+                        6.75,
+                        Amps.of(40),
+                        1
+                    ),
+                    new Translation2d(Inches.of(13.5), Inches.of(11.5)),
+                    new Translation2d(Inches.of(13.625), Inches.of(-11.625)),
+                    new Translation2d(Inches.of(-13.625), Inches.of(11.5)),
+                    new Translation2d(Inches.of(-13.5), Inches.of(-10.4375))
+            ));
+;
 
                 public RobotConfig config;
     
@@ -231,18 +250,30 @@ public final class Constants {
                 }
             }
 
+            public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
+                Drive.AutoConstants.kTranslationPID, 
+                Drive.AutoConstants.kRotationPID
+            );
+
+            public static final Time kAutoAlignPredict = Seconds.of(0.0);
+
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Inches.of(0.4);
-            public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(0.25);
+            public static final Distance kPositionTolerance = Inches.of(0.5);
+            public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
-            public static final Time kEndTriggerDebounce = Seconds.of(0.04);
+            public static final Time kEndTriggerDebounce = Seconds.of(0.1);
 
-            public static final Time kAlignmentAdjustmentTimeout = Seconds.of(0.075);
+            public static final Time kTeleopAlginAdjustTimeout = Seconds.of(1);
+            public static final Time kAutoAlginAdjustTimeout = Seconds.of(0.5);
+
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kPathConstraints = new PathConstraints(1.25, 1.25, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.5, 2, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+
+
+            public static final PathConstraints kPathConstraints = new PathConstraints(2, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
         
             // X = side to side, Y = away from tag
             // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
@@ -377,7 +408,7 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final Constraints kConstraints = new Constraints(3.5, 3.5 / 2.0); //8.0, 10
+        public static final Constraints kConstraints = new Constraints(4.5, 3.5 / 2.0); //8.0, 10
         public static final int kPeriodMs = 0;
 
         public static final double kS = 0.0;
@@ -433,7 +464,7 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(4.0, 3.5); //12, 7.5
+        public static final Constraints constraints = new Constraints(3.0, 3.5); //12, 7.5
 
         public static final double minHeight = 0;
         public static final double maxHeight = 1.24;
@@ -455,8 +486,12 @@ public final class Constants {
     public static final class DynamicsConstants {
         public static final Angle kArmAngleTolerance = Degrees.of(1);
         public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
+
+        public static final double kSafeElevHeightForSwerve = 0.5;
+
+
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
-        public static final Angle kMoveableArmAngle = Degrees.of(276.198611); //used in cos math, so this is equivalent to ~80 degrees either side of the left horizon //TODO this is currently straight up, this might change
+        public static final Angle kMoveableArmAngle = Degrees.of(83.801389); //used in cos math, so this is equivalent to ~80 degrees either side of the left horizon //TODO this is currently straight up, this might change
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
     
@@ -469,6 +504,44 @@ public final class Constants {
 
     }
 
+    public static final class WinchClimberConstants {
+        //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
+
+        public enum WinchSpeeds{
+            ENGAGE(0.0), //speed which it'll rotate to move and engage the cage
+            RETRACT(0.0), //speed which it'll rotate to bring the cage down
+            ;
+
+            public final double speed;
+
+            private WinchSpeeds(double speed) {
+                this.speed = speed;
+            }
+        }
+        
+        public static final int kMotorID = 13;
+
+        private static final EncoderConfig kEncoderConfig = new EncoderConfig()
+            .positionConversionFactor(1.0)
+            .velocityConversionFactor(1.0)
+        ;
+
+        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+            .smartCurrentLimit(35)
+            .secondaryCurrentLimit(40)
+            .inverted(false)
+            .openLoopRampRate(0.25)
+            .idleMode(IdleMode.kBrake)
+            .apply(kEncoderConfig)
+        ;
+
+
+        public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
+        public static final Rotation2d kEngagedAngle = Rotation2d.fromDegrees(270.0); //angle to engage the cage
+        public static final Rotation2d kRetractedAngle = Rotation2d.fromDegrees(180.0); //desired angle at the end of the match
+
+
+    }
     @SuppressWarnings("unused")
     private static final Optional<Integer> kGender = Optional.empty();
 }

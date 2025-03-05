@@ -37,6 +37,7 @@ import com.spartronics4915.frc2025.subsystems.MechanismRenderer;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.WinchClimber;
 import com.spartronics4915.frc2025.subsystems.bling2.*;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
@@ -115,7 +116,7 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
-    // public final ClimberSubsystem climberSubsystem;
+    public final WinchClimber climberSubsystem;
 
     
     public final DynamicsCommandFactory dynamics;
@@ -140,7 +141,7 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         armSubsystem = new ArmSubsystem();
         elevatorSubsystem = new ElevatorSubsystem();
-        // climberSubsystem = new ClimberSubsystem();
+        climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
@@ -307,7 +308,7 @@ public class RobotContainer {
 
         dynamics.hasScoredTrigger.onTrue(dynamics.stow());
 
-        new Trigger(intakeSubsystem::detect)//.and(DriverStation::isTeleop)
+        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop)
             .debounce(0.02).onTrue(
                 Commands.parallel(
                     dynamics.stow()
@@ -377,6 +378,14 @@ public class RobotContainer {
         operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
 
         operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
+        
+        operatorController.rightBumper()
+            .whileTrue(climberSubsystem.driveWinch(0.5).withName("Move Climber Pos"));
+            // .onTrue(dynamics.gotoClimb());
+
+        operatorController.leftBumper()
+            .whileTrue(climberSubsystem.driveWinch(-0.5).withName("Move Climber Neg"));
+            // .onTrue(dynamics.gotoClimb());
 
         //#endregion
 
@@ -419,13 +428,19 @@ public class RobotContainer {
 
             chooser.addOption("Create auto...", variableAuto);
 
-            chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
-            chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
-            chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
-            chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
-            chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
-            chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
+            // chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
+            // chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
+            // chooser.addOption("M-R debug straight", new PathPlannerAuto("M-R straight debug"));
+            // chooser.addOption("M-R debug curve", new PathPlannerAuto("M-R curve debug"));
+            // chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
+            // chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
             chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
+
+            chooser.addOption("Test Single Run", Commands.sequence(
+                    dynamics.loadStow(),
+                    dynamics.blockingIntake(),
+                    Commands.defer(complexAutoChooser::getSingleRun, Set.of(swerveSubsystem))
+            ));
 
             chooser.addOption("Align with move", Commands.sequence(
                 variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT, BranchHeight.L4),
