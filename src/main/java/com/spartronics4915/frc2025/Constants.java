@@ -34,6 +34,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
@@ -258,13 +259,13 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Inches.of(0.5);
+            public static final Distance kPositionTolerance = Centimeter.of(1.0);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.1);
 
-            public static final Time kTeleopAlginAdjustTimeout = Seconds.of(1);
-            public static final Time kAutoAlginAdjustTimeout = Seconds.of(0.5);
+            public static final Time kTeleopAlginAdjustTimeout = Seconds.of(2);
+            public static final Time kAutoAlginAdjustTimeout = Seconds.of(1.0);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
@@ -361,7 +362,7 @@ public final class Constants {
                 public static final double kSingleTagPunishment = 0.3;
             }
             public static final class MegaTag2 {
-                public static final double kInitialValue = 0.1;
+                public static final double kInitialValue = 0.2;
                 public static final double kAverageDistancePunishment = 0.075;
                 public static final double kRobotSpeedPunishment = 0.25;
                 public static final double kMultipleTagsBonus = 0.05;
