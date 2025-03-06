@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 public class VariableAutos {
 
@@ -177,14 +178,19 @@ public class VariableAutos {
             Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
+            Commands.print("Stow & return"),
             Commands.parallel(
                 dynamics.stow(),
                 Commands.sequence(
+                    Commands.print("start delay"),
                     Commands.waitTime(delay),
+                    Commands.print("end delay"),
                     Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.print("returning path"),
                     pathPair.returnPath
                 )
             ),
+            Commands.print("blocking intake"),
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
@@ -209,7 +215,7 @@ public class VariableAutos {
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            dynamics.gotoScore(height.preset),
+            // dynamics.gotoScore(height.preset),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
             Commands.parallel(
