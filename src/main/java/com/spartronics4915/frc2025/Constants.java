@@ -331,7 +331,7 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
-        public static final BlingShow SHOW_SPARTRONICS48 = new BlingShow("bling/spartronics48.bling");
+        public static final BlingShow SHOW_SPARTRONICS47 = new BlingShow("bling/spartronics47.bling");
     }
 
     public static final class VisionConstants {
