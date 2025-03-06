@@ -118,7 +118,7 @@ public class DriverCommunication extends BlingSegment {
 
     @Override
     protected void updateLights() {
-        if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
+        if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS47 : WARN; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
