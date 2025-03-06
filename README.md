@@ -24,8 +24,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Down | Nudge backwards |
 | D-pad Left | Nudge left |
 | D-pad Right | Nudge right |
-| Windows | *None* |
-| Menu | *None* |
+| Windows | Winch Release Rope |
+| Menu | Winch Pull Rope |
 
 ## Operator controller
 | input   | action |

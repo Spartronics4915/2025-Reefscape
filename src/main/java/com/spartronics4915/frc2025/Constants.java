@@ -520,14 +520,15 @@ public final class Constants {
             }
         }
         
-        public static final int kMotorID = 13;
+        public static final int kWinchMotorID = 13;
+        public static final int kArmMotorID = 14;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1.0)
             .velocityConversionFactor(1.0)
         ;
 
-        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+        public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
@@ -535,6 +536,15 @@ public final class Constants {
             .idleMode(IdleMode.kBrake)
             .apply(kEncoderConfig)
         ;
+
+        public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
+        .smartCurrentLimit(10)
+        .secondaryCurrentLimit(15)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kBrake)
+        .apply(kEncoderConfig)
+    ;
 
 
         public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
