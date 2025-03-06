@@ -256,28 +256,14 @@ public final class ChassisSpeedSuppliers {
         return () -> {
             boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
             switch (DriverCommunication.getClosestRegion(swerve)) {
-                case REEF, PROCESSOR: {
-                    if (isBlue) {
-                        return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
-                    }
-                    else {
-                        return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
-                    }
-                }
                 case CORAL_STATION: {
                     if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                     else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
-                case BARGE: {
-                    int location = DriverStation.getLocation().getAsInt() - 1;
-                    System.out.println(location);
-                    if (isBlue)
-                        return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
-                    else 
-                        return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
+                default: {
+                    return (isBlue ? OrientTowardsNearestPOIConstants.BLUE_REEF_CENTER : OrientTowardsNearestPOIConstants.RED_REEF_CENTER).minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
                 }
             }
-            return swerve.getHeading();
         };
     }
 

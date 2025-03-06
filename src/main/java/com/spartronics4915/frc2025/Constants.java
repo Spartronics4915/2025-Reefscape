@@ -293,6 +293,8 @@ public final class Constants {
             new Translation2d(8.8, 6.1),
             new Translation2d(8.8, 5)
         };
+        public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
+        public static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
     }
 
     public static final class VisionConstants {
