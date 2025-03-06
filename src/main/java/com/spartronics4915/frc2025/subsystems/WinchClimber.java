@@ -17,16 +17,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class WinchClimber extends SubsystemBase implements ModeSwitchInterface{
-    
+public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
+
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     // private final RelativeEncoder mEncoder;
-
-    // Positive means go forward or unwind
-
-    private double mArmSpeedSetpoint = 0.0;
-    private double mWinchSpeedSetpoint = 0.0;
 
     public WinchClimber() {
         super();
@@ -47,24 +42,20 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface{
 
     public void setArmSpeed(double speed) {
 
-        mArmSpeedSetpoint = speed;
         mArmMotor.set(speed);
     }
-    public void setWinchSpeed(double speed){
-        mWinchSpeedSetpoint = speed;
+
+    public void setWinchSpeed(double speed) {
         mWinchMotor.set(speed);
     }
 
-    public void stopWinch(){
+    public void stopWinch() {
         mWinchMotor.set(0.0);
-        mWinchSpeedSetpoint = 0.0;
     }
 
     public void stopArm() {
         mArmMotor.set(0);
-        mArmSpeedSetpoint = 0;
     }
-
 
     private void turnArmBrakeModeOn() {
         SparkBaseConfig newConfig = new SparkMaxConfig().idleMode(IdleMode.kBrake);
@@ -78,34 +69,32 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface{
         mArmMotor.configureAsync(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
-
     public Command setArmCommand(double speed) {
 
-        return this.runOnce( ()-> {
+        return this.runOnce(() -> {
             setArmCommand(speed);
         });
     }
+
     public Command stopArmCommand() {
 
-        return this.runOnce( ()-> {
+        return this.runOnce(() -> {
             stopArm();
         });
     }
 
-
-
-    public Command setWinchCommand(double speed){
+    public Command setWinchCommand(double speed) {
         return this.runOnce(() -> {
 
-            if(speed > 0) {
-                turnArmBrakeModeOff();            
+            if (speed > 0) {
+                turnArmBrakeModeOff();
 
             }
             setWinchSpeed(speed);
         });
     }
 
-    public Command stopWinchCommand(){
+    public Command stopWinchCommand() {
         return this.runOnce(() -> {
             stopWinch();
             turnArmBrakeModeOn();
@@ -114,10 +103,19 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface{
 
     // @Override
     // public void periodic() {
-    //     mMotor.set(mSpeedSetpoint);
+    // mMotor.set(mSpeedSetpoint);
     // }
 
-    @Override public void onModeSwitch() {stopWinch();}
-    @Override public void onDisable() {stopWinch();}
+    @Override
+    public void onModeSwitch() {
+        stopWinch();
+        stopArm();
+    }
+
+    @Override
+    public void onDisable() {
+        stopWinch();
+        stopArm();
+    }
 
 }
