@@ -189,7 +189,8 @@ public class VariableAutos {
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
             )
-        ).withName("Auto cycle");
+        ).withName("Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
