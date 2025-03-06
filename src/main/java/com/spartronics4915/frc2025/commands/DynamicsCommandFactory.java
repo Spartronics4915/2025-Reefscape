@@ -58,6 +58,7 @@ public class DynamicsCommandFactory {
         tab.addBoolean("isElevStowed", this::isElevStowed);
         tab.addBoolean("coralInArm", this::isCoralInArm);
         tab.addBoolean("funnelIntake", this::funnelDetect);
+        tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
 
@@ -272,7 +273,7 @@ public class DynamicsCommandFactory {
     
     public Command autoPrescore(){
         return Commands.sequence(
-            makeSystemSafeToMove(false, false, false),
+            makeSystemSafeToMove(true, false, false),
             armPriorityMove(DynaPreset.AUTO_PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
         );
     }
