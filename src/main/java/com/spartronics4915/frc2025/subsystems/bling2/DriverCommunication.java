@@ -215,7 +215,7 @@ public class DriverCommunication extends BlingSegment {
 
         rumbleTime--;
         alertFrames--;
-        if (rumbleTime == 0) rumble(RumblePresets.OFF);
+        if (rumbleTime <= 0) rumble(RumblePresets.OFF);
     }
 
     private void rumble(RumblePresets feedback) {
