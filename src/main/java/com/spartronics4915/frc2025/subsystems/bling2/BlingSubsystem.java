@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class BlingSubsystem extends SubsystemBase {
@@ -13,6 +15,7 @@ public class BlingSubsystem extends SubsystemBase {
     private AddressableLEDBuffer buffer;
     private BlingSegment[] segments;
     private String[] hexStrings;
+    private int blingPort;
 
     public void updateSegments(BlingSegment... segments) {
         this.segments = segments;
@@ -37,6 +40,7 @@ public class BlingSubsystem extends SubsystemBase {
     }
 
     public BlingSubsystem(int port, BlingSegment... shows) {
+        this.blingPort = port;
         if (LIGHTS_ENABLED) strip = new AddressableLED(port);
         updateSegments(shows);
     }
@@ -48,6 +52,21 @@ public class BlingSubsystem extends SubsystemBase {
             hexStrings[i] = ledColor.toHexString();
         }
         SmartDashboard.putStringArray("Bling", hexStrings);
+    }
+
+    /**
+     * Clears the memory of the lights, only works if lights are disabled
+     */
+    public Command clearLights() {
+        return Commands.runOnce(() -> {
+            if (LIGHTS_ENABLED) {
+                System.out.println("hey you aren't supposed to do that with lights enabled");
+            } else {
+                AddressableLED clearStrip = new AddressableLED(blingPort);
+                clearStrip.stop();
+                clearStrip.close();
+            }
+        });
     }
 
     @Override
