@@ -119,7 +119,7 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
-            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS48 : WARN; 
+            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS47 : WARN; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
         } else if (vision != null && vision.newMegaTag1Reading()) {
