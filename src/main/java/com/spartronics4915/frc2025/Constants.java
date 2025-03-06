@@ -302,7 +302,7 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
-        public static boolean LIGHTS_ENABLED = false; // Turn this off for rumble but no LED strips.
+        public static boolean LIGHTS_ENABLED = true; // Turn this off for rumble but no LED strips.
 
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
@@ -331,7 +331,7 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
-        public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
+        public static final BlingShow SHOW_SPARTRONICS48 = new BlingShow("bling/spartronics48.bling");
     }
 
     public static final class VisionConstants {
