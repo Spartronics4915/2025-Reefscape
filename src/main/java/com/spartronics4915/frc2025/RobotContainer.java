@@ -200,7 +200,7 @@ public class RobotContainer {
                 buildAutoChooser();
 
 
-        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, intakeSubsystem, dynamics, visionSubsystem);
+        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
         driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
         blingSubsystem = new BlingSubsystem(0, driverCommunication);
     }

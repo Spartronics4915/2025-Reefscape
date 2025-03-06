@@ -43,6 +43,8 @@ public class BlingSubsystem extends SubsystemBase {
         this.blingPort = port;
         if (LIGHTS_ENABLED) strip = new AddressableLED(port);
         updateSegments(shows);
+
+        SmartDashboard.putData("Stop lights", clearLights());
     }
 
     private void logLEDs() {

@@ -31,7 +31,6 @@ public class DriverCommunication extends BlingSegment {
     private LimelightVisionSubsystem vision;
     private ArmSubsystem arm;
     private ElevatorSubsystem elevator;
-    private IntakeSubsystem intake;
     private DynamicsCommandFactory dynamics;
 
     private RumbleController[] controllers;
@@ -80,22 +79,22 @@ public class DriverCommunication extends BlingSegment {
 
     /**
      * @param length Length of the segment
-     * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, IntakeSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
+     * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
      */
     public DriverCommunication(int length, Object... subsystems) {
         this.ledLength = length;
         for (Object subsystem : subsystems) {
             if (subsystem instanceof SwerveSubsystem) this.swerve = (SwerveSubsystem) subsystem;
             if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
-            if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
             if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
-        dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
-            rumbleTime = 10;
-            rumble(RumblePresets.SOFT);
-        }));
+        if (RUMBLE_ENABLED)
+            dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
+                rumbleTime = 10;
+                rumble(RumblePresets.SOFT);
+            }));
     }
 
     public void setRumbleControllers(RumbleController... controllers) {
@@ -219,6 +218,7 @@ public class DriverCommunication extends BlingSegment {
     }
 
     private void rumble(RumblePresets feedback) {
+        if (!RUMBLE_ENABLED) return;
         for (RumbleController controller : controllers) {
             controller.setFeedback(feedback.rumble);
         }

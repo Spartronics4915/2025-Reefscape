@@ -302,7 +302,8 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
-        public static boolean LIGHTS_ENABLED = true; // Turn this off for rumble but no LED strips.
+        public static boolean LIGHTS_ENABLED = true;
+        public static boolean RUMBLE_ENABLED = true;
 
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
