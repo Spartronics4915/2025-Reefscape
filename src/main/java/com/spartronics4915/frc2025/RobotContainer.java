@@ -195,7 +195,7 @@ public class RobotContainer {
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem,
                 armSubsystem, elevatorSubsystem, intakeSubsystem, dynamics, visionSubsystem);
         driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
-        blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
+        blingSubsystem = new BlingSubsystem(0, driverCommunication); // FIXME THIS LINE SHOULDN"T BE COMMITED
     }
 
     /**
@@ -291,14 +291,16 @@ public class RobotContainer {
                     }));
         }
 
-        // windows button
-        driverController.back().onTrue(climberSubsystem.setWinchCommand(0.5))
-                .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
-        // .onTrue(dynamics.gotoClimb());
+        if (climberSubsystem != null) {
+            // windows button
+            driverController.back().onTrue(climberSubsystem.setWinchCommand(0.5))
+                    .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
+            // .onTrue(dynamics.gotoClimb());
 
-        // menu button
-        driverController.start().onTrue(climberSubsystem.setWinchCommand(-0.5))
-                .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
+            // menu button
+            driverController.start().onTrue(climberSubsystem.setWinchCommand(-0.5))
+                    .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
+        }
 
         // #endregion
 
@@ -306,15 +308,10 @@ public class RobotContainer {
 
         dynamics.hasScoredTrigger.onTrue(dynamics.stow());
 
-        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop)
-            .debounce(0.02).onTrue(
-                Commands.parallel(
-                    dynamics.stow()
-                ).withName("auto stowing (trigger))")
-            );
+        new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop).debounce(0.02)
+                .onTrue(Commands.parallel(dynamics.stow()).withName("auto stowing (trigger))"));
 
-        new Trigger(dynamics::funnelDetect).onTrue(
-                dynamics.intake());
+        new Trigger(dynamics::funnelDetect).onTrue(dynamics.intake());
 
         // #endregion
 
@@ -330,9 +327,9 @@ public class RobotContainer {
 
         operatorController.leftTrigger().onTrue(dynamics.stow());
 
-        operatorController.back().onTrue(
-                intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK)).onFalse(
-                        intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)); // windows button
+        operatorController.back().onTrue(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK))
+                .onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)); // windows
+                                                                                 // button
 
         operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
 
@@ -356,14 +353,11 @@ public class RobotContainer {
         // ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() ->
         // !intakeSubsystem.detect()));
 
-        operatorController.leftStick().onTrue(
-                dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
+        operatorController.leftStick().onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
 
-        operatorController.rightStick().onTrue(
-                dynamics.gotoScore(DynaPreset.ALGAE_LOW));
+        operatorController.rightStick().onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
 
-        operatorController.a().onTrue(
-                dynamics.removeAlgaeArm());
+        operatorController.a().onTrue(dynamics.removeAlgaeArm());
 
         operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
 
@@ -373,14 +367,19 @@ public class RobotContainer {
 
         operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
 
-        operatorController.rightBumper().onTrue(climberSubsystem.setArmCommand(0.5))
-                .onFalse(climberSubsystem.stopArmCommand());// .withName("Move Climber Pos");
-        // .onTrue(dynamics.gotoClimb());
+        if (climberSubsystem != null) {
+            operatorController.rightBumper().onTrue(climberSubsystem.setArmCommand(0.5))
+                    .onFalse(climberSubsystem.stopArmCommand());// .withName("Move
+                                                                // Climber
+                                                                // Pos");
+            // .onTrue(dynamics.gotoClimb());
 
-        operatorController.leftBumper().onTrue(climberSubsystem.setArmCommand(-0.5))
-                .onFalse(climberSubsystem.stopArmCommand());// .withName("Move Climber Pos");
-        // .onTrue(dynamics.gotoClimb()); // .onTrue(dynamics.gotoClimb());
-
+            operatorController.leftBumper().onTrue(climberSubsystem.setArmCommand(-0.5))
+                    .onFalse(climberSubsystem.stopArmCommand());// .withName("Move
+                                                                // Climber
+                                                                // Pos");
+            // .onTrue(dynamics.gotoClimb()); // .onTrue(dynamics.gotoClimb());
+        }
         // #endregion
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
@@ -438,26 +437,23 @@ public class RobotContainer {
                     Commands.defer(complexAutoChooser::getSingleRun, Set.of(swerveSubsystem))));
 
             chooser.addOption("one time", Commands.sequence(
-                variableAutoFactory.generateAutoCycle(FieldBranch.D, StationSide.RIGHT, BranchHeight.L4)
-            ));
+                    variableAutoFactory.generateAutoCycle(FieldBranch.D, StationSide.RIGHT, BranchHeight.L4)));
 
             chooser.addOption("Align with move", Commands.sequence(
-                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.LEFT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.LEFT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.LEFT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.LEFT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.LEFT, BranchHeight.L2)
-            ));
+                    variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.LEFT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.LEFT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.LEFT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.LEFT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.LEFT, BranchHeight.L2)));
 
             chooser.addOption("Align Mirror with move", Commands.sequence(
-                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.RIGHT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.RIGHT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.RIGHT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.RIGHT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT, BranchHeight.L2),
-                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT, BranchHeight.L2)
-            ));
+                    variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.RIGHT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.RIGHT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.RIGHT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.RIGHT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT, BranchHeight.L2),
+                    variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT, BranchHeight.L2)));
         }
 
         chooser.onChange((c) -> {
