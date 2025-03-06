@@ -202,7 +202,7 @@ public class RobotContainer {
 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, intakeSubsystem, dynamics, visionSubsystem);
         driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
-        blingSubsystem = new BlingSubsystem(0, BlingConstants.OFF); //FIXME THIS LINE SHOULDN"T BE COMMITED
+        blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
     }
 
     /**
@@ -312,7 +312,7 @@ public class RobotContainer {
             .debounce(0.02).onTrue(
                 Commands.parallel(
                     dynamics.stow()
-                )
+                ).withName("auto stowing (trigger))")
             );
 
         new Trigger(dynamics::funnelDetect).onTrue(
@@ -442,22 +442,26 @@ public class RobotContainer {
                     Commands.defer(complexAutoChooser::getSingleRun, Set.of(swerveSubsystem))
             ));
 
+            chooser.addOption("one time", Commands.sequence(
+                variableAutoFactory.generateAutoCycle(FieldBranch.D, StationSide.RIGHT, BranchHeight.L4)
+            ));
+
             chooser.addOption("Align with move", Commands.sequence(
-                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.LEFT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.LEFT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.LEFT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.LEFT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.LEFT, BranchHeight.L4)
+                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.LEFT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.LEFT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.LEFT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.LEFT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.LEFT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.LEFT, BranchHeight.L2)
             ));
 
             chooser.addOption("Align Mirror with move", Commands.sequence(
-                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.RIGHT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.RIGHT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.RIGHT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.RIGHT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT, BranchHeight.L4),
-                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT, BranchHeight.L4)
+                variableAutoFactory.generateAutoCycle(FieldBranch.A, StationSide.RIGHT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.C, StationSide.RIGHT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.E, StationSide.RIGHT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.G, StationSide.RIGHT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.I, StationSide.RIGHT, BranchHeight.L2),
+                variableAutoFactory.generateAutoCycle(FieldBranch.K, StationSide.RIGHT, BranchHeight.L2)
             ));
         }
 
