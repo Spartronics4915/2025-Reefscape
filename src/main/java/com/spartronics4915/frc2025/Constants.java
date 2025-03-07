@@ -521,7 +521,7 @@ public final class Constants {
         }
         
         public static final int kWinchMotorID = 13;
-        public static final int kArmMotorID = 14;
+        public static final int kArmMotorID = 23;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1.0)
