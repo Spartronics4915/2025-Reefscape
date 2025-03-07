@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.777840909090909,
-        "y": 5.256491477272728
+        "x": 7.894176136363638,
+        "y": 5.994389204545455
       },
       "isLocked": false,
       "linkedName": "Reef exit 4"
     },
     {
       "anchor": {
-        "x": 1.4059943181818182,
-        "y": 6.971605113636364
+        "x": 1.1799715909090909,
+        "y": 7.107883522727272
       },
       "prevControl": {
-        "x": 4.198039772727273,
-        "y": 7.071321022727273
+        "x": 1.8862926136363638,
+        "y": 6.443110795454545
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.61,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

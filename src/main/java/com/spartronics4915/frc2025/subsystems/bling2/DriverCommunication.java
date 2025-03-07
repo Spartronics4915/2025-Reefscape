@@ -117,13 +117,13 @@ public class DriverCommunication extends BlingSegment {
 
     @Override
     protected void updateLights() {
-        if (!Robot.AUTO_TIMER.hasElapsed(0.01) && vision != null) { // Match has started
+        if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : WARN; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
-        } else if (vision != null && vision.newMegaTag1Reading()) {
-            current = CYAN;
-            alertFrames = 10;
+        // } else if (vision != null && vision.newMegaTag1Reading()) {
+        //     current = CYAN;
+        //     alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
             current = CYAN;
             rumble(RumblePresets.LEFT_WEAK);

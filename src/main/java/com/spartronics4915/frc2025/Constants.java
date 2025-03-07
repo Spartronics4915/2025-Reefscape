@@ -34,6 +34,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
@@ -258,13 +259,13 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Inches.of(0.5);
+            public static final Distance kPositionTolerance = Centimeter.of(1.0);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.1);
 
-            public static final Time kTeleopAlginAdjustTimeout = Seconds.of(1);
-            public static final Time kAutoAlginAdjustTimeout = Seconds.of(0.5);
+            public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
+            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.3);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
@@ -287,6 +288,8 @@ public final class Constants {
 
     public static final class OrientTowardsNearestPOIConstants {
         public static final Rotation2d REEF_OFFSET = Rotation2d.k180deg;
+        public static final Translation2d REEF_CENTER_RED = new Translation2d(13.067, 4.031);
+        public static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.471, 4.031);
         public static final double CORAL_STATION_ANGLE = 55;
         public static final Rotation2d BARGE_ROTATION = Rotation2d.kCCW_90deg;
         public static final Translation2d[] BARGE_RED_CAGE_POSITIONS = {
@@ -308,7 +311,7 @@ public final class Constants {
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 70; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
-        public static final int BLING_LENGTH = 48;
+        public static final int BLING_LENGTH = 23+24;
 
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
@@ -363,7 +366,7 @@ public final class Constants {
                 public static final double kSingleTagPunishment = 0.3;
             }
             public static final class MegaTag2 {
-                public static final double kInitialValue = 0.1;
+                public static final double kInitialValue = 0.2;
                 public static final double kAverageDistancePunishment = 0.075;
                 public static final double kRobotSpeedPunishment = 0.25;
                 public static final double kMultipleTagsBonus = 0.05;
@@ -489,7 +492,7 @@ public final class Constants {
         public static final Angle kArmAngleTolerance = Degrees.of(1);
         public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 0.5;
+        public static final double kSafeElevHeightForSwerve = 0.4;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
