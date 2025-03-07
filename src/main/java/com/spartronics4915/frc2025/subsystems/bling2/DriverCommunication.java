@@ -11,7 +11,6 @@ import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
-import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
@@ -35,6 +34,7 @@ public class DriverCommunication extends BlingSegment {
 
     private RumbleController[] controllers;
     private double rumbleTime = 0;
+    private boolean hasRumbled = false;
 
     private int alertFrames = 0;
 
@@ -135,6 +135,7 @@ public class DriverCommunication extends BlingSegment {
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
+                    hasRumbled = false;
                     Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
                     int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
                     switch(index) {
@@ -171,19 +172,34 @@ public class DriverCommunication extends BlingSegment {
 
                     if (dynamics.funnelDetect()) {
                         current = RAINBOW;
-                        rumble(RumblePresets.STRONG);
-                        rumbleTime = 5;
+                        if (!hasRumbled) {
+                            rumble(RumblePresets.STRONG);
+                            rumbleTime = 5;
+                            hasRumbled = true;
+                        }
                     } else {
                         if (subsystemsInCorrectSpot && robotInRightSpot) {
                             current = GOOD;
+                            hasRumbled = false;
                         }
-                        else if (subsystemsInCorrectSpot) current = PURPLE; // Robot needs to move
-                        else if (robotInRightSpot) current = WARN; // Mechanisms need to move
-                        else current = OFF;
+                        else if (subsystemsInCorrectSpot) {
+                            current = PURPLE;
+                            hasRumbled = false;
+                        } // Robot needs to move
+                        else if (robotInRightSpot) {
+                            current = WARN;
+                            hasRumbled = false;
+                        } // Mechanisms need to move
+                        else {
+                            current = OFF;
+                            hasRumbled = false;
+                        }
                     }
 
                     break;
                 case BARGE:
+                    hasRumbled = false;
+                    /* Climber Lights
                     if (DriverStation.getLocation().isEmpty()) {
                         current = OFF;
                         break;
@@ -201,9 +217,13 @@ public class DriverCommunication extends BlingSegment {
                     if (distance <= -BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? BLUE : RED;
                     else if (distance >= BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? RED : BLUE;
                     else current = RAINBOW; // It's climbin' time.
+                     */
+
+                    current = SHOW_RAINBOW_FUN;
 
                     break;
                 default:
+                    hasRumbled = false;
                     current = OFF;
             }
         }
@@ -214,7 +234,7 @@ public class DriverCommunication extends BlingSegment {
 
         rumbleTime--;
         alertFrames--;
-        if (rumbleTime == 0) rumble(RumblePresets.OFF);
+        if (rumbleTime <= 0) rumble(RumblePresets.OFF);
     }
 
     private void rumble(RumblePresets feedback) {
