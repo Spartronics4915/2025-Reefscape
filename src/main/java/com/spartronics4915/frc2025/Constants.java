@@ -305,7 +305,7 @@ public final class Constants {
         public static boolean LIGHTS_ENABLED = true;
         public static boolean RUMBLE_ENABLED = true;
 
-        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 70; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
         public static final int BLING_LENGTH = 48;
@@ -332,7 +332,7 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
-        public static final BlingShow SHOW_SPARTRONICS42 = new BlingShow("bling/spartronics42.bling");
+        public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
     }
 
     public static final class VisionConstants {
