@@ -306,7 +306,7 @@ public final class Constants {
 
     public static final class BlingConstants {
         public static boolean LIGHTS_ENABLED = true;
-        public static boolean RUMBLE_ENABLED = true;
+        public static final boolean RUMBLE_ENABLED = true;
 
         public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 70; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
