@@ -441,6 +441,8 @@ public class RobotContainer {
             // chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
             chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
 
+            chooser.addOption("Drive Forwards", Autos.driveForward(swerveSubsystem));
+
             chooser.addOption("Test Single Run", Commands.sequence(
                     dynamics.loadStow(),
                     dynamics.blockingIntake(),
