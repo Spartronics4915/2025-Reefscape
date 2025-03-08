@@ -56,7 +56,7 @@ public class LimelightDevice extends SubsystemBase {
         AprilTagRegion region;
         switch (role) {
             case REEF:
-            region = AprilTagRegion.kReef.and(AprilTagRegion.kProcessor);
+            region = AprilTagRegion.kReef;//.and(AprilTagRegion.kProcessor);
             break;
             case ALIGN:
             region = AprilTagRegion.kReef;
