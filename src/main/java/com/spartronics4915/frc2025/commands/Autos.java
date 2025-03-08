@@ -121,5 +121,9 @@ public final class Autos {
         return Commands.run(() -> swerve.driveFieldOriented(new ChassisSpeeds(ChassisSpeedSuppliers.shouldFlip() ? 1 : -1,0,0)), swerve).withTimeout(seconds);
     }
 
+    public static Command driveForward(SwerveSubsystem swerve) {
+        return Commands.run(() -> swerve.drive(new ChassisSpeeds(1.0, 0.0, 0.0)));
+    }
+
 
 }
