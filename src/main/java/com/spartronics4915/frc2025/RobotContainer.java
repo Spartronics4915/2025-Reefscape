@@ -399,6 +399,11 @@ public class RobotContainer {
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
     
+        debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
+                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
+
+        debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
+                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
     }
 
     /**
