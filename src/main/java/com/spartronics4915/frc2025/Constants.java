@@ -350,7 +350,7 @@ public final class Constants {
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.NOTHING),
-                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.NOTHING),
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF), //TODO: CHANGE
                 new LimelightConstants("chucky", LimelightModel.LIMELIGHT_3, 14, LimelightRole.NOTHING),
                 new LimelightConstants("doug", LimelightModel.LIMELIGHT_3, 15, LimelightRole.NOTHING)
         };
