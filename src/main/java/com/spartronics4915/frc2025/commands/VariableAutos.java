@@ -201,9 +201,11 @@ public class VariableAutos {
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side);
-        alignmentGenerator.changePathConstraints(kStartingPathConstraints);
         
         return Commands.sequence(
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
+            }),
             Commands.parallel(
                 Commands.parallel(
                     pathPair.autoAlign
@@ -211,7 +213,7 @@ public class VariableAutos {
                 Commands.sequence(
                     dynamics.autoPrescore(),
                     Commands.waitUntil(() -> alignmentGenerator.isPIDLoopRunning),
-                    Commands.print("moving to height"),
+                    Commands.print("moving to height"), //!!! did not trigger -shark
                     dynamics.gotoScore(height.preset)
                 )
             ),
@@ -229,11 +231,11 @@ public class VariableAutos {
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            ),
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kPathConstraints);
-            })
-        ).withName("Starting Auto cycle");
+            )
+        ).finallyDo(() -> {
+            alignmentGenerator.changePathConstraints(kPathConstraints);
+        }).withName("Starting Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public PathPair getPathPair(FieldBranch branch, StationSide side){
