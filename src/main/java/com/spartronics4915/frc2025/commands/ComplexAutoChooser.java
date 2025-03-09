@@ -8,8 +8,12 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.Constants.Drive.AutoConstants.StationVisualizationConstants;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
+import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -33,6 +37,7 @@ public class ComplexAutoChooser extends SubsystemBase {
             index = count++;
             String path = "Variable Autos/Step " + index + "/";
             buildBranchChooser();
+            setBranchPreview(getFieldBranch());
             buildHeightChooser();
             SmartDashboard.putData(path + "Score on...", branchChooser);
             SmartDashboard.putData(path + "At...", heightChooser);
@@ -56,12 +61,28 @@ public class ComplexAutoChooser extends SubsystemBase {
             branchChooser.addOption("H", FieldBranch.H);
             branchChooser.addOption("I", FieldBranch.I);
             branchChooser.addOption("J", FieldBranch.J);
+
+            branchChooser.onChange(this::setBranchPreview);
         }
 
         private void buildHeightChooser() {
             heightChooser.setDefaultOption("L4", BranchHeight.L4);
             heightChooser.addOption("L3", BranchHeight.L3);
             heightChooser.addOption("L2", BranchHeight.L2);
+        }
+
+        protected void setBranchPreview(FieldBranch branch) {
+            var reefSide = branch.simpleBranchInfo.reefSide();
+            var branchSide = branch.simpleBranchInfo.branchSide();
+
+            Translation2d branchPose = reefSide.getCurrent().getTranslation().plus(
+                new Translation2d(
+                    0.2,//branchSide.tagOffset.getY(),
+                    branchSide.tagOffset.getX() * (branchSide == BranchSide.LEFT ? -1 : 1) * 1.5
+                ).rotateBy(reefSide.getCurrent().getRotation())
+            );
+
+            previewField.getObject("Branch " + index).setPose(new Pose2d(branchPose, reefSide.getCurrent().getRotation()));
         }
 
         protected FieldBranch getFieldBranch() {
