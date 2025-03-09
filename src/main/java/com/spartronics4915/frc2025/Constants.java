@@ -266,7 +266,7 @@ public final class Constants {
             public static final Time kEndTriggerDebounce = Seconds.of(0.1);
 
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
-            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.4);
+            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
