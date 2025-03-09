@@ -107,11 +107,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
         if  (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
 
-            return new Pose2d(7.578, 4.0, Rotation2d.fromDegrees(0.0));
+            return new Pose2d(7.578, 4.0, Rotation2d.fromDegrees(180.0));
         }
         else {
 
-            return new Pose2d(10.005,4, Rotation2d.fromDegrees(180.0));
+            return new Pose2d(10.005,4, Rotation2d.fromDegrees(0.0));
 
         }
 
