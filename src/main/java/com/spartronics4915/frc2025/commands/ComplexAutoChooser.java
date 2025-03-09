@@ -2,18 +2,26 @@ package com.spartronics4915.frc2025.commands;
 
 import com.spartronics4915.frc2025.commands.VariableAutos.FieldBranch;
 import com.spartronics4915.frc2025.commands.VariableAutos.StationSide;
+import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.spartronics4915.frc2025.Constants.Drive.AutoConstants.StationVisualizationConstants;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ComplexAutoChooser {
+public class ComplexAutoChooser extends SubsystemBase {
     private class VariableAutoSegment {
         private SendableChooser<FieldBranch> branchChooser = new SendableChooser<>();
         private SendableChooser<BranchHeight> heightChooser = new SendableChooser<>();
@@ -112,15 +120,22 @@ public class ComplexAutoChooser {
     private VariableAutoSegment[] segments;
     private VariableAutos factory;
     private SendableChooser<StationSide> stationChooser = new SendableChooser<>();
+    private SwerveSubsystem swerve;
+    private Field2d previewField;
 
-    public ComplexAutoChooser(VariableAutos factory, int length) {
+    public ComplexAutoChooser(VariableAutos factory, int length, SwerveSubsystem swerve) {
         this.factory = factory;
+        this.swerve = swerve;
+        previewField = new Field2d();
         buildStationChooser();
+        setStationPreview(stationChooser.getSelected());
         SmartDashboard.putData("Variable Autos/Station", stationChooser);
         segments = new VariableAutoSegment[length];
         for (int i = 0; i < length; i++) {
             segments[i] = new VariableAutoSegment();
         }
+
+        SmartDashboard.putData("Preview Field", previewField);
 
         SingleRun.initSingleRun();
     }
@@ -128,6 +143,21 @@ public class ComplexAutoChooser {
     private void buildStationChooser() {
         stationChooser.setDefaultOption("Left", StationSide.LEFT);
         stationChooser.addOption("Right", StationSide.RIGHT);
+        stationChooser.onChange(this::setStationPreview);
+    }
+
+    private void setStationPreview(StationSide side) {
+        FieldObject2d station = previewField.getObject("Station");
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            station.setPose(side == StationSide.LEFT ? StationVisualizationConstants.kBlueLeft : StationVisualizationConstants.kBlueRight);
+        } else {
+            station.setPose(side == StationSide.LEFT ? StationVisualizationConstants.kRedLeft : StationVisualizationConstants.kRedRight);
+        }
+    }
+
+    public void updatePreviewField(Pose2d robotPose) {
+        previewField.setRobotPose(robotPose);
+        SmartDashboard.putData("Preview Field", previewField);
     }
 
     public Command getAuto() {
@@ -155,5 +185,10 @@ public class ComplexAutoChooser {
 
     public Command getSingleRun() {
         return SingleRun.getSingleRun(factory, stationChooser.getSelected());
+    }
+
+    @Override
+    public void periodic() {
+        updatePreviewField(swerve.getPose());
     }
 }

@@ -18,6 +18,7 @@ import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -278,6 +279,13 @@ public final class Constants {
         
             // X = side to side, Y = away from tag
             // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
+
+            public static final class StationVisualizationConstants {
+                    public static final Pose2d kBlueLeft = new Pose2d(0.947, 7.447, Rotation2d.fromDegrees(-50));
+                    public static final Pose2d kBlueRight = new Pose2d(0.947, 0.614, Rotation2d.fromDegrees(50));
+                    public static final Pose2d kRedLeft = new Pose2d(16.603, 0.614, Rotation2d.fromDegrees(130));
+                    public static final Pose2d kRedRight = new Pose2d(16.603, 7.447, Rotation2d.fromDegrees(-120));
+            }
         }
 
     }
