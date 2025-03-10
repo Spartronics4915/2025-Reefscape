@@ -398,6 +398,11 @@ public class RobotContainer {
         SmartDashboard.putData("preset3elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L3));
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
+        SmartDashboard.putData("Stow", dynamics.stow());
+        SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
+        SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
+        SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
+
     
         debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
                            .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));

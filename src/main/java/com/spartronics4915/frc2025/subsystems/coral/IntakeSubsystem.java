@@ -104,7 +104,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public boolean detect(){
         if (RobotBase.isSimulation()) {
-            return true;
+            return false;
         }
 
         LaserCan.Measurement measurement = lc.getMeasurement();

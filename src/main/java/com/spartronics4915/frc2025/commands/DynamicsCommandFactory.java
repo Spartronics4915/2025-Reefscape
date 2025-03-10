@@ -113,7 +113,7 @@ public class DynamicsCommandFactory {
      * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
-        var currAngle =  armSubsystem.getPosition();
+        var currAngle =  getArmRotation();
         return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); //TODO measure this so it's only if it's above the horizon (for climb)
     }
 
