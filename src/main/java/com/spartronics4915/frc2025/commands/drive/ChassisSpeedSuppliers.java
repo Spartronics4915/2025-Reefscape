@@ -256,13 +256,30 @@ public final class ChassisSpeedSuppliers {
         return () -> {
             boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
             switch (DriverCommunication.getClosestRegion(swerve)) {
+                case REEF, PROCESSOR, BARGE: {
+                    Translation2d reefCenter = isBlue ? OrientTowardsNearestPOIConstants.REEF_CENTER_BLUE : OrientTowardsNearestPOIConstants.REEF_CENTER_RED;
+                    return reefCenter.minus(swerve.getPose().getTranslation()).getAngle();
+                    // if (isBlue) {
+                    //     return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
+                    // }
+                    // else {
+                    //     return AlignToReef.getClosestReefAprilTag(swerve.getPose()).getRotation().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
+                    // }
+                }
                 case CORAL_STATION: {
                     if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                     else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
-                default: {
-                    return (isBlue ? OrientTowardsNearestPOIConstants.BLUE_REEF_CENTER : OrientTowardsNearestPOIConstants.RED_REEF_CENTER).minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.REEF_OFFSET);
+                default:{
+                    return Rotation2d.kZero; //unreachable
                 }
+                // case BARGE: {
+                //     int location = DriverStation.getLocation().getAsInt() - 1;
+                //     if (isBlue)
+                //         return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
+                //     else 
+                //         return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
+                // }
             }
         };
     }

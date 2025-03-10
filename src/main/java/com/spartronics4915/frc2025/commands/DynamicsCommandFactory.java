@@ -58,6 +58,7 @@ public class DynamicsCommandFactory {
         tab.addBoolean("isElevStowed", this::isElevStowed);
         tab.addBoolean("coralInArm", this::isCoralInArm);
         tab.addBoolean("funnelIntake", this::funnelDetect);
+        tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
 
@@ -77,10 +78,17 @@ public class DynamicsCommandFactory {
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
         L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
         CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
-        ALGAE_HIGH(0.78, Rotation2d.fromDegrees(90)),
-        ALGAE_LOW(0.375, Rotation2d.fromDegrees(90));
+        ALGAE_HIGH(0.78 - 0.03, Rotation2d.fromDegrees(90)),
+        ALGAE_LOW(0.375 - 0.03, Rotation2d.fromDegrees(90));
 
         private final DynamicsSetpoint setpoint;
+
+        public Rotation2d getArmAngle() {
+            return this.setpoint.armAngle;
+        }
+        public double getElevatorHeight() {
+            return this.setpoint.heightMeters;
+        }
 
         private DynaPreset(double meters, Rotation2d angle) {
             this.setpoint = new DynamicsSetpoint(meters, angle);
@@ -265,7 +273,7 @@ public class DynamicsCommandFactory {
     
     public Command autoPrescore(){
         return Commands.sequence(
-            makeSystemSafeToMove(false, false, false),
+            makeSystemSafeToMove(true, false, false),
             armPriorityMove(DynaPreset.AUTO_PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
         );
     }

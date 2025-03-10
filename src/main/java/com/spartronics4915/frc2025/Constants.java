@@ -12,9 +12,13 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
+import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
 import com.spartronics4915.frc2025.util.Structures.PIDFConstants;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -24,10 +28,14 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
@@ -252,25 +260,32 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Inches.of(0.5);
+            public static final Distance kPositionTolerance = Centimeter.of(1.0);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.1);
 
-            public static final Time kTeleopAlginAdjustTimeout = Seconds.of(1);
-            public static final Time kAutoAlginAdjustTimeout = Seconds.of(0.5);
+            public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
+            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.5, 2, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
 
             public static final PathConstraints kPathConstraints = new PathConstraints(2, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
         
             // X = side to side, Y = away from tag
             // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
+
+            public static final class StationVisualizationConstants {
+                    public static final Pose2d kBlueLeft = new Pose2d(0.947, 7.447, Rotation2d.fromDegrees(-50));
+                    public static final Pose2d kBlueRight = new Pose2d(0.947, 0.614, Rotation2d.fromDegrees(50));
+                    public static final Pose2d kRedLeft = new Pose2d(16.603, 0.614, Rotation2d.fromDegrees(130));
+                    public static final Pose2d kRedRight = new Pose2d(16.603, 7.447, Rotation2d.fromDegrees(-120));
+            }
         }
 
     }
@@ -281,6 +296,8 @@ public final class Constants {
 
     public static final class OrientTowardsNearestPOIConstants {
         public static final Rotation2d REEF_OFFSET = Rotation2d.k180deg;
+        public static final Translation2d REEF_CENTER_RED = new Translation2d(13.067, 4.031);
+        public static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.471, 4.031);
         public static final double CORAL_STATION_ANGLE = 55;
         public static final Rotation2d BARGE_ROTATION = Rotation2d.kCCW_90deg;
         public static final Translation2d[] BARGE_RED_CAGE_POSITIONS = {
@@ -297,6 +314,39 @@ public final class Constants {
         public static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
     }
 
+    public static final class BlingConstants {
+        public static boolean LIGHTS_ENABLED = true; // Turn this off for rumble but no LED strips.
+
+        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
+
+        public static final int BLING_LENGTH = 23+24;
+
+        // Driver Communication Constants
+        public static final double ARM_THRESHOLD = 10; // Degrees
+        public static final double ELEVATOR_THRESHOLD = .1; // Meters
+        public static final double BARGE_ALIGNMMENT_THRESHOLD = .2; // Distance that the robot can be, in meters, from the barge starting position.
+
+        // Segment constants
+        public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 20);
+
+        public static final BlingLEDPattern OFF = new BlingLEDPattern(LEDPattern.kOff, BLING_LENGTH);
+        public static final BlingLEDPattern GOOD = BlingSegment.pulseColor(BLING_LENGTH, Color.kLime, .8);
+        public static final BlingLEDPattern WARN = BlingSegment.pulseColor(BLING_LENGTH, Color.kYellow, .4);
+        public static final BlingLEDPattern BAD = BlingSegment.pulseColor(BLING_LENGTH, Color.kRed, .2);
+
+        public static final BlingLEDPattern RED = BlingSegment.solid(Color.kRed, BLING_LENGTH);
+        public static final BlingLEDPattern ORANGE = BlingSegment.solid(Color.kOrange, BLING_LENGTH);
+        public static final BlingLEDPattern YELLOW = BlingSegment.solid(Color.kYellow, BLING_LENGTH);
+        public static final BlingLEDPattern GREEN = BlingSegment.solid(Color.kLime, BLING_LENGTH);
+        public static final BlingLEDPattern BLUE = BlingSegment.solid(Color.kBlue, BLING_LENGTH);
+        public static final BlingLEDPattern CYAN = BlingSegment.solid(Color.kCyan, BLING_LENGTH);
+        public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
+        public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
+
+        public static final BlingShow SHOW_SPARTRONICS47 = new BlingShow("bling/spartronics47.bling");
+    }
+
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
         public static final double kMaxSpeedForMegaTag1 = 0.5; //meters
@@ -310,7 +360,7 @@ public final class Constants {
         public static final LimelightConstants kLimelights[] = {
                 new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.NOTHING),
-                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.NOTHING),
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF), //TODO: CHANGE
                 new LimelightConstants("chucky", LimelightModel.LIMELIGHT_3, 14, LimelightRole.NOTHING),
                 new LimelightConstants("doug", LimelightModel.LIMELIGHT_3, 15, LimelightRole.NOTHING)
         };
@@ -324,7 +374,7 @@ public final class Constants {
                 public static final double kSingleTagPunishment = 0.3;
             }
             public static final class MegaTag2 {
-                public static final double kInitialValue = 0.1;
+                public static final double kInitialValue = 0.2;
                 public static final double kAverageDistancePunishment = 0.075;
                 public static final double kRobotSpeedPunishment = 0.25;
                 public static final double kMultipleTagsBonus = 0.05;
@@ -450,7 +500,7 @@ public final class Constants {
         public static final Angle kArmAngleTolerance = Degrees.of(1);
         public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 0.5;
+        public static final double kSafeElevHeightForSwerve = 0.4;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change

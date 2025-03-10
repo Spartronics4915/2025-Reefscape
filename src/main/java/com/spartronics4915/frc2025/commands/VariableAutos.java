@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 public class VariableAutos {
 
@@ -68,8 +69,8 @@ public class VariableAutos {
     }
 
     public enum BranchSide{
-        LEFT(new Translation2d(0.1311035, 0.5152845)),
-        RIGHT(new Translation2d(0.199132, 0.5154565));
+        LEFT(new Translation2d(0.108759 + 0.0381 + 0.00635, 0.5152845 + 0.0254)),
+        RIGHT(new Translation2d(0.218062, 0.5154565 + 0.0254));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -177,26 +178,34 @@ public class VariableAutos {
             Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
+            Commands.print("Stow & return"),
             Commands.parallel(
                 dynamics.stow(),
                 Commands.sequence(
+                    Commands.print("start delay"),
                     Commands.waitTime(delay),
+                    Commands.print("end delay"),
                     Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.print("returning path"),
                     pathPair.returnPath
                 )
             ),
+            Commands.print("blocking intake"),
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
             )
-        ).withName("Auto cycle");
+        ).withName("Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side);
-        alignmentGenerator.changePathConstraints(kStartingPathConstraints);
         
         return Commands.sequence(
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
+            }),
             Commands.parallel(
                 Commands.parallel(
                     pathPair.autoAlign
@@ -204,11 +213,11 @@ public class VariableAutos {
                 Commands.sequence(
                     dynamics.autoPrescore(),
                     Commands.waitUntil(() -> alignmentGenerator.isPIDLoopRunning),
-                    Commands.print("moving to height"),
+                    Commands.print("moving to height"), //!!! did not trigger -shark
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            dynamics.gotoScore(height.preset),
+            // dynamics.gotoScore(height.preset),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
             Commands.parallel(
@@ -222,11 +231,11 @@ public class VariableAutos {
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            ),
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kPathConstraints);
-            })
-        ).withName("Starting Auto cycle");
+            )
+        ).finallyDo(() -> {
+            alignmentGenerator.changePathConstraints(kPathConstraints);
+        }).withName("Starting Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public PathPair getPathPair(FieldBranch branch, StationSide side){
