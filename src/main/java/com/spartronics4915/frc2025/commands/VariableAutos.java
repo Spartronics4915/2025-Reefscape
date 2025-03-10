@@ -1,20 +1,27 @@
 package com.spartronics4915.frc2025.commands;
 
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
-import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 public class VariableAutos {
 
@@ -62,8 +69,8 @@ public class VariableAutos {
     }
 
     public enum BranchSide{
-        LEFT(new Translation2d(0.1527 - 0.00635, 0.5273 + 0.0254 - 0.00635)),
-        RIGHT(new Translation2d(0.1738, 0.5273 + 0.0254 - 0.00635));
+        LEFT(new Translation2d(0.108759 + 0.0381 + 0.00635, 0.5152845 + 0.0254)),
+        RIGHT(new Translation2d(0.218062, 0.5154565 + 0.0254));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -125,12 +132,17 @@ public class VariableAutos {
 
     private AlignToReef alignmentGenerator;
     private DynamicsCommandFactory dynamics;
+    private SwerveSubsystem swerve;
 
+    private final ChassisSpeeds reverseIntoStation;
 
-    public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics) {
+    public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
         super();
         this.alignmentGenerator = alignmentGenerator;
         this.dynamics = dynamics;
+        this.swerve = swerve;
+
+        reverseIntoStation = new ChassisSpeeds(kStationApproachSpeed.unaryMinus().in(MetersPerSecond), 0, 0);
     }
 
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height) {
@@ -148,42 +160,82 @@ public class VariableAutos {
         var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
-            pathPair.approachPath,
-            Commands.sequence(
-                pathPair.autoAlign,
-                dynamics.gotoScore(height.preset)
+            Commands.deadline(
+                pathPair.approachPath,
+                Commands.sequence(
+                    Commands.waitUntil(dynamics.intakeSubsystem::detect),
+                    dynamics.autoPrescore()
+                )
             ),
+            Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
+                pathPair.autoAlign,
+                Commands.sequence(
+                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
+                    Commands.print("moving to height"),
+                    dynamics.gotoScore(height.preset)
+                )
+            ),
+            Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
-            Commands.sequence(
+            Commands.print("Stow & return"),
+            Commands.parallel(
                 dynamics.stow(),
-                Commands.waitTime(delay),
-                pathPair.returnPath
+                Commands.sequence(
+                    Commands.print("start delay"),
+                    Commands.waitTime(delay),
+                    Commands.print("end delay"),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.print("returning path"),
+                    pathPair.returnPath
+                )
             ),
-            dynamics.blockingIntake()
-        );
+            Commands.print("blocking intake"),
+            Commands.deadline(
+                dynamics.blockingIntake(),
+                Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
+            )
+        ).withName("Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
-            Commands.sequence(
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
+            }),
+            Commands.parallel(
                 Commands.parallel(
-                    pathPair.autoAlign,
-                    dynamics.stow()
+                    pathPair.autoAlign
                 ),
-                dynamics.gotoScore(height.preset)
+                Commands.sequence(
+                    dynamics.autoPrescore(),
+                    Commands.waitUntil(() -> alignmentGenerator.isPIDLoopRunning),
+                    Commands.print("moving to height"), //!!! did not trigger -shark
+                    dynamics.gotoScore(height.preset)
+                )
             ),
+            // dynamics.gotoScore(height.preset),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
-            Commands.sequence(
+            Commands.parallel(
                 dynamics.stow(),
-                Commands.waitTime(delay),
-                pathPair.returnPath
+                Commands.sequence(
+                    Commands.waitTime(delay),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    pathPair.returnPath
+                )
             ),
-            dynamics.blockingIntake()
-        );
+            Commands.deadline(
+                dynamics.blockingIntake(),
+                Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
+            )
+        ).finallyDo(() -> {
+            alignmentGenerator.changePathConstraints(kPathConstraints);
+        }).withName("Starting Auto cycle")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public PathPair getPathPair(FieldBranch branch, StationSide side){

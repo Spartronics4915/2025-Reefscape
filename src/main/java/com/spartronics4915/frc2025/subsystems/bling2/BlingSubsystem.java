@@ -1,13 +1,21 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
+import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class BlingSubsystem extends SubsystemBase {
     private AddressableLED strip;
     private AddressableLEDBuffer buffer;
     private BlingSegment[] segments;
+    private String[] hexStrings;
+    private int blingPort;
 
     public void updateSegments(BlingSegment... segments) {
         this.segments = segments;
@@ -17,8 +25,10 @@ public class BlingSubsystem extends SubsystemBase {
             ledLength += x.getStripLength();
         }
 
-        strip.setLength(ledLength);
+        if (LIGHTS_ENABLED) strip.setLength(ledLength);
         buffer = new AddressableLEDBuffer(ledLength);
+
+        hexStrings = new String[ledLength];
 
         int index = 0;
         for (BlingSegment x : segments) {
@@ -26,12 +36,37 @@ public class BlingSubsystem extends SubsystemBase {
             index += x.ledLength;
         }
         
-        strip.start();
+        if (LIGHTS_ENABLED) strip.start();
     }
 
     public BlingSubsystem(int port, BlingSegment... shows) {
-        strip = new AddressableLED(port);
+        this.blingPort = port;
+        if (LIGHTS_ENABLED) strip = new AddressableLED(port);
         updateSegments(shows);
+    }
+
+    private void logLEDs() {
+        for(int i = 0; i < hexStrings.length; i++) {
+            int brightnessMultiplier = (100/BLING_BRIGHTNESS);
+            Color ledColor = new Color(buffer.getRed(i) * brightnessMultiplier, buffer.getGreen(i) * brightnessMultiplier,buffer.getBlue(i) * brightnessMultiplier);
+            hexStrings[i] = ledColor.toHexString();
+        }
+        SmartDashboard.putStringArray("Bling", hexStrings);
+    }
+
+    /**
+     * Clears the memory of the lights, only works if lights are disabled
+     */
+    public Command clearLights() {
+        return Commands.runOnce(() -> {
+            if (LIGHTS_ENABLED) {
+                System.out.println("hey you aren't supposed to do that with lights enabled");
+            } else {
+                AddressableLED clearStrip = new AddressableLED(blingPort);
+                clearStrip.stop();
+                clearStrip.close();
+            }
+        });
     }
 
     @Override
@@ -39,7 +74,8 @@ public class BlingSubsystem extends SubsystemBase {
         for (BlingSegment show : segments) {
             show.update();
         }
-        strip.setData(buffer);
+        if (LIGHTS_ENABLED) strip.setData(buffer);
+        logLEDs();
     }
 
 }

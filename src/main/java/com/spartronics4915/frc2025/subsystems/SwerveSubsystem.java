@@ -1,6 +1,7 @@
 package com.spartronics4915.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,6 +24,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,6 +41,8 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private final SwerveDrive swerveDrive;
 
     private final StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("pose", Pose2d.struct).publish();
+    private final StructPublisher<Pose2d> future075Publisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("future 0.75s", Pose2d.struct).publish();
+
     private final StructPublisher<ChassisSpeeds> shimPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("shim", ChassisSpeeds.struct).publish();
     private final DoublePublisher speedPublisher = NetworkTableInstance.getDefault().getTable("logging").getDoubleTopic("speed").publish();
 
@@ -75,7 +80,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
             swerveDrive::getRobotVelocity, 
             (speeds, FF) -> {shimPublisher.accept(speeds); drive(speeds);}, 
             Drive.AutoConstants.kDriveController, 
-            Drive.AutoConstants.PathplannerConfigs.PROGRAMMER_CHASSIS.config, 
+            Drive.AutoConstants.PathplannerConfigs.COMP_CHASSIS.config, 
             () -> {
                 Optional<Alliance> temp = DriverStation.getAlliance();
                 if(temp.isEmpty()) return false;
@@ -102,11 +107,11 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
         if  (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
 
-            return new Pose2d(1.198, 4.025, Rotation2d.fromDegrees(0.0));
+            return new Pose2d(7.578, 4.0, Rotation2d.fromDegrees(180.0));
         }
         else {
 
-            return new Pose2d(16.3,4, Rotation2d.fromDegrees(180.0));
+            return new Pose2d(10.005,4, Rotation2d.fromDegrees(0.0));
 
         }
 
@@ -119,6 +124,19 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public void driveFieldOriented(ChassisSpeeds chassisSpeeds) {
         swerveDrive.driveFieldOriented(chassisSpeeds);
+    }
+
+    public Pose2d predict(Time inTheFuture){
+        
+        Pose2d currPose = getPose();
+
+        var cs = getFieldVelocity();
+
+        return new Pose2d(
+            currPose.getX() + cs.vxMetersPerSecond * inTheFuture.in(Seconds), 
+            currPose.getY() + cs.vyMetersPerSecond * inTheFuture.in(Seconds), 
+            currPose.getRotation().plus(Rotation2d.fromRadians(cs.omegaRadiansPerSecond * inTheFuture.in(Seconds)))
+        );
     }
 
     public Pose2d getPose() {
@@ -180,6 +198,7 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public void periodic() {
         posePublisher.accept(getPose());
         speedPublisher.accept(getSpeed());
+        future075Publisher.accept(predict(Seconds.of(0.75)));
     }
 
 }

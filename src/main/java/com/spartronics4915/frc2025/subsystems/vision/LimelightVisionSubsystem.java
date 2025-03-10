@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
@@ -7,6 +9,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.spartronics4915.frc2025.Constants.VisionConstants;
+import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import com.spartronics4915.frc2025.util.Structures.LimelightConstants;
@@ -18,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -38,6 +42,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
     private final AprilTagFieldLayout fieldLayout;
 
     private boolean initalPoseSet = false;
+
+    private long lastMegaTag1Reading;
+    private boolean isMegaTag1ReadingNew = false;
 
     public LimelightVisionSubsystem(SwerveSubsystem swerveSubsystem, AprilTagFieldLayout fieldLayout) {
         limelights = new ArrayList<>();
@@ -72,6 +79,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
             }
 
             SmartDashboard.putBoolean("Initial Pose Set?", false);
+            SmartDashboard.putBoolean("VisionDiagnostics/Want New MT1 Reading?", false);
+
+            lastMegaTag1Reading = System.currentTimeMillis();
         }
 
         this.fieldLayout = fieldLayout;
@@ -136,10 +146,19 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
 
     @Override
     public void periodic() {
+        Long currentTime = System.currentTimeMillis();
+        Time sinceLastReading = Milliseconds.of(currentTime - lastMegaTag1Reading);
+        boolean wantNewMegaTag1Reading = sinceLastReading.gte(VisionConstants.newMegaTag1ReadingThreshold);
+        SmartDashboard.putBoolean("VisionDiagnostics/Want New MT1 Reading?", wantNewMegaTag1Reading);
+
         getVisionMeasurements().forEach((measurement) -> {
             if (!initalPoseSet) {
                 initalPoseSet = true;
                 SmartDashboard.putBoolean("Initial Pose Set?", true);
+            }
+            if (measurement.diagMethod().equals(PoseEstimationMethod.MEGATAG_1)) {
+                if (wantNewMegaTag1Reading) isMegaTag1ReadingNew = true;
+                lastMegaTag1Reading = currentTime;
             }
             if (!discardMeasurements) swerveSubsystem.addVisionMeasurement(measurement.pose(), measurement.timestamp(), measurement.stdDevs());
             if (VisionConstants.kVisionDiagnostics) {
@@ -174,6 +193,14 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
 
     public boolean isInitialPoseSet() {
         return initalPoseSet;
+    }
+
+    public boolean newMegaTag1Reading() {
+        if (isMegaTag1ReadingNew) {
+            isMegaTag1ReadingNew = false;
+            return true;
+        }
+        return false;
     }
 
     public Optional<Pose2d> getBotPose2dFromReefCamera() {
