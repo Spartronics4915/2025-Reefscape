@@ -100,7 +100,7 @@ public class DynamicsCommandFactory {
     }
 
     private Rotation2d getArmRotation(){
-        return RobotBase.isSimulation() ? armSubsystem.getSetpoint() : armSubsystem.getPosition();
+        return RobotBase.isSimulation() ? armSubsystem.getTargetPosition() : armSubsystem.getPosition();
     }
 
     //#region Composite Commands
