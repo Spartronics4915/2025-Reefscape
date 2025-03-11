@@ -277,6 +277,11 @@ public class RobotContainer {
                 .withName("Align Right Branch")
             );
 
+            driverController.back().whileTrue(
+                alignmentCommandFactory.generateCommand(FieldBranchSide.MIDDLE)
+                .withName("Align Middle Branch")
+            );
+
             driverController.povUp().whileTrue(
                 Commands.run(() -> {
                     swerveSubsystem.drive(new ChassisSpeeds(0.25, 0, 0));
