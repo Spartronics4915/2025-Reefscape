@@ -72,7 +72,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     public Command setArmCommand(double speed) {
 
         return this.runOnce(() -> {
-            setArmCommand(speed);
+            System.out.println("Arm " +speed);
+
+            setArmSpeed(speed);
         });
     }
 
@@ -85,6 +87,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     public Command setWinchCommand(double speed) {
         return this.runOnce(() -> {
+            System.out.println("winch " + speed);
 
             if (speed > 0) {
                 turnArmBrakeModeOff();

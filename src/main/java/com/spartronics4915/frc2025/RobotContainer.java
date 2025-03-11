@@ -293,12 +293,12 @@ public class RobotContainer {
 
         if (climberSubsystem != null) {
             // windows button
-            driverController.back().onTrue(climberSubsystem.setWinchCommand(0.5))
+            driverController.back().onTrue(climberSubsystem.setWinchCommand(-0.5))
                     .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
             // .onTrue(dynamics.gotoClimb());
 
             // menu button
-            driverController.start().onTrue(climberSubsystem.setWinchCommand(-0.5))
+            driverController.start().onTrue(climberSubsystem.setWinchCommand(0.5))
                     .onFalse(climberSubsystem.stopWinchCommand());// .withName("Move Climber Pos");
         }
 
@@ -368,13 +368,13 @@ public class RobotContainer {
         operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
 
         if (climberSubsystem != null) {
-            operatorController.rightBumper().onTrue(climberSubsystem.setArmCommand(0.5))
+            operatorController.rightBumper().onTrue(climberSubsystem.setArmCommand(0.2))
                     .onFalse(climberSubsystem.stopArmCommand());// .withName("Move
                                                                 // Climber
                                                                 // Pos");
             // .onTrue(dynamics.gotoClimb());
 
-            operatorController.leftBumper().onTrue(climberSubsystem.setArmCommand(-0.5))
+            operatorController.leftBumper().onTrue(climberSubsystem.setArmCommand(-0.2))
                     .onFalse(climberSubsystem.stopArmCommand());// .withName("Move
                                                                 // Climber
                                                                 // Pos");

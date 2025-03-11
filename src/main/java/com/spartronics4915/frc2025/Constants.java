@@ -538,8 +538,8 @@ public final class Constants {
         ;
 
         public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
-        .smartCurrentLimit(10)
-        .secondaryCurrentLimit(15)
+        .smartCurrentLimit(18)
+        .secondaryCurrentLimit(20)
         .inverted(false)
         .openLoopRampRate(0.25)
         .idleMode(IdleMode.kBrake)
