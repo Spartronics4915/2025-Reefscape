@@ -127,7 +127,7 @@ public class AlignToReef {
             desiredBranchPublisher.accept(branch);
     
             return getPathFromWaypoint(getWaypointFromBranch(branch));
-        }, Set.of());
+        }, Set.of(mSwerve));
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {

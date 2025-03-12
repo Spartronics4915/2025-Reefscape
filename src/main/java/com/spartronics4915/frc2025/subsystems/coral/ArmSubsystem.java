@@ -74,9 +74,12 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     }
 
     public void resetMechanism(){
-        var position = getPosition();
-        mCurrentSetPoint = position;
-        mCurrentState = new State(angleToRaw(position), 0.0);
+        resetMechanism(getPosition());
+    }
+
+    public void resetMechanism(Rotation2d angle){
+        mCurrentSetPoint = angle;
+        mCurrentState = new State(angleToRaw(angle), 0.0);
     }
 
     private Rotation2d rawToAngle(double rotation) {
@@ -105,7 +108,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private void initArmProfile() {
         mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
-        mCurrentState = new State(angleToRaw(getPosition()), 0.0);
+        mCurrentState = new State(angleToRaw(ArmConstants.kStartingAngle), 0.0);
     }
 
     @Override
@@ -137,7 +140,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     
     private void setMechanismAngle(Rotation2d angle){
         mArmMotor.setPosition(angleToRaw(angle));
-        resetMechanism();
+        resetMechanism(angle);
     }
 
     public void setSetpoint(Rotation2d newSetpoint){

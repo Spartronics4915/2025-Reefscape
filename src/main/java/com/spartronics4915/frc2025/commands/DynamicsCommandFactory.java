@@ -78,8 +78,8 @@ public class DynamicsCommandFactory {
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
         L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
         CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
-        ALGAE_HIGH(0.78, Rotation2d.fromDegrees(90)),
-        ALGAE_LOW(0.375, Rotation2d.fromDegrees(90));
+        ALGAE_HIGH(0.78 - 0.03, Rotation2d.fromDegrees(90)),
+        ALGAE_LOW(0.375 - 0.03, Rotation2d.fromDegrees(90));
 
         private final DynamicsSetpoint setpoint;
 

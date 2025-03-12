@@ -116,7 +116,7 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
-    public final WinchClimber climberSubsystem;
+    // public final WinchClimber climberSubsystem;
 
     
     public final DynamicsCommandFactory dynamics;
@@ -141,7 +141,7 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         armSubsystem = new ArmSubsystem();
         elevatorSubsystem = new ElevatorSubsystem();
-        climberSubsystem = new WinchClimber();
+        // climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
@@ -192,7 +192,7 @@ public class RobotContainer {
         // Configure the trigger bindings
         configureBindings();
 
-        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 3);
+        complexAutoChooser = new ComplexAutoChooser(variableAutoFactory, 3, swerveSubsystem);
 
         // Need to initialize this here after vision is configured.
         // Need to clean up initialization flow to make it more clear
@@ -378,13 +378,13 @@ public class RobotContainer {
 
         operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
         
-        operatorController.rightBumper()
-            .whileTrue(climberSubsystem.driveWinch(0.5).withName("Move Climber Pos"));
-            // .onTrue(dynamics.gotoClimb());
+        // operatorController.rightBumper()
+        //     .whileTrue(climberSubsystem.driveWinch(0.5).withName("Move Climber Pos"));
+        //     // .onTrue(dynamics.gotoClimb());
 
-        operatorController.leftBumper()
-            .whileTrue(climberSubsystem.driveWinch(-0.5).withName("Move Climber Neg"));
-            // .onTrue(dynamics.gotoClimb());
+        // operatorController.leftBumper()
+        //     .whileTrue(climberSubsystem.driveWinch(-0.5).withName("Move Climber Neg"));
+        //     // .onTrue(dynamics.gotoClimb());
 
         //#endregion
 
@@ -398,6 +398,11 @@ public class RobotContainer {
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
     
+        debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
+                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
+
+        debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
+                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
     }
 
     /**
@@ -434,6 +439,8 @@ public class RobotContainer {
             // chooser.addOption("M-R Circle", new PathPlannerAuto("Circle move debug"));
             // chooser.addOption("Reef loop debug", new PathPlannerAuto("Reef loop debug"));
             chooser.addOption("Leave", new PathPlannerAuto("Leave Auto"));
+
+            chooser.addOption("Drive Forwards", Autos.driveForward(swerveSubsystem));
 
             chooser.addOption("Test Single Run", Commands.sequence(
                     dynamics.loadStow(),
