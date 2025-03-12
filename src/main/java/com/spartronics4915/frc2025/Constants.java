@@ -468,8 +468,8 @@ public final class Constants {
         public static final int elevatorFollowerID = 10; //right motor
         public static final boolean motorInverted = true;
         public static final boolean followerInverted = true;
-        public static final double motorPositionConversionFactor = (1/20.0) * 0.14044 * 2;
-        public static final double motorVelocityConversionFactor = (1/20.0) * 0.14044 * 2;
+        public static final double motorPositionConversionFactor = (1/9.0) * 0.14044 * 2;
+        public static final double motorVelocityConversionFactor = (1/9.0) * 0.14044 * 2;
         public static final int motorSmartCurrentLimit = 35; //18
         public static final int motorSecondaryCurrentLimit = 40; //20
         public static final int followerSmartCurrentLimit = 35;
