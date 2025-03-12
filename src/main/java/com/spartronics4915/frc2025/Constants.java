@@ -345,6 +345,8 @@ public final class Constants {
 
         public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
         public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
+
+        public static final BlingSegment MATCH_END = SHOW_RAINBOW_FUN;
     }
 
     public static final class VisionConstants {

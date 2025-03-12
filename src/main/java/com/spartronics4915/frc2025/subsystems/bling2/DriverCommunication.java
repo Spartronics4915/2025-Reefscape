@@ -1,11 +1,9 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
-import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
-import static edu.wpi.first.units.Units.Meters;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -102,8 +100,10 @@ public class DriverCommunication extends BlingSegment {
 
     @Override
     protected void updateLights() {
+        System.out.println(Robot.TELEOP_TIMER.get());
+
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
-            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : WARN; 
+            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
         // } else if (vision != null && vision.newMegaTag1Reading()) {
@@ -111,6 +111,10 @@ public class DriverCommunication extends BlingSegment {
         //     alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
             current = CYAN;
+        } else if (Robot.TELEOP_TIMER.hasElapsed(140)) { // Match has ended, play show
+            current = MATCH_END;
+        } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
+            current = BAD;
         }
         else {
             Region closest = getClosestRegion(this.swerve);
