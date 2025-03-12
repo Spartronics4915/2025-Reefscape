@@ -4,6 +4,7 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathCon
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -12,6 +13,7 @@ import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.subsystems.bling2.DriverCommunication.Region;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -135,6 +137,16 @@ public class VariableAutos {
 
     private final ChassisSpeeds reverseIntoStation;
 
+    public boolean isSwerveCloseToReef() {
+        Translation2d currentReef = 
+        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ?
+            Region.REEF.bluePositions[0] :
+            Region.REEF.redPositions[0]
+        ;
+
+        return (currentReef.getDistance(swerve.getPose().getTranslation()) < kTriggerDistance);
+    }
+
     public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
         super();
         this.alignmentGenerator = alignmentGenerator;
@@ -198,17 +210,14 @@ public class VariableAutos {
         
         return Commands.sequence(
             Commands.parallel(
-                Commands.parallel(
-                    pathPair.autoAlign
-                ),
+                pathPair.autoAlign,
                 Commands.sequence(
                     dynamics.autoPrescore(),
-                    Commands.waitUntil(() -> alignmentGenerator.isPIDLoopRunning),
+                    Commands.waitUntil(() -> isSwerveCloseToReef()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            dynamics.gotoScore(height.preset),
             dynamics.waitUntilPreset(height.preset),
             dynamics.score(),
             Commands.parallel(

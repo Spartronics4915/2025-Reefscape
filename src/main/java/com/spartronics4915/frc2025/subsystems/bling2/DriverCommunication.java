@@ -58,8 +58,8 @@ public class DriverCommunication extends BlingSegment {
             new Translation2d[] {new Translation2d(17, 7.5), new Translation2d(17, .5)}, 
         null);
 
-        final Translation2d[] redPositions;        
-        final Translation2d[] bluePositions;
+        public final Translation2d[] redPositions;        
+        public final Translation2d[] bluePositions;
         final Supplier<LEDPattern> pattern;
 
         private Region(Translation2d[] blue, Translation2d[] red, Supplier<LEDPattern> pattern) {
