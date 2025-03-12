@@ -523,7 +523,7 @@ public final class Constants {
         public enum WinchSpeeds{
             ENGAGE(0.0), //speed which it'll rotate to move and engage the cage
             RETRACT(0.0), //speed which it'll rotate to bring the cage down
-            ;
+            ; //FIXME magnitude 0.5, find sign convention
 
             public final double speed;
 
@@ -531,15 +531,28 @@ public final class Constants {
                 this.speed = speed;
             }
         }
+
+        public enum ClimberSpeeds{
+            ENGAGE(0.0),
+            RETRACT(0.0),
+            ; //FIXME magnitude 0.2, find sign convention
+
+            public final double speed;
+
+            private ClimberSpeeds(double speed) {
+                this.speed = speed;
+            }
+        }
         
-        public static final int kMotorID = 13;
+        public static final int kWinchMotorID = 13;
+        public static final int kArmMotorID = 23;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1.0)
             .velocityConversionFactor(1.0)
         ;
 
-        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+        public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
@@ -548,6 +561,14 @@ public final class Constants {
             .apply(kEncoderConfig)
         ;
 
+        public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
+        .smartCurrentLimit(18)
+        .secondaryCurrentLimit(20)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kBrake)
+        .apply(kEncoderConfig)
+    ;
 
         public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
         public static final Rotation2d kEngagedAngle = Rotation2d.fromDegrees(270.0); //angle to engage the cage

@@ -6,6 +6,9 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.*;
@@ -14,61 +17,109 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class WinchClimber extends SubsystemBase implements ModeSwitchInterface{
-    
-    private final SparkBase mMotor;
-    private final RelativeEncoder mEncoder;
+public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
-    private double mSpeedSetpoint = 0.0;
+    private final SparkBase mWinchMotor;
+    private final SparkBase mArmMotor;
+    // private final RelativeEncoder mEncoder;
 
     public WinchClimber() {
         super();
 
-        mMotor = new SparkMax(kMotorID, MotorType.kBrushless);
-        mMotor.configure(kMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        mWinchMotor = new SparkMax(kWinchMotorID, MotorType.kBrushless);
+        mWinchMotor.configure(kWinchMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        mEncoder = mMotor.getEncoder();
+        mArmMotor = new SparkMax(kArmMotorID, MotorType.kBrushless);
+        mArmMotor.configure(kArmMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        mEncoder.setPosition(kStartingAngle.getRotations());
+        // mEncoder = mMotor.getEncoder();
 
-        mMotor.set(0.0);
+        // mEncoder.setPosition(kStartingAngle.getRotations());
+
+        mWinchMotor.set(0.0);
+        mArmMotor.set(0.0);
     }
 
-    public void setWinchSpeed(double speed){
-        mSpeedSetpoint = speed;
+    public void setArmSpeed(double speed) {
+
+        mArmMotor.set(speed);
     }
 
-    public void stopWinch(){
-        mMotor.set(0.0);
-        mSpeedSetpoint = 0.0;
+    public void setWinchSpeed(double speed) {
+        mWinchMotor.set(speed);
     }
 
-    public Command driveWinch(double speed){
-        return this.startEnd(() -> {
-            setWinchSpeed(speed);
-        }, () -> {
-            stopWinch();
-        });
+    public void stopWinch() {
+        mWinchMotor.set(0.0);
     }
 
-    public Command setWinchCommand(double speed){
+    public void stopArm() {
+        mArmMotor.set(0);
+    }
+
+    private void turnArmBrakeModeOn() {
+        SparkBaseConfig newConfig = new SparkMaxConfig().idleMode(IdleMode.kBrake);
+
+        mArmMotor.configureAsync(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+    private void turnArmBrakeModeOff() {
+        SparkBaseConfig newConfig = new SparkMaxConfig().idleMode(IdleMode.kCoast);
+
+        mArmMotor.configureAsync(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+    public Command setArmCommand(double speed) {
+
         return this.runOnce(() -> {
+            setArmSpeed(speed);
+        });
+    }
+
+    public Command stopArmCommand() {
+
+        return this.runOnce(() -> {
+            stopArm();
+        });
+    }
+
+    public Command setWinchCommand(double speed) {
+        return this.runOnce(() -> {
+            if (speed > 0) turnArmBrakeModeOff();
             setWinchSpeed(speed);
         });
     }
 
-    public Command stopWinchCommand(){
+    public Command stopWinchCommand() {
         return this.runOnce(() -> {
             stopWinch();
+            turnArmBrakeModeOn();
         });
+    }
+
+    public Command setClimberSpeedsCommand(ClimberSpeeds speed) {
+        return setArmCommand(speed.speed);
+    }
+
+    public Command setWinchSpeedsCommand(WinchSpeeds speed) {
+        return setWinchCommand(speed.speed);
+    }
+
+    // @Override
+    // public void periodic() {
+    // mMotor.set(mSpeedSetpoint);
+    // }
+
+    @Override
+    public void onModeSwitch() {
+        stopWinch();
+        stopArm();
     }
 
     @Override
-    public void periodic() {
-        mMotor.set(mSpeedSetpoint);
+    public void onDisable() {
+        stopWinch();
+        stopArm();
     }
-
-    @Override public void onModeSwitch() {stopWinch();}
-    @Override public void onDisable() {stopWinch();}
 
 }
