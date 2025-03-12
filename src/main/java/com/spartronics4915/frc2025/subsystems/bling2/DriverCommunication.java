@@ -12,8 +12,6 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,10 +29,6 @@ public class DriverCommunication extends BlingSegment {
     private ArmSubsystem arm;
     private ElevatorSubsystem elevator;
     private DynamicsCommandFactory dynamics;
-
-    private RumbleController[] controllers;
-    private double rumbleTime = 0;
-    private boolean hasRumbled = false;
 
     private int alertFrames = 0;
 
@@ -90,15 +84,6 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
-        if (RUMBLE_ENABLED)
-            dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
-                rumbleTime = 10;
-                rumble(RumblePresets.SOFT);
-            }));
-    }
-
-    public void setRumbleControllers(RumbleController... controllers) {
-        this.controllers = controllers;
     }
 
     public static Region getClosestRegion(SwerveSubsystem swerve) {
@@ -126,7 +111,6 @@ public class DriverCommunication extends BlingSegment {
         //     alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
             current = CYAN;
-            rumble(RumblePresets.LEFT_WEAK);
         }
         else {
             Region closest = getClosestRegion(this.swerve);
@@ -135,7 +119,6 @@ public class DriverCommunication extends BlingSegment {
             switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
-                    hasRumbled = false;
                     Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
                     int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
                     switch(index) {
@@ -172,33 +155,15 @@ public class DriverCommunication extends BlingSegment {
 
                     if (dynamics.funnelDetect()) {
                         current = RAINBOW;
-                        if (!hasRumbled) {
-                            rumble(RumblePresets.STRONG);
-                            rumbleTime = 5;
-                            hasRumbled = true;
-                        }
                     } else {
-                        if (subsystemsInCorrectSpot && robotInRightSpot) {
-                            current = GOOD;
-                            hasRumbled = false;
-                        }
-                        else if (subsystemsInCorrectSpot) {
-                            current = PURPLE;
-                            hasRumbled = false;
-                        } // Robot needs to move
-                        else if (robotInRightSpot) {
-                            current = WARN;
-                            hasRumbled = false;
-                        } // Mechanisms need to move
-                        else {
-                            current = OFF;
-                            hasRumbled = false;
-                        }
+                        if (subsystemsInCorrectSpot && robotInRightSpot) current = GOOD;
+                        else if (subsystemsInCorrectSpot) current = PURPLE; // Robot needs to move
+                        else if (robotInRightSpot) current = WARN; // Mechanisms need to move
+                        else current = OFF; // Should never be that
                     }
 
                     break;
                 case BARGE:
-                    hasRumbled = false;
                     /* Climber Lights
                     if (DriverStation.getLocation().isEmpty()) {
                         current = OFF;
@@ -223,7 +188,6 @@ public class DriverCommunication extends BlingSegment {
 
                     break;
                 default:
-                    hasRumbled = false;
                     current = OFF;
             }
         }
@@ -232,16 +196,7 @@ public class DriverCommunication extends BlingSegment {
         current.buffer = this.buffer;
         current.updateLights();
 
-        rumbleTime--;
         alertFrames--;
-        if (rumbleTime <= 0) rumble(RumblePresets.OFF);
-    }
-
-    private void rumble(RumblePresets feedback) {
-        if (!RUMBLE_ENABLED) return;
-        for (RumbleController controller : controllers) {
-            controller.setFeedback(feedback.rumble);
-        }
     }
 
     public static Command setAutoSegmentCommand(BlingSegment segment) {

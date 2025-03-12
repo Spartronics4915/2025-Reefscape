@@ -201,7 +201,6 @@ public class RobotContainer {
 
 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
-        driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
         blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
     }
 
