@@ -517,7 +517,7 @@ public final class Constants {
 
         public enum WinchSpeeds{
             ENGAGE(0.5), //speed which it'll rotate to move and engage the cage
-            RETRACT(0.5), //speed which it'll rotate to bring the cage down
+            RETRACT(-0.5), //speed which it'll rotate to bring the cage down
             ; //FIXME magnitude 0.5, find sign convention
 
             public final double speed;
@@ -529,7 +529,7 @@ public final class Constants {
 
         public enum ClimberSpeeds{
             ENGAGE(0.2),
-            RETRACT(0.2),
+            RETRACT(-0.2),
             ; //FIXME magnitude 0.2, find sign convention
 
             public final double speed;
