@@ -11,6 +11,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
@@ -116,7 +118,7 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
-    // public final WinchClimber climberSubsystem;
+    public final WinchClimber climberSubsystem;
 
     
     public final DynamicsCommandFactory dynamics;
@@ -141,7 +143,7 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         armSubsystem = new ArmSubsystem();
         elevatorSubsystem = new ElevatorSubsystem();
-        // climberSubsystem = new WinchClimber();
+        climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
@@ -378,23 +380,21 @@ public class RobotContainer {
             dynamics.removeAlgaeArm()
         );
 
-        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+        operatorController.povLeft()
+            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
+            .onFalse(climberSubsystem.stopArmCommand());
+        operatorController.povRight()
+            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
+            .onFalse(climberSubsystem.stopArmCommand());
 
-        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
-
-        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
-
-        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
-        
-        // operatorController.rightBumper()
-        //     .whileTrue(climberSubsystem.driveWinch(0.5).withName("Move Climber Pos"));
-        //     // .onTrue(dynamics.gotoClimb());
-
-        // operatorController.leftBumper()
-        //     .whileTrue(climberSubsystem.driveWinch(-0.5).withName("Move Climber Neg"));
-        //     // .onTrue(dynamics.gotoClimb());
-
+        operatorController.povUp()
+            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
+            .onFalse(climberSubsystem.stopWinchCommand());
+        operatorController.povDown()
+            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+            .onFalse(climberSubsystem.stopWinchCommand());
         //#endregion
+        
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
 
@@ -416,8 +416,16 @@ public class RobotContainer {
 
         debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
                            .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
-    }
 
+        debugController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+    
+        debugController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+    
+        debugController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
+    
+        debugController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
+    }
+    
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
