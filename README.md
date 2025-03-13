@@ -14,7 +14,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Push Right Stick | *None* |
 | A | Set field relative heading |
 | B | Toggle field relative |
-| X | *None* |
+| X | Climb |
 | Y | *None* |
 | Left Trigger | X-brake swerve |
 | Right Trigger | Reef / coral station auto orient |
