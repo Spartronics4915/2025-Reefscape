@@ -561,7 +561,7 @@ public final class Constants {
         .secondaryCurrentLimit(20)
         .inverted(false)
         .openLoopRampRate(0.25)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .apply(kEncoderConfig)
     ;
 
