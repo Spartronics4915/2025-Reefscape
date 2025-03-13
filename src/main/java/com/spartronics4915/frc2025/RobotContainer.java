@@ -263,6 +263,8 @@ public class RobotContainer {
                 }, Set.of())
             );
 
+            driverController.x().onTrue(dynamics.gotoClimb());
+
             driverController.leftBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
                 //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
