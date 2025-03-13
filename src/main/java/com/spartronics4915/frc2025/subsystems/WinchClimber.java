@@ -1,27 +1,35 @@
 package com.spartronics4915.frc2025.subsystems;
 
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.*;
-
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
+    private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
+    private boolean isClimbed = false;
+
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
-    // private final RelativeEncoder mEncoder;
+    private final RelativeEncoder mEncoder;
 
     public WinchClimber() {
         super();
@@ -32,7 +40,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         mArmMotor = new SparkMax(kArmMotorID, MotorType.kBrushless);
         mArmMotor.configure(kArmMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        // mEncoder = mMotor.getEncoder();
+        mEncoder = mArmMotor.getEncoder();    //figure out conversions
+
+        isClimbed = false;
 
         // mEncoder.setPosition(kStartingAngle.getRotations());
 
@@ -109,6 +119,14 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     // public void periodic() {
     // mMotor.set(mSpeedSetpoint);
     // }
+
+    @Override
+    public void periodic() {
+        if  (180d <= mEncoder.getPosition()){
+            isClimbed = true;
+        }
+    }
+
 
     @Override
     public void onModeSwitch() {
