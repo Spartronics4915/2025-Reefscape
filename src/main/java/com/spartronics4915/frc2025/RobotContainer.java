@@ -399,6 +399,7 @@ public class RobotContainer {
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
         SmartDashboard.putData("Stow", dynamics.stow());
+        SmartDashboard.putData("Climb", dynamics.gotoClimb());
         SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
