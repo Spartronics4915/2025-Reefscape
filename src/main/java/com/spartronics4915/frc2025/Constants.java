@@ -4,14 +4,22 @@
 
 package com.spartronics4915.frc2025;
 
-import java.util.Arrays;
 import java.util.Optional;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
@@ -24,16 +32,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
@@ -45,17 +43,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.EncoderConfig;
-import com.revrobotics.spark.config.SoftLimitConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.SlotConfigs;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -468,8 +463,8 @@ public final class Constants {
         public static final int elevatorFollowerID = 10; //right motor
         public static final boolean motorInverted = true;
         public static final boolean followerInverted = true;
-        public static final double motorPositionConversionFactor = (1/20.0) * 0.14044 * 2;
-        public static final double motorVelocityConversionFactor = (1/20.0) * 0.14044 * 2;
+        public static final double motorPositionConversionFactor = (1/9.0) * 0.14044 * 2;
+        public static final double motorVelocityConversionFactor = (1/9.0) * 0.14044 * 2;
         public static final int motorSmartCurrentLimit = 35; //18
         public static final int motorSecondaryCurrentLimit = 40; //20
         public static final int followerSmartCurrentLimit = 35;
@@ -521,9 +516,9 @@ public final class Constants {
         //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
 
         public enum WinchSpeeds{
-            ENGAGE(0.0), //speed which it'll rotate to move and engage the cage
-            RETRACT(0.0), //speed which it'll rotate to bring the cage down
-            ;
+            ENGAGE(0.5), //speed which it'll rotate to move and engage the cage
+            RETRACT(-0.5), //speed which it'll rotate to bring the cage down
+            ; //FIXME magnitude 0.5, find sign convention
 
             public final double speed;
 
@@ -531,15 +526,28 @@ public final class Constants {
                 this.speed = speed;
             }
         }
+
+        public enum ClimberSpeeds{
+            ENGAGE(0.2),
+            RETRACT(-0.2),
+            ; //FIXME magnitude 0.2, find sign convention
+
+            public final double speed;
+
+            private ClimberSpeeds(double speed) {
+                this.speed = speed;
+            }
+        }
         
-        public static final int kMotorID = 13;
+        public static final int kWinchMotorID = 13;
+        public static final int kArmMotorID = 23;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1.0)
             .velocityConversionFactor(1.0)
         ;
 
-        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+        public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
@@ -548,6 +556,14 @@ public final class Constants {
             .apply(kEncoderConfig)
         ;
 
+        public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
+        .smartCurrentLimit(18)
+        .secondaryCurrentLimit(20)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kCoast)
+        .apply(kEncoderConfig)
+    ;
 
         public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
         public static final Rotation2d kEngagedAngle = Rotation2d.fromDegrees(270.0); //angle to engage the cage
