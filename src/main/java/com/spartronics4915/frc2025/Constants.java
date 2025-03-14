@@ -543,8 +543,8 @@ public final class Constants {
         public static final int kArmMotorID = 23;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
-            .positionConversionFactor(1.0)
-            .velocityConversionFactor(1.0)
+            .positionConversionFactor(0.0357142857)
+            .velocityConversionFactor(0.0357142857)
         ;
 
         public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
