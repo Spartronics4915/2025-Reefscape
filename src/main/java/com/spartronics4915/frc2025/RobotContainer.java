@@ -53,6 +53,7 @@ import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
+
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -265,7 +266,18 @@ public class RobotContainer {
                 }, Set.of())
             );
 
+            
+
             driverController.x().onTrue(dynamics.gotoClimb());
+
+            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE));
+
+            driverController.start().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT));
+
+            driverController.back().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
+
+            driverController.rightStick().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
+
 
             driverController.leftBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
