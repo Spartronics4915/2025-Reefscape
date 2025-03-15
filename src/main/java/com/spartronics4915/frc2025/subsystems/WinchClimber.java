@@ -40,7 +40,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         mArmMotor = new SparkMax(kArmMotorID, MotorType.kBrushless);
         mArmMotor.configure(kArmMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        mEncoder = mArmMotor.getEncoder();    //figure out conversions
+        mEncoder = mArmMotor.getEncoder();   
+        mEncoder.setPosition(0.25);
+        
 
         isClimbed = false;
 
@@ -121,7 +123,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     // }
 
     private boolean isClimbed() {
-        return 180d >= mEncoder.getPosition();
+        return .5 >= mEncoder.getPosition();
     }
 
     @Override
