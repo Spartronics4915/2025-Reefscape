@@ -519,7 +519,7 @@ public final class Constants {
         
         public static final double kElevatorSafeHeightSetpoint =  0.45;
 
-        public static final double kScoreLaserCanDebounce = 0.1; //seconds
+        public static final double kScoreLaserCanDebounce = 0.15; //seconds
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
