@@ -542,9 +542,9 @@ public final class Constants {
         }
 
         public enum ClimberSpeeds{
-            ENGAGE(0.2),
-            RETRACT(-0.2),
-            ; //FIXME magnitude 0.2, find sign convention
+            ENGAGE(-0.2),
+            RETRACT(0.2),
+            ;
 
             public final double speed;
 
