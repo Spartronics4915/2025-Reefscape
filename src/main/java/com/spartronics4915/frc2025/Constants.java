@@ -336,13 +336,20 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final Constraints kConstraints = new Constraints(3.5, 3.5 / 2.0); //8.0, 10
+        public static final double kMaxVelocity = 3.5;
+        public static final double kMaxAcceliration = 3.5 / 2.0;
+
+        public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceliration); //8.0, 10
         public static final int kPeriodMs = 0;
 
         public static final double kS = 0.0;
         public static final double kG = 0.0;
         public static final double kV = 0.0;
         public static final double kA = 0.0;
+
+        public static final double kP = 200;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
         
         //The values set here are placeholders for sim
         public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(5);
@@ -351,9 +358,9 @@ public final class Constants {
         public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(270);
 
         public static final SlotConfigs kPIDConfigs = new SlotConfigs()
-            .withKP(200)
-            .withKI(0.0)
-            .withKD(0.0);
+            .withKP(kP)
+            .withKI(kI)
+            .withKD(kD);
 
         public static final CurrentLimitsConfigs kCurrentLimits = new CurrentLimitsConfigs()
             .withSupplyCurrentLimit(20);
