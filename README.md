@@ -11,11 +11,11 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Left Stick |  Drive |
 | Push Left Stick |  Reset field relative heading |
 | Right Stick | Field angle |
-| Push Right Stick | retract climber arm |
+| Push Right Stick | *None* |
 | A | Set field relative heading |
 | B | Toggle field relative |
-| X | go to pre climb position |
-| Y | Start winch |
+| X | Goto pre climb position |
+| Y | *None* |
 | Left Trigger | X-brake swerve |
 | Right Trigger | Reef / coral station auto orient |
 | Left Bumper | Auto-align to left branch |
@@ -24,8 +24,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Down | Nudge backwards |
 | D-pad Left | Nudge left |
 | D-pad Right | Nudge right |
-| Windows | retract winch |
-| Menu | start climber arm |
+| Windows | Auto-align to middle of reef |
+| Menu | Retract climber winch |
 
 ## Operator controller
 | input   | action |
@@ -40,8 +40,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Y | L4 scoring preset |
 | Left Trigger | Stow |
 | Right Trigger | Score |
-| Left Bumper | Move climber forward |
-| Right Bumper | Move climber backward |
+| Left Bumper | Retract climber |
+| Right Bumper | Engage climber |
 | D-pad Up | (Manual) Elevator up |
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |

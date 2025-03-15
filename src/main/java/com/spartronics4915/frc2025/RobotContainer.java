@@ -270,14 +270,8 @@ public class RobotContainer {
 
             driverController.x().onTrue(dynamics.gotoClimb());
 
-            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE));
-
-            driverController.start().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT));
-
-            driverController.back().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
-
-            driverController.rightStick().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
-
+            driverController.start().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+                                    .onFalse(climberSubsystem.stopWinchCommand());
 
             driverController.leftBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
@@ -392,6 +386,11 @@ public class RobotContainer {
             dynamics.removeAlgaeArm()
         );
 
+        operatorController.leftBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
+                                       .onFalse(climberSubsystem.stopArmCommand());
+
+        operatorController.rightBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
+                                       .onFalse(climberSubsystem.stopArmCommand());
         
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
