@@ -100,8 +100,6 @@ public class DriverCommunication extends BlingSegment {
 
     @Override
     protected void updateLights() {
-        System.out.println(Robot.TELEOP_TIMER.get());
-
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
