@@ -521,6 +521,10 @@ public final class Constants {
 
         public static final double kScoreLaserCanDebounce = 0.15; //seconds
 
+        public static final Time kCheckIfScoredDuration = Seconds.of(0.4);
+
+        public static final Time kJustScoredThreshold = Seconds.of(1);
+
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
 

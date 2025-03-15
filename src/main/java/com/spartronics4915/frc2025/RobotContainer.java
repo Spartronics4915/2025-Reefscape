@@ -350,6 +350,7 @@ public class RobotContainer {
                 Commands.parallel(
                     dynamics.stow()
                 ).withName("auto stowing (trigger))")
+                .onlyIf(dynamics::hasNotJustScored)
             );
 
         new Trigger(dynamics::funnelDetect).onTrue(
