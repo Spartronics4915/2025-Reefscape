@@ -392,20 +392,6 @@ public class RobotContainer {
             dynamics.removeAlgaeArm()
         );
 
-        operatorController.povLeft()
-            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
-            .onFalse(climberSubsystem.stopArmCommand());
-        operatorController.povRight()
-            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
-            .onFalse(climberSubsystem.stopArmCommand());
-
-        operatorController.povUp()
-            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
-            .onFalse(climberSubsystem.stopWinchCommand());
-        operatorController.povDown()
-            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
-            .onFalse(climberSubsystem.stopWinchCommand());
-        //#endregion
         
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
