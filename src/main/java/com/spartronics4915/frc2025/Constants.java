@@ -552,7 +552,7 @@ public final class Constants {
             .secondaryCurrentLimit(40)
             .inverted(false)
             .openLoopRampRate(0.25)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
         ;
 
         public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
@@ -560,7 +560,7 @@ public final class Constants {
         .secondaryCurrentLimit(20)
         .inverted(false)
         .openLoopRampRate(0.25)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .apply(kEncoderConfig)
     ;
 
