@@ -1,9 +1,10 @@
 package com.spartronics4915.frc2025.commands.autos;
 
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlignAdjustTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlignPredict;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAlignmentAdjustmentTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopAlignAdjustTimeout;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,17 +14,15 @@ import java.util.Set;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
-import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.AprilTagRegion;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -43,6 +42,8 @@ public class AlignToReef {
     public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
+
+    public boolean isPIDLoopRunning = false;
 
 
     public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
@@ -79,9 +80,40 @@ public class AlignToReef {
         });
     }
 
+    /**
+     * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
+     */
+    public enum FieldBranchSide{
+        LEFT(BranchSide.LEFT),
+        RIGHT(BranchSide.RIGHT),
+        MIDDLE(BranchSide.MIDDLE);
+
+        public BranchSide branchSide;
+
+        public FieldBranchSide getOpposite(){
+            switch (this){
+                case LEFT: return FieldBranchSide.RIGHT;
+                case RIGHT: return FieldBranchSide.LEFT;
+                case MIDDLE: return FieldBranchSide.MIDDLE;
+            }
+            System.out.println("Error, switch case failed to catch the field branch side");
+            return this;
+        }
+
+        private FieldBranchSide(BranchSide internal) {
+            this.branchSide = internal;
+        }
+    }
+
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
-    public Command generateCommand(BranchSide side) {
+    private PathConstraints pathConstraints = kPathConstraints;
+
+    public void changePathConstraints(PathConstraints newPathConstraints){
+        this.pathConstraints = newPathConstraints;
+    }
+
+    public Command generateCommand(FieldBranchSide side) {
         return Commands.defer(() -> {
             var branch = getClosestBranch(side, mSwerve);
             desiredBranchPublisher.accept(branch);
@@ -97,7 +129,7 @@ public class AlignToReef {
             desiredBranchPublisher.accept(branch);
     
             return getPathFromWaypoint(getWaypointFromBranch(branch));
-        }, Set.of());
+        }, Set.of(mSwerve));
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {
@@ -110,25 +142,33 @@ public class AlignToReef {
             return 
             Commands.sequence(
                 Commands.print("start position PID loop"),
-                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAutoAlignAdjustTimeout),
                 Commands.print("end position PID loop")
             );
         }
 
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
-            kPathConstraints,
+            pathConstraints,
             new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
             new GoalEndState(0.0, waypoint.getRotation())
         );
 
         path.preventFlipping = true;
 
-        return AutoBuilder.followPath(path).andThen(
+        return (AutoBuilder.followPath(path).andThen(
             Commands.print("start position PID loop"),
-            PositionPIDCommand.generateCommand(mSwerve, waypoint, kAlignmentAdjustmentTimeout),
+            PositionPIDCommand.generateCommand(mSwerve, waypoint, (
+                DriverStation.isAutonomous() ? kAutoAlignAdjustTimeout : kTeleopAlignAdjustTimeout
+            ))
+                .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
+                .finallyDo(() -> {isPIDLoopRunning = false;}),
             Commands.print("end position PID loop")
-        );
+        )).finallyDo((interupt) -> {
+            if (interupt) { //if this is false then the position pid would've X braked & called the same method
+                mSwerve.drive(new ChassisSpeeds(0,0,0));
+            }
+        });
     }
     
 
@@ -168,10 +208,22 @@ public class AlignToReef {
         return getClosestReefAprilTag(swerve.getPose()).getRotation().rotateBy(Rotation2d.k180deg);
     }
 
-    public static Pose2d getClosestBranch(BranchSide side, SwerveSubsystem swerve){
-        Pose2d tag = getClosestReefAprilTag(swerve.getPose());
+    public static Pose2d getClosestBranch(FieldBranchSide fieldSide, SwerveSubsystem swerve){
+        Pose2d swervePose = swerve.predict(kAutoAlignPredict);
         
-        return getBranchFromTag(tag, side);
+        Pose2d tag = getClosestReefAprilTag(swervePose);
+        
+        BranchSide tagSide = fieldSide.branchSide;
+
+        if (
+            swervePose.getX() > 4.500
+            &&
+            swervePose.getX() < 13
+        ) {
+            tagSide = fieldSide.getOpposite().branchSide;
+        }
+
+        return getBranchFromTag(tag, tagSide);
     }
 
 

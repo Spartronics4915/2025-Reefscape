@@ -6,6 +6,8 @@ package com.spartronics4915.frc2025;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
+
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -46,9 +48,18 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    @SuppressWarnings("all")
     public void robotInit() {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         FollowPathCommand.warmupCommand().schedule();
+
+        // BuildConstants will generate when you build
+        SmartDashboard.putString("Git/SHA", BuildConstants.GIT_SHA);
+        SmartDashboard.putString("Git/Branch", BuildConstants.GIT_BRANCH);
+        SmartDashboard.putString("Git/Commit Date", BuildConstants.GIT_DATE);
+        SmartDashboard.putString("Git/Build Date", BuildConstants.BUILD_DATE);
+        SmartDashboard.putBoolean("Git/Dirty", BuildConstants.DIRTY == 1);
+        SmartDashboard.putNumber("Git/Revision", BuildConstants.GIT_REVISION);
     }
 
     /**
@@ -65,13 +76,14 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-
-        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+        RumbleFeedbackHandler.handleControllers();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        RumbleFeedbackHandler.onDisable();
+    }
 
     @Override
     public void disabledPeriodic() {}

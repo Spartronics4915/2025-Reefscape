@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.1"
+    id "com.peterabeles.gversion" version "1.10"
 }
 
 java {
@@ -109,4 +110,15 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+// https://docs.wpilib.org/en/stable/docs/software/advanced-gradlerio/deploy-git-data.html
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+  srcDir       = "src/main/java/"
+  classPackage = "com.spartronics4915.frc2025"
+  className    = "BuildConstants"
+  dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+  timeZone     = "America/Los_Angeles" // Use preferred time zone
+  indent       = "  "
 }

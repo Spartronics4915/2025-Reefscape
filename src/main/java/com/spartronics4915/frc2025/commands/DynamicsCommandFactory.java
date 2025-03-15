@@ -1,4 +1,5 @@
 package com.spartronics4915.frc2025.commands;
+import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
@@ -8,6 +9,7 @@ import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,7 +27,7 @@ import java.util.Set;
 
 public class DynamicsCommandFactory {
 
-    private IntakeSubsystem intakeSubsystem;
+    public IntakeSubsystem intakeSubsystem;
     private ElevatorSubsystem elevatorSubsystem;
     private ArmSubsystem armSubsystem;
 
@@ -56,6 +58,7 @@ public class DynamicsCommandFactory {
         tab.addBoolean("isElevStowed", this::isElevStowed);
         tab.addBoolean("coralInArm", this::isCoralInArm);
         tab.addBoolean("funnelIntake", this::funnelDetect);
+        tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
 
@@ -68,20 +71,36 @@ public class DynamicsCommandFactory {
 
     public enum DynaPreset{
         LOAD(0.0, Rotation2d.fromDegrees(234.4421)),
-        PRESCORE(0.0, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
-        L1(0.1, Rotation2d.fromDegrees(47.900)),
+        PRESCORE(0.2, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
+        AUTO_PRESCORE(kMinSafeElevHeight, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
+        L1(0.0, Rotation2d.fromDegrees(20)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
         L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
         CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
-        ALGAE_HIGH(0.78, Rotation2d.fromDegrees(90)),
-        ALGAE_LOW(0.375, Rotation2d.fromDegrees(90));
+        ALGAE_HIGH(0.78 - 0.03, Rotation2d.fromDegrees(90)),
+        ALGAE_LOW(0.375 - 0.03, Rotation2d.fromDegrees(90));
 
         private final DynamicsSetpoint setpoint;
+
+        public Rotation2d getArmAngle() {
+            return this.setpoint.armAngle;
+        }
+        public double getElevatorHeight() {
+            return this.setpoint.heightMeters;
+        }
 
         private DynaPreset(double meters, Rotation2d angle) {
             this.setpoint = new DynamicsSetpoint(meters, angle);
         }
+    }
+
+    private double getElevHeight(){
+        return RobotBase.isSimulation() ? elevatorSubsystem.getDesiredPosition().in(Meters) : elevatorSubsystem.getPosition();
+    }
+
+    private Rotation2d getArmRotation(){
+        return RobotBase.isSimulation() ? armSubsystem.getTargetPosition() : armSubsystem.getPosition();
     }
 
     //#region Composite Commands
@@ -94,24 +113,23 @@ public class DynamicsCommandFactory {
      * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
-        var currAngle =  armSubsystem.getPosition();
-        return currAngle.getCos() < Math.cos(kMoveableArmAngle.in(Radians)); //TODO measure this so it's only if it's above the horizon (for climb)
+        var currAngle =  getArmRotation();
+        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); //TODO measure this so it's only if it's above the horizon (for climb)
     }
 
     private boolean isElevAtSetpoint(double setpoint){
-        // System.out.println(Math.abs(setpoint - elevatorSubsystem.getPosition()));
-        return Math.abs(setpoint - elevatorSubsystem.getPosition()) < 2*kElevatorHeightTolerance;
+        return Math.abs(setpoint - getElevHeight()) < 2*kElevatorHeightTolerance;
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
-        return armSubsystem.getPosition().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
+        return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
     }
 
     /**
      * @return Whether the arm is below the horizon and the elevator is too low to allow movement
      */
     private boolean isArmBelowHorizon(){
-        return (armSubsystem.getPosition().getDegrees() > 180);
+        return (getArmRotation().getDegrees() > 180);
     }
 
     /**
@@ -122,7 +140,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isElevStowed(){
-        return  elevatorSubsystem.getPosition() + kElevatorHeightTolerance < kMinSafeElevHeight;
+        return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
     private boolean isCoralInArm(){
@@ -139,6 +157,10 @@ public class DynamicsCommandFactory {
         }
 
         return  measurement.distance_mm < funnelLCTriggerDist.in(Millimeter) || intakeSubsystem.detect(); // the || is here as a way to prevent us stalling at a CS when we are already holding a coral
+    }
+
+    public boolean isSwerveMovable(){
+        return getElevHeight() < kSafeElevHeightForSwerve;
     }
 
     private Command makeElevatorSafeToMove(){
@@ -248,6 +270,13 @@ public class DynamicsCommandFactory {
             armPriorityMove(DynaPreset.PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
         );
     }
+    
+    public Command autoPrescore(){
+        return Commands.sequence(
+            makeSystemSafeToMove(true, false, false),
+            armPriorityMove(DynaPreset.AUTO_PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
+        );
+    }
 
 
     //#endregion
@@ -280,11 +309,18 @@ public class DynamicsCommandFactory {
                        .withName("Operator Goto " + preset);
     }
 
+    public Command gotoClimb(){
+        return Commands.sequence(
+            makeSystemSafeToMove(true, false, true),
+            armPriorityMove(DynaPreset.CLIMB.setpoint)
+        ).withName("Goto Climb");
+    }
+
     public Command score(){
         return Commands.deadline(
             Commands.waitUntil(
                 hasScoredTrigger
-            ).withTimeout(1.0),
+            ).withTimeout(0.5),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
         ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
         .withName("Score");
@@ -309,7 +345,7 @@ public class DynamicsCommandFactory {
             intake(),
             Commands.waitUntil(
                 () -> funnelDetect() || isCoralInArm()
-            ).withTimeout(7.5) //TODO remove for comps
+            ).withTimeout(RobotBase.isSimulation() ? 0.5 : 15) //TODO remove for comps
         )
         .withName("Blocking Intake");
     }

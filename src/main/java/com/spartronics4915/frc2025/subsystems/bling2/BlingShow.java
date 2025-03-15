@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import com.spartronics4915.frc2025.Constants.BlingConstants;
+
 import edu.wpi.first.wpilibj.Filesystem;
 
 /**
@@ -21,8 +24,14 @@ public class BlingShow extends BlingSegment {
         this.ledLength = show[0].length / 3;
         this.maxLength = show.length - 1;
     }
+
+    public BlingShow(byte[][] show) {
+        this.show = show;
+        this.ledLength = show[0].length / 3;
+        this.maxLength = show.length - 1;
+    }
     
-    private byte[][] loadFromDeploy(String filename) throws IOException, OutOfMemoryError, SecurityException {
+    public static byte[][] loadFromDeploy(String filename) throws IOException, OutOfMemoryError, SecurityException {
         System.out.println("Attempting to load " + Filesystem.getDeployDirectory().getPath() + "/" + filename);
 
         byte[] arr = Files.readAllBytes(Path.of(Filesystem.getDeployDirectory().getPath() + "/" + filename));
@@ -52,15 +61,15 @@ public class BlingShow extends BlingSegment {
     }
 
     public int getR(int index) {
-        return show[frame][index * 3] & 0xff;
+        return show[frame][index * 3] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     public int getG(int index) {
-        return show[frame][index * 3 + 1] & 0xff;
+        return show[frame][index * 3 + 1] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     public int getB(int index) {
-        return show[frame][index * 3 + 2] & 0xff;
+        return show[frame][index * 3 + 2] & 0xff * BlingConstants.BLING_BRIGHTNESS / 100;
     }
 
     @Override
