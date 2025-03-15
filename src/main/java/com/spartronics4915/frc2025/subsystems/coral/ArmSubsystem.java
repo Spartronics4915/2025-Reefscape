@@ -96,13 +96,16 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         SmartDashboard.putData("SetConstraints", Commands.defer(() -> {
             return Commands.runOnce(() -> {
             
-                    Constraints newConstraints = new Constraints(SmartDashboard.getNumber("kMaxVelocity", ArmConstants.kMaxVelocity), ArmConstants.kMaxAcceliration);
+                    Constraints newConstraints = new Constraints(
+                        SmartDashboard.getNumber("kMaxVelocity", ArmConstants.kMaxVelocity),
+                        SmartDashboard.getNumber("kMaxVelocity", ArmConstants.kMaxAcceliration)
+                        );
                     mArmProfile = new TrapezoidProfile(newConstraints);
     
                     resetMechanism();
     
             });
-            
+
         }, Set.of()));
     }
 
