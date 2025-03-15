@@ -396,7 +396,7 @@ public class RobotContainer {
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
 
-        SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
+        SmartDashboard.putData("preset1Arm", armSubsystem.presetCommand(ArmSubsystemState.EH));
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
@@ -404,10 +404,13 @@ public class RobotContainer {
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
         SmartDashboard.putData("Stow", dynamics.stow());
+        SmartDashboard.putData("Stow Load", dynamics.loadStow());
+        SmartDashboard.putData("Stow Prescore", dynamics.prescoreStow());
         SmartDashboard.putData("Climb", dynamics.gotoClimb());
         SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
+        SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
 
     
         debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
