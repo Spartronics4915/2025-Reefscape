@@ -73,18 +73,18 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         SmartDashboard.putData("preset3Arm", presetCommand(ArmSubsystemState.SCORE));
         SmartDashboard.putData("preset4Arm", presetCommand(ArmSubsystemState.STOW));
 
-        SmartDashboard.putNumber("kP", ArmConstants.kP);
-        SmartDashboard.putNumber("kI", ArmConstants.kI);
-        SmartDashboard.putNumber("kD", ArmConstants.kD);
-        SmartDashboard.putNumber("kMaxVelocity", ArmConstants.kMaxVelocity);
-        SmartDashboard.putNumber("kMaxAcceliration", ArmConstants.kMaxAcceliration);
+        SmartDashboard.putNumber("Arm_kP", ArmConstants.kP);
+        SmartDashboard.putNumber("Arm_kI", ArmConstants.kI);
+        SmartDashboard.putNumber("Arm_kD", ArmConstants.kD);
+        SmartDashboard.putNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity);
+        SmartDashboard.putNumber("Arm_kMaxAcceliration", ArmConstants.kMaxAcceliration);
 
-        SmartDashboard.putData("SetPID", Commands.defer(() -> {
+        SmartDashboard.putData("Arm_SetPID", Commands.defer(() -> {
             return Commands.runOnce(() -> {
                 mArmMotor.getConfigurator().apply(new SlotConfigs()
-                    .withKP(SmartDashboard.getNumber("kP", ArmConstants.kP))
-                    .withKI(SmartDashboard.getNumber("kI", ArmConstants.kI))
-                    .withKD(SmartDashboard.getNumber("kD", ArmConstants.kD))
+                    .withKP(SmartDashboard.getNumber("Arm_kP", ArmConstants.kP))
+                    .withKI(SmartDashboard.getNumber("Arm_kI", ArmConstants.kI))
+                    .withKD(SmartDashboard.getNumber("Arm_kD", ArmConstants.kD))
                 );
 
                 resetMechanism();
@@ -93,12 +93,12 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
         }, Set.of()));
 
-        SmartDashboard.putData("SetConstraints", Commands.defer(() -> {
+        SmartDashboard.putData("Arm_SetConstraints", Commands.defer(() -> {
             return Commands.runOnce(() -> {
             
                     Constraints newConstraints = new Constraints(
-                        SmartDashboard.getNumber("kMaxVelocity", ArmConstants.kMaxVelocity),
-                        SmartDashboard.getNumber("kMaxVelocity", ArmConstants.kMaxAcceliration)
+                        SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity),
+                        SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxAcceliration)
                         );
                     mArmProfile = new TrapezoidProfile(newConstraints);
     
