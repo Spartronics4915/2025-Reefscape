@@ -61,9 +61,11 @@ this controller will have tools for debugging
 
 # Bling/Driver Communication
 
-Before match start: Flashes Yellow if can't see 2 tags, will do a Spartronics themed light show once it can.
+Before match start: Solid purple if can't see 2 tags, will do a Spartronics themed light show once it can.
 
 If a MegaTag1 reading is needed it'll be a rapidly flashing cyan, overriding all other bling, other than autos.
+
+Upon end of match, the robot will flash red for 5 seconds, then play a fun light show.
 
 Reef Zone:
 | Color | Meaning |
