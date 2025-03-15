@@ -7,6 +7,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.Set;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -20,15 +22,19 @@ import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystem
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -93,6 +99,32 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         SmartDashboard.putData("preset2elev", presetCommand(ElevatorSubsystemState.L1));
         SmartDashboard.putData("preset3elev", presetCommand(ElevatorSubsystemState.L3));
         SmartDashboard.putData("preset4elev", presetCommand(ElevatorSubsystemState.L4));
+
+        SmartDashboard.putNumber("ElevatorP", ElevatorConstants.motorPIDConstants.kP);
+        SmartDashboard.putNumber("ElevatorI", ElevatorConstants.motorPIDConstants.kI);
+        SmartDashboard.putNumber("ElevatorD", ElevatorConstants.motorPIDConstants.kD);
+
+        SmartDashboard.putData("ElevatorPidSet", Commands.defer(() -> Commands.runOnce(() -> {
+                motorConfig.closedLoop.pid(
+                    SmartDashboard.getNumber("ElevatorP", ElevatorConstants.motorPIDConstants.kP),
+                    SmartDashboard.getNumber("ElevatorI", ElevatorConstants.motorPIDConstants.kI),
+                    SmartDashboard.getNumber("ElevatorD", ElevatorConstants.motorPIDConstants.kP)
+                );
+                motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+                resetMechanism();
+            }), 
+            Set.of()
+        ));
+
+        SmartDashboard.putNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxVelocity);
+        SmartDashboard.putNumber("ElevatorMaxAccel", ElevatorConstants.constraints.maxAcceleration);
+
+        SmartDashboard.putData("ElevatorConstraintsSet",Commands.defer(() -> Commands.runOnce(() -> {
+                elevatorProfile = new TrapezoidProfile(new Constraints(SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxVelocity), SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxAcceleration)));
+                resetMechanism();
+            }), 
+            Set.of()
+        ));
     }
 
     public void resetMechanism() {
