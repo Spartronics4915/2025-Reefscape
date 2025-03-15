@@ -143,7 +143,7 @@ public class DynamicsCommandFactory {
         return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
-    private boolean isCoralInArm(){
+    public boolean isCoralInArm(){
         // return false;
         return intakeSubsystem.detect();
     }

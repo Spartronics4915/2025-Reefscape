@@ -1,20 +1,15 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
-import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
-import static edu.wpi.first.units.Units.Meters;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
-import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,11 +26,7 @@ public class DriverCommunication extends BlingSegment {
     private LimelightVisionSubsystem vision;
     private ArmSubsystem arm;
     private ElevatorSubsystem elevator;
-    private IntakeSubsystem intake;
     private DynamicsCommandFactory dynamics;
-
-    private RumbleController[] controllers;
-    private double rumbleTime = 0;
 
     private int alertFrames = 0;
 
@@ -80,26 +71,17 @@ public class DriverCommunication extends BlingSegment {
 
     /**
      * @param length Length of the segment
-     * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, IntakeSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
+     * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
      */
     public DriverCommunication(int length, Object... subsystems) {
         this.ledLength = length;
         for (Object subsystem : subsystems) {
             if (subsystem instanceof SwerveSubsystem) this.swerve = (SwerveSubsystem) subsystem;
             if (subsystem instanceof LimelightVisionSubsystem) this.vision = (LimelightVisionSubsystem) subsystem;
-            if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
             if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
-        dynamics.hasScoredTrigger.onTrue(Commands.runOnce(() -> {
-            rumbleTime = 10;
-            rumble(RumblePresets.SOFT);
-        }));
-    }
-
-    public void setRumbleControllers(RumbleController... controllers) {
-        this.controllers = controllers;
     }
 
     public static Region getClosestRegion(SwerveSubsystem swerve) {
@@ -119,7 +101,7 @@ public class DriverCommunication extends BlingSegment {
     @Override
     protected void updateLights() {
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
-            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS47 : WARN; 
+            current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
             current = autoSegment;
         // } else if (vision != null && vision.newMegaTag1Reading()) {
@@ -127,7 +109,10 @@ public class DriverCommunication extends BlingSegment {
         //     alertFrames = 10;
         } else if (alertFrames > 0 && alertFrames % 2 == 0) {
             current = CYAN;
-            rumble(RumblePresets.LEFT_WEAK);
+        } else if (Robot.TELEOP_TIMER.hasElapsed(140)) { // Match has ended, play show
+            current = MATCH_END;
+        } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
+            current = BAD;
         }
         else {
             Region closest = getClosestRegion(this.swerve);
@@ -172,19 +157,16 @@ public class DriverCommunication extends BlingSegment {
 
                     if (dynamics.funnelDetect()) {
                         current = RAINBOW;
-                        rumble(RumblePresets.STRONG);
-                        rumbleTime = 5;
                     } else {
-                        if (subsystemsInCorrectSpot && robotInRightSpot) {
-                            current = GOOD;
-                        }
+                        if (subsystemsInCorrectSpot && robotInRightSpot) current = GOOD;
                         else if (subsystemsInCorrectSpot) current = PURPLE; // Robot needs to move
                         else if (robotInRightSpot) current = WARN; // Mechanisms need to move
-                        else current = OFF;
+                        else current = OFF; // Should never be that
                     }
 
                     break;
                 case BARGE:
+                    /* Climber Lights
                     if (DriverStation.getLocation().isEmpty()) {
                         current = OFF;
                         break;
@@ -202,6 +184,9 @@ public class DriverCommunication extends BlingSegment {
                     if (distance <= -BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? BLUE : RED;
                     else if (distance >= BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? RED : BLUE;
                     else current = RAINBOW; // It's climbin' time.
+                     */
+
+                    current = SHOW_RAINBOW_FUN;
 
                     break;
                 default:
@@ -213,15 +198,7 @@ public class DriverCommunication extends BlingSegment {
         current.buffer = this.buffer;
         current.updateLights();
 
-        rumbleTime--;
         alertFrames--;
-        if (rumbleTime <= 0) rumble(RumblePresets.OFF);
-    }
-
-    private void rumble(RumblePresets feedback) {
-        for (RumbleController controller : controllers) {
-            controller.setFeedback(feedback.rumble);
-        }
     }
 
     public static Command setAutoSegmentCommand(BlingSegment segment) {
