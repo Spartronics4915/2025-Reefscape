@@ -12,8 +12,10 @@ import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,6 +30,8 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
+
+    private final PowerDistribution powerDistribution = new PowerDistribution(22, ModuleType.kRev);
 
     public static final Timer AUTO_TIMER = new Timer();
     public static final Timer TELEOP_TIMER = new Timer();
@@ -79,6 +83,8 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
         RumbleFeedbackHandler.handleControllers();
+
+        SmartDashboard.putData("PDH", powerDistribution);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
