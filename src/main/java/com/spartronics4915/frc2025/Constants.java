@@ -550,8 +550,8 @@ public final class Constants {
         public static final int kArmMotorID = 23;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
-            .positionConversionFactor(1.0)
-            .velocityConversionFactor(1.0)
+            .positionConversionFactor(1/7.0 * 1/4.0)
+            .velocityConversionFactor(1/7.0 * 1/4.0)
         ;
 
         public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
@@ -559,8 +559,7 @@ public final class Constants {
             .secondaryCurrentLimit(40)
             .inverted(false)
             .openLoopRampRate(0.25)
-            .idleMode(IdleMode.kBrake)
-            .apply(kEncoderConfig)
+            .idleMode(IdleMode.kCoast)
         ;
 
         public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
@@ -568,7 +567,7 @@ public final class Constants {
         .secondaryCurrentLimit(20)
         .inverted(false)
         .openLoopRampRate(0.25)
-        .idleMode(IdleMode.kCoast)
+        .idleMode(IdleMode.kBrake)
         .apply(kEncoderConfig)
     ;
 

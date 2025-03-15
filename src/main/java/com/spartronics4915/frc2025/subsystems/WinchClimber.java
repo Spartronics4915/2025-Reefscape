@@ -120,11 +120,13 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     // mMotor.set(mSpeedSetpoint);
     // }
 
+    private boolean isClimbed() {
+        return 180d >= mEncoder.getPosition();
+    }
+
     @Override
     public void periodic() {
-        if  (180d <= mEncoder.getPosition()){
-            isClimbed = true;
-        }
+
     }
 
 
