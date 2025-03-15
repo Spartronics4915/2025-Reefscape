@@ -166,7 +166,7 @@ public class DynamicsCommandFactory {
     private Command makeElevatorSafeToMove(){
         return Commands.sequence(
                 Commands.waitUntil(this::isElevSafeToMove),
-                elevatorSubsystem.setSetPointCommand(kMinSafeElevHeight),
+                elevatorSubsystem.setSetPointCommand(kElevatorSafeHeightSetpoint),
                 Commands.waitUntil(() -> !this.isElevStowed())
             ); 
     }

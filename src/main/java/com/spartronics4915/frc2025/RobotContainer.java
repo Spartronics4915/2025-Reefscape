@@ -392,19 +392,19 @@ public class RobotContainer {
             dynamics.removeAlgaeArm()
         );
 
-        operatorController.povLeft()
-            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
-            .onFalse(climberSubsystem.stopArmCommand());
-        operatorController.povRight()
-            .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
-            .onFalse(climberSubsystem.stopArmCommand());
+        // operatorController.povLeft()
+        //     .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
+        //     .onFalse(climberSubsystem.stopArmCommand());
+        // operatorController.povRight()
+        //     .onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
+        //     .onFalse(climberSubsystem.stopArmCommand());
 
-        operatorController.povUp()
-            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
-            .onFalse(climberSubsystem.stopWinchCommand());
-        operatorController.povDown()
-            .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
-            .onFalse(climberSubsystem.stopWinchCommand());
+        // operatorController.povUp()
+        //     .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
+        //     .onFalse(climberSubsystem.stopWinchCommand());
+        // operatorController.povDown()
+        //     .onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+        //     .onFalse(climberSubsystem.stopWinchCommand());
         //#endregion
         
 
@@ -430,13 +430,13 @@ public class RobotContainer {
         debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
                            .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
 
-        debugController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
     
-        debugController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
     
-        debugController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
+        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
     
-        debugController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
+        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
     }
     
     /**

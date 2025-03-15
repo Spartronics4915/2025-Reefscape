@@ -416,8 +416,8 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final double kMaxVelocity = 4.5;
-        public static final double kMaxAcceliration = 3.5 / 2.0;
+        public static final double kMaxVelocity = 6.0;
+        public static final double kMaxAcceliration = 5.0 / 2.0;
 
         public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceliration); //8.0, 10
         public static final int kPeriodMs = 0;
@@ -427,7 +427,7 @@ public final class Constants {
         public static final double kV = 0.0;
         public static final double kA = 0.0;
 
-        public static final double kP = 200;
+        public static final double kP = 250;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         
@@ -479,7 +479,7 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(3.0, 3.5); //12, 7.5
+        public static final Constraints constraints = new Constraints(6.0, 5.0); //12, 7.5
 
         public static final double minHeight = 0;
         public static final double maxHeight = 1.24;
@@ -510,7 +510,9 @@ public final class Constants {
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
     
-        public static final double kMinSafeElevHeight = 0.385; //previously 4.361// height of the elevator for when the arm is stowed and needs to move
+        public static final double kMinSafeElevHeight = 0.3; //previously 4.361// height of the elevator for when the arm is stowed and needs to move
+        
+        public static final double kElevatorSafeHeightSetpoint =  0.45;
 
         public static final double kScoreLaserCanDebounce = 0.1; //seconds
 

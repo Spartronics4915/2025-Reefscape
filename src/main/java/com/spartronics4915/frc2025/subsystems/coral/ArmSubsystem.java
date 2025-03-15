@@ -79,34 +79,34 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         SmartDashboard.putNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity);
         SmartDashboard.putNumber("Arm_kMaxAcceliration", ArmConstants.kMaxAcceliration);
 
-        SmartDashboard.putData("Arm_SetPID", Commands.defer(() -> {
-            return Commands.runOnce(() -> {
-                mArmMotor.getConfigurator().apply(new SlotConfigs()
-                    .withKP(SmartDashboard.getNumber("Arm_kP", ArmConstants.kP))
-                    .withKI(SmartDashboard.getNumber("Arm_kI", ArmConstants.kI))
-                    .withKD(SmartDashboard.getNumber("Arm_kD", ArmConstants.kD))
-                );
+        // SmartDashboard.putData("Arm_SetPID", Commands.defer(() -> {
+        //     return Commands.runOnce(() -> {
+        //         mArmMotor.getConfigurator().apply(new SlotConfigs()
+        //             .withKP(SmartDashboard.getNumber("Arm_kP", ArmConstants.kP))
+        //             .withKI(SmartDashboard.getNumber("Arm_kI", ArmConstants.kI))
+        //             .withKD(SmartDashboard.getNumber("Arm_kD", ArmConstants.kD))
+        //         );
 
-                resetMechanism();
+        //         resetMechanism();
 
-            });
+        //     });
 
-        }, Set.of()));
+        // }, Set.of()));
 
-        SmartDashboard.putData("Arm_SetConstraints", Commands.defer(() -> {
-            return Commands.runOnce(() -> {
+        // SmartDashboard.putData("Arm_SetConstraints", Commands.defer(() -> {
+        //     return Commands.runOnce(() -> {
             
-                    Constraints newConstraints = new Constraints(
-                        SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity),
-                        SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxAcceliration)
-                        );
-                    mArmProfile = new TrapezoidProfile(newConstraints);
+        //             Constraints newConstraints = new Constraints(
+        //                 SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity),
+        //                 SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxAcceliration)
+        //                 );
+        //             mArmProfile = new TrapezoidProfile(newConstraints);
     
-                    resetMechanism();
+        //             resetMechanism();
     
-            });
+        //     });
 
-        }, Set.of()));
+        // }, Set.of()));
     }
 
     private void initArmMotor() {

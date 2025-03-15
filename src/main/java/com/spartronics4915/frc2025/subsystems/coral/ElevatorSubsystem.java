@@ -104,27 +104,27 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
         SmartDashboard.putNumber("ElevatorI", ElevatorConstants.motorPIDConstants.kI);
         SmartDashboard.putNumber("ElevatorD", ElevatorConstants.motorPIDConstants.kD);
 
-        SmartDashboard.putData("ElevatorPidSet", Commands.defer(() -> Commands.runOnce(() -> {
-                motorConfig.closedLoop.pid(
-                    SmartDashboard.getNumber("ElevatorP", ElevatorConstants.motorPIDConstants.kP),
-                    SmartDashboard.getNumber("ElevatorI", ElevatorConstants.motorPIDConstants.kI),
-                    SmartDashboard.getNumber("ElevatorD", ElevatorConstants.motorPIDConstants.kP)
-                );
-                motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-                resetMechanism();
-            }), 
-            Set.of()
-        ));
+        // SmartDashboard.putData("ElevatorPidSet", Commands.defer(() -> Commands.runOnce(() -> {
+        //         motorConfig.closedLoop.pid(
+        //             SmartDashboard.getNumber("ElevatorP", ElevatorConstants.motorPIDConstants.kP),
+        //             SmartDashboard.getNumber("ElevatorI", ElevatorConstants.motorPIDConstants.kI),
+        //             SmartDashboard.getNumber("ElevatorD", ElevatorConstants.motorPIDConstants.kP)
+        //         );
+        //         motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        //         resetMechanism();
+        //     }), 
+        //     Set.of()
+        // ));
 
         SmartDashboard.putNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxVelocity);
         SmartDashboard.putNumber("ElevatorMaxAccel", ElevatorConstants.constraints.maxAcceleration);
 
-        SmartDashboard.putData("ElevatorConstraintsSet",Commands.defer(() -> Commands.runOnce(() -> {
-                elevatorProfile = new TrapezoidProfile(new Constraints(SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxVelocity), SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxAcceleration)));
-                resetMechanism();
-            }), 
-            Set.of()
-        ));
+        // SmartDashboard.putData("ElevatorConstraintsSet",Commands.defer(() -> Commands.runOnce(() -> {
+        //         elevatorProfile = new TrapezoidProfile(new Constraints(SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxVelocity), SmartDashboard.getNumber("ElevatorMaxVel", ElevatorConstants.constraints.maxAcceleration)));
+        //         resetMechanism();
+        //     }), 
+        //     Set.of()
+        // ));
     }
 
     public void resetMechanism() {
