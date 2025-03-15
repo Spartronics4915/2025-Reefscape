@@ -268,9 +268,12 @@ public class RobotContainer {
 
             
 
-            driverController.x().onTrue(dynamics.gotoClimb());
+            driverController.back().onTrue(dynamics.gotoClimb());
 
-            driverController.start().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+            driverController.x().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+                                    .onFalse(climberSubsystem.stopWinchCommand());
+
+            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
                                     .onFalse(climberSubsystem.stopWinchCommand());
 
             driverController.leftBumper().whileTrue(
@@ -287,7 +290,7 @@ public class RobotContainer {
                 .withName("Align Right Branch")
             );
 
-            driverController.back().whileTrue(
+            driverController.start().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.MIDDLE)
                 .withName("Align Middle Branch")
             );
