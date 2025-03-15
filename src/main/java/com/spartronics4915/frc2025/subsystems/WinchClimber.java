@@ -26,7 +26,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
     private boolean isClimbed = false;
-
+    private boolean winchEngaged = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     private final RelativeEncoder mEncoder;
@@ -131,6 +131,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     @Override
     public void periodic() {
+       if (0.7<=mEncoder.getPosition();) {
+        winchEngaged = true;
+       }
 
        
     }
