@@ -60,6 +60,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Git/Build Date", BuildConstants.BUILD_DATE);
         SmartDashboard.putBoolean("Git/Dirty", BuildConstants.DIRTY == 1);
         SmartDashboard.putNumber("Git/Revision", BuildConstants.GIT_REVISION);
+
+        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     /**
