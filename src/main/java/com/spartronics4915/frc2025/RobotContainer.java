@@ -47,6 +47,7 @@ import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
@@ -298,6 +299,25 @@ public class RobotContainer {
                 Commands.run(() -> {
                     swerveSubsystem.drive(new ChassisSpeeds(-0.25, 0, 0));
                 })
+            );
+        }
+
+        //#endregion
+
+        //#region Rumble
+
+        if (OI.RUMBLE_ENABLED) {
+            // Score is currently not used, maybe later?
+            // dynamics.hasScoredTrigger.onTrue(
+            //     Rumble.DEBUG.controller.timedRumble(RumblePresets.PRESET0L.rumble, 1.0)
+            // );
+
+            new Trigger(dynamics::funnelDetect).onTrue(
+                Rumble.DRIVER.controller.timedRumble(RumblePresets.DRIVER_FUNNEL.rumble, OI.rumbleTime)
+            );
+
+            new Trigger(dynamics::isCoralInArm).onTrue(
+                Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
             );
         }
 
