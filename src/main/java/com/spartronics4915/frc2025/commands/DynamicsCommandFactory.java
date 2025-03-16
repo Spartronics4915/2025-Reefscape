@@ -9,6 +9,7 @@ import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -122,6 +123,10 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
+        return isArmAtSetpoint(angle, kArmAngleTolerance);
+    }
+
+    private boolean isArmAtSetpoint(Rotation2d angle, Angle tolerance){
         return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
     }
 
@@ -329,7 +334,7 @@ public class DynamicsCommandFactory {
     public Command autoScore(DynaPreset scoringLocation){
         return Commands.sequence(
             Commands.waitUntil(() -> 
-                isArmAtSetpoint(scoringLocation.setpoint.armAngle) && 
+                isArmAtSetpoint(scoringLocation.setpoint.armAngle, kArmAngleAutoScoringTolerance) && 
                 isElevAtSetpoint(scoringLocation.setpoint.heightMeters)
             ),
             score()
