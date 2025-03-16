@@ -132,7 +132,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle, Angle tolerance){
-        return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
+        return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), tolerance);
     }
 
     /**
