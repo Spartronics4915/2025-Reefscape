@@ -274,7 +274,7 @@ public final class Constants {
 
             public static final PathConstraints kPathConstraints = new PathConstraints(2, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
             
-            public static final double kTriggerDistance = 0;
+            public static final double kTriggerDistance = 2;
             // X = side to side, Y = away from tag
             // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
 
