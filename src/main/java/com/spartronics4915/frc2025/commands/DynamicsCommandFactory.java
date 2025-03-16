@@ -10,12 +10,15 @@ import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
@@ -23,6 +26,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeter;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
 
@@ -31,6 +35,8 @@ public class DynamicsCommandFactory {
     public IntakeSubsystem intakeSubsystem;
     private ElevatorSubsystem elevatorSubsystem;
     private ArmSubsystem armSubsystem;
+
+    private Timer lastScoredTimer = new Timer();
 
     private LaserCan funnelLC;
     public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
@@ -62,9 +68,8 @@ public class DynamicsCommandFactory {
         tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
-
-
-
+        lastScoredTimer.start();
+        hasScoredTrigger.onTrue(Commands.runOnce(() -> lastScoredTimer.reset()));
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
@@ -148,7 +153,7 @@ public class DynamicsCommandFactory {
         return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
-    private boolean isCoralInArm(){
+    public boolean isCoralInArm(){
         // return false;
         return intakeSubsystem.detect();
     }
@@ -166,6 +171,10 @@ public class DynamicsCommandFactory {
 
     public boolean isSwerveMovable(){
         return getElevHeight() < kSafeElevHeightForSwerve;
+    }
+
+    public boolean hasNotJustScored() {
+        return lastScoredTimer.hasElapsed(kJustScoredThreshold.in(Seconds));
     }
 
     private Command makeElevatorSafeToMove(){
@@ -328,7 +337,17 @@ public class DynamicsCommandFactory {
             ).withTimeout(0.5),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
         ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
+        .andThen(checkIfScored().onlyIf(DriverStation::isTeleop))
         .withName("Score");
+    }
+
+    public Command checkIfScored() {
+        return Commands.sequence(
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
+            Commands.waitTime(kCheckIfScoredDuration),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
+            gotoLastInputtedScore().onlyIf(this::isCoralInArm)
+        );
     }
 
     public Command autoScore(DynaPreset scoringLocation){
@@ -339,6 +358,7 @@ public class DynamicsCommandFactory {
             ),
             score()
         )
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("Autonomous Score");
     }
 

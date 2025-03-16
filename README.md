@@ -11,11 +11,11 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Left Stick |  Drive |
 | Push Left Stick |  Reset field relative heading |
 | Right Stick | Field angle |
-| Push Right Stick | retract climber arm |
+| Push Right Stick | *None* |
 | A | Set field relative heading |
 | B | Toggle field relative |
-| X | go to pre climb position |
-| Y | Start winch |
+| X | Retract climber winch |
+| Y | Engage climber winch |
 | Left Trigger | X-brake swerve |
 | Right Trigger | Reef / coral station auto orient |
 | Left Bumper | Auto-align to left branch |
@@ -24,8 +24,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Down | Nudge backwards |
 | D-pad Left | Nudge left |
 | D-pad Right | Nudge right |
-| Windows | retract winch |
-| Menu | start climber arm |
+| Windows | Goto pre-climb preset |
+| Menu | Auto-align to middle of reef |
 
 ## Operator controller
 | input   | action |
@@ -40,8 +40,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Y | L4 scoring preset |
 | Left Trigger | Stow |
 | Right Trigger | Score |
-| Left Bumper | Move climber forward |
-| Right Bumper | Move climber backward |
+| Left Bumper | Retract climber |
+| Right Bumper | Engage climber |
 | D-pad Up | (Manual) Elevator up |
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |
@@ -61,9 +61,11 @@ this controller will have tools for debugging
 
 # Bling/Driver Communication
 
-Before match start: Flashes Yellow if can't see 2 tags, will do a Spartronics themed light show once it can.
+Before match start: Solid purple if can't see 2 tags, will do a Spartronics themed light show once it can.
 
 If a MegaTag1 reading is needed it'll be a rapidly flashing cyan, overriding all other bling, other than autos.
+
+Upon end of match, the robot will flash red for 5 seconds, then play a fun light show.
 
 Reef Zone:
 | Color | Meaning |

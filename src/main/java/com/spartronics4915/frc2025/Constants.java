@@ -126,6 +126,8 @@ public final class Constants {
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
 
+        public static final boolean RUMBLE_ENABLED = true;
+        public static final double rumbleTime = 0.5;
     }
 
     public static final class ClimberConstants{
@@ -310,12 +312,12 @@ public final class Constants {
     }
 
     public static final class BlingConstants {
-        public static boolean LIGHTS_ENABLED = true; // Turn this off for rumble but no LED strips.
+        public static boolean LIGHTS_ENABLED = true;
 
-        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 70; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
-        public static final int BLING_LENGTH = 23+24;
+        public static final int BLING_LENGTH = 48;
 
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
@@ -339,7 +341,10 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
-        public static final BlingShow SHOW_SPARTRONICS47 = new BlingShow("bling/spartronics47.bling");
+        public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
+        public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
+
+        public static final BlingSegment MATCH_END = SHOW_RAINBOW_FUN;
     }
 
     public static final class VisionConstants {
@@ -516,7 +521,11 @@ public final class Constants {
         
         public static final double kElevatorSafeHeightSetpoint =  0.375;
 
-        public static final double kScoreLaserCanDebounce = 0.1; //seconds
+        public static final double kScoreLaserCanDebounce = 0.15; //seconds
+
+        public static final Time kCheckIfScoredDuration = Seconds.of(0.4);
+
+        public static final Time kJustScoredThreshold = Seconds.of(1);
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
@@ -527,9 +536,9 @@ public final class Constants {
         //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
 
         public enum WinchSpeeds{
-            ENGAGE(0.5), //speed which it'll rotate to move and engage the cage
-            RETRACT(-0.5), //speed which it'll rotate to bring the cage down
-            ; //FIXME magnitude 0.5, find sign convention
+            ENGAGE(0.95), //speed which it'll rotate to move and engage the cage
+            RETRACT(-0.95), //speed which it'll rotate to bring the cage down
+            ;
 
             public final double speed;
 
@@ -539,9 +548,9 @@ public final class Constants {
         }
 
         public enum ClimberSpeeds{
-            ENGAGE(0.2),
-            RETRACT(-0.2),
-            ; //FIXME magnitude 0.2, find sign convention
+            ENGAGE(-0.2),
+            RETRACT(0.2),
+            ;
 
             public final double speed;
 
@@ -563,7 +572,7 @@ public final class Constants {
             .secondaryCurrentLimit(40)
             .inverted(false)
             .openLoopRampRate(0.25)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
         ;
 
         public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()

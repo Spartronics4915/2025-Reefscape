@@ -49,6 +49,7 @@ import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
@@ -203,8 +204,7 @@ public class RobotContainer {
                 buildAutoChooser();
 
 
-        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, intakeSubsystem, dynamics, visionSubsystem);
-        driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
+        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
         blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
     }
 
@@ -268,16 +268,13 @@ public class RobotContainer {
 
             
 
-            driverController.x().onTrue(dynamics.gotoClimb());
+            driverController.back().onTrue(dynamics.gotoClimb());
 
-            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE));
+            driverController.x().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
+                                    .onFalse(climberSubsystem.stopWinchCommand());
 
-            driverController.start().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT));
-
-            driverController.back().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
-
-            driverController.rightStick().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
-
+            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
+                                    .onFalse(climberSubsystem.stopWinchCommand());
 
             driverController.leftBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
@@ -293,7 +290,7 @@ public class RobotContainer {
                 .withName("Align Right Branch")
             );
 
-            driverController.back().whileTrue(
+            driverController.start().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.MIDDLE)
                 .withName("Align Middle Branch")
             );
@@ -325,6 +322,25 @@ public class RobotContainer {
 
         //#endregion
 
+        //#region Rumble
+
+        if (OI.RUMBLE_ENABLED) {
+            // Score is currently not used, maybe later?
+            // dynamics.hasScoredTrigger.onTrue(
+            //     Rumble.DEBUG.controller.timedRumble(RumblePresets.PRESET0L.rumble, 1.0)
+            // );
+
+            new Trigger(dynamics::funnelDetect).onTrue(
+                Rumble.DRIVER.controller.timedRumble(RumblePresets.DRIVER_FUNNEL.rumble, OI.rumbleTime)
+            );
+
+            new Trigger(dynamics::isCoralInArm).onTrue(
+                Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
+            );
+        }
+
+        //#endregion
+
         //#region automated controls
 
         dynamics.hasScoredTrigger.onTrue(dynamics.stow());
@@ -334,6 +350,7 @@ public class RobotContainer {
                 Commands.parallel(
                     dynamics.stow()
                 ).withName("auto stowing (trigger))")
+                .onlyIf(dynamics::hasNotJustScored)
             );
 
         new Trigger(dynamics::funnelDetect).onTrue(
@@ -392,11 +409,16 @@ public class RobotContainer {
             dynamics.removeAlgaeArm()
         );
 
+        operatorController.leftBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
+                                       .onFalse(climberSubsystem.stopArmCommand());
+
+        operatorController.rightBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
+                                       .onFalse(climberSubsystem.stopArmCommand());
         
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
 
-        SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
+        SmartDashboard.putData("preset1Arm", armSubsystem.presetCommand(ArmSubsystemState.EH));
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
@@ -404,10 +426,13 @@ public class RobotContainer {
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
         SmartDashboard.putData("Stow", dynamics.stow());
+        SmartDashboard.putData("Stow Load", dynamics.loadStow());
+        SmartDashboard.putData("Stow Prescore", dynamics.prescoreStow());
         SmartDashboard.putData("Climb", dynamics.gotoClimb());
         SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
+        SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
 
     
         debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
