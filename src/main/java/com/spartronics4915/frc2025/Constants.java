@@ -289,7 +289,7 @@ public final class Constants {
     }
 
     public static final class ChassisSpeedSupplierConstants {
-        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.0, 0);
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.5, 0);
     }
 
     public static final class OrientTowardsNearestPOIConstants {
