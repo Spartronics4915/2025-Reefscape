@@ -26,6 +26,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -44,6 +47,10 @@ import static com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConst
 public final class ChassisSpeedSuppliers {
     private static final PIDController mAnglePIDRad = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
     
+    private static StructPublisher<Rotation2d> targetAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("targetAngleRad", Rotation2d.struct).publish();
+    private static StructPublisher<Rotation2d> currentAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("currentAngleRad", Rotation2d.struct).publish();
+
+
     static{
         mAnglePIDRad.enableContinuousInput(-Math.PI, Math.PI);
         RobotModeTriggers.teleop()
@@ -174,8 +181,15 @@ public final class ChassisSpeedSuppliers {
     
     public static Supplier<ChassisSpeeds> gotoAngle(Supplier<Rotation2d> fieldRelativeAngleSupplier, SwerveSubsystem mSwerve){
         return () -> {
+
+            Rotation2d currentRotation = mSwerve.getPose().getRotation();
+            Rotation2d targetRotation = fieldRelativeAngleSupplier.get();
+
+            targetAnglePublisher.accept(currentRotation);
+            currentAnglePublisher.accept(targetRotation);
+
             return new ChassisSpeeds(0, 0,
-                mAnglePIDRad.calculate(mSwerve.getPose().getRotation().getRadians(), fieldRelativeAngleSupplier.get().getRadians())
+                mAnglePIDRad.calculate(currentRotation.getRadians(), targetRotation.getRadians())
             );
         };
     }
