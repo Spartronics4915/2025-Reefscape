@@ -502,7 +502,7 @@ public final class Constants {
         public static final Angle kArmAngleTolerance = Degrees.of(1);
         public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 0.4;
+        public static final double kSafeElevHeightForSwerve = 0.45;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
@@ -512,7 +512,7 @@ public final class Constants {
     
         public static final double kMinSafeElevHeight = 0.3; //previously 4.361// height of the elevator for when the arm is stowed and needs to move
         
-        public static final double kElevatorSafeHeightSetpoint =  0.45;
+        public static final double kElevatorSafeHeightSetpoint =  0.375;
 
         public static final double kScoreLaserCanDebounce = 0.1; //seconds
 
