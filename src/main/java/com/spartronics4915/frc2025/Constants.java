@@ -506,7 +506,7 @@ public final class Constants {
 
     public static final class DynamicsConstants {
         public static final Angle kArmAngleTolerance = Degrees.of(5);
-        public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(2);
+        public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(5);
 
         public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
 
