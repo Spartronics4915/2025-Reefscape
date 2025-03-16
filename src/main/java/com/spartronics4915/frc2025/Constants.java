@@ -288,7 +288,7 @@ public final class Constants {
 
     }
 
-    public static final class DriveCommandConstants {
+    public static final class ChassisSpeedSupplierConstants {
         public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.0, 0);
     }
 

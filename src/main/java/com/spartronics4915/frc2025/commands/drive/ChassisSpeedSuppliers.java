@@ -10,7 +10,7 @@ import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
-import static com.spartronics4915.frc2025.Constants.DriveCommandConstants.*;
+import static com.spartronics4915.frc2025.Constants.ChassisSpeedSupplierConstants.*;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
