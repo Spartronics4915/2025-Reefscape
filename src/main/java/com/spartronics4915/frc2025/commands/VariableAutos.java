@@ -142,8 +142,8 @@ public class VariableAutos {
     public boolean isSwerveCloseToReef() {
         Translation2d currentReef = 
         (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ?
-            Region.REEF.bluePositions[0] :
-            Region.REEF.redPositions[0]
+            new Translation2d(4.5, 4.0) :
+            new Translation2d(13, 4.0)
         ;
 
         return (currentReef.getDistance(swerve.getPose().getTranslation()) < kTriggerDistance);
