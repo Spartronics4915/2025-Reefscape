@@ -344,7 +344,7 @@ public class DynamicsCommandFactory {
     public Command checkIfScored() {
         return Commands.sequence(
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
-            Commands.waitTime(kCheckIfScoredDuration),
+            Commands.race(Commands.waitUntil(this::isCoralInArm), Commands.waitTime(kCheckIfScoredDuration)),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
             gotoLastInputtedScore().onlyIf(this::isCoralInArm)
         );
