@@ -179,7 +179,9 @@ public class AlignToReef {
      */
     private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
         if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
-            var diff = target.minus(mSwerve.getPose()).getTranslation();
+            System.out.println("velocity is smol");
+            var diff = target.getTranslation().minus(mSwerve.getPose().getTranslation());
+            System.out.println("diff calc: \nx: " + diff.getX() + "\ny: " + diff.getY() + "\nt: " + diff.getAngle().getDegrees());
             return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
         }
         return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
