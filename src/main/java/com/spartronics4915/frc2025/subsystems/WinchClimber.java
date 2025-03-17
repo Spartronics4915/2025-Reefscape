@@ -115,6 +115,10 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         return setWinchCommand(speed.speed);
     }
 
+    public Command winchEngagedCommand() {
+        return this.runOnce(() -> winchEngaged());
+    }
+
     // @Override
     // public void periodic() {
     // mMotor.set(mSpeedSetpoint);
