@@ -151,7 +151,7 @@ public class RobotContainer {
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
-        CoralSim.setup(swerveSubsystem, intakeSubsystem);
+        if (RobotBase.isSimulation()) CoralSim.setup(swerveSubsystem, intakeSubsystem);
 
         ModeSwitchHandler.EnableModeSwitchHandler(
             intakeSubsystem,
