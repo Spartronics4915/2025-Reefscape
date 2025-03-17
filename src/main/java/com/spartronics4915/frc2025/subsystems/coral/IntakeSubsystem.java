@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.RPM;
 import com.spartronics4915.frc2025.Constants.IntakeConstants;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -40,6 +41,8 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     
     private SparkMax mMotor1;
     private SparkClosedLoopController closedLoopController;
+
+    public double setpoint = 0.0; 
 
     // private var sensor;
     private LaserCan lc;
@@ -89,9 +92,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             newSpeed,
             ControlType.kVelocity
         );
+
+        setpoint = newSpeed;
     }
 
     private void setPercentage(double newPercentage) {
+        setpoint = newPercentage;
         mMotor1.set(newPercentage);
     }
 
@@ -104,7 +110,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public boolean detect(){
         if (RobotBase.isSimulation()) {
-            return false;
+            return CoralSim.getIntakeLC();
         }
 
         LaserCan.Measurement measurement = lc.getMeasurement();

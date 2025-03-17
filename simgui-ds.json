@@ -21,6 +21,7 @@
           "keyRate": 0.009999999776482582
         },
         {
+          "decKey": 256,
           "incKey": 69
         },
         {
@@ -101,9 +102,6 @@
   "robotJoysticks": [
     {
       "guid": "Keyboard0"
-    },
-    {
-      "guid": "030000004c050000c405000000000000"
     }
   ],
   "useEnableDisableHotkeys": true

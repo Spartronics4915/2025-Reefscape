@@ -47,6 +47,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
@@ -56,6 +57,7 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
@@ -149,6 +151,8 @@ public class RobotContainer {
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
 
+        CoralSim.setup(swerveSubsystem, intakeSubsystem);
+
         ModeSwitchHandler.EnableModeSwitchHandler(
             intakeSubsystem,
             armSubsystem,
@@ -158,7 +162,7 @@ public class RobotContainer {
         MechanismRenderer.generateRenderer(
             elevatorSubsystem::getDesiredPosition, 
             () -> armSubsystem.getTargetPosition().getMeasure(), 
-            intakeSubsystem::getSpeed, 
+            () -> RPM.of(intakeSubsystem.setpoint), 
             intakeSubsystem::detect,
             "Target Position"
         );
@@ -174,7 +178,7 @@ public class RobotContainer {
         MechanismRenderer.generateRenderer(
             () -> elevatorSubsystem.getSetpoint(), 
             () -> armSubsystem.getSetpoint().getMeasure(), 
-            intakeSubsystem::getSpeed, 
+            () -> RPM.of(intakeSubsystem.setpoint), 
             intakeSubsystem::detect,
             "setpoints"
         );
@@ -362,7 +366,10 @@ public class RobotContainer {
         //#region Operator Controls
 
         operatorController.rightTrigger().onTrue( //whileTrue
-            dynamics.score()
+            Commands.parallel(
+                dynamics.score(),
+                Commands.print("scoring")
+            )
         );/*.onFalse(Commands.parallel(
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
             dynamics.stow()

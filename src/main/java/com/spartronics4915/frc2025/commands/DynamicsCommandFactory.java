@@ -5,6 +5,7 @@ import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
+import com.spartronics4915.frc2025.util.CoralSim;
 
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
@@ -159,6 +160,10 @@ public class DynamicsCommandFactory {
     }
 
     public boolean funnelDetect(){
+
+        if (RobotBase.isSimulation()) {
+            return CoralSim.getFunnelLC() || intakeSubsystem.detect();
+        }
 
         var measurement = funnelLC.getMeasurement();
 
