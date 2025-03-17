@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
+  "robotWidth": 0.762,
+  "robotLength": 0.762,
   "holonomicMode": true,
   "pathFolders": [
     "Pairs",
@@ -14,15 +14,15 @@
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
-  "robotMass": 10.0,
+  "robotMass": 125.0,
   "robotMOI": 1.939,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.048,
-  "driveGearing": 5.143,
-  "maxDriveSpeed": 5.45,
+  "driveGearing": 5.9,
+  "maxDriveSpeed": 5.273,
   "driveMotorType": "NEO",
   "driveCurrentLimit": 40.0,
-  "wheelCOF": 1.2,
+  "wheelCOF": 1.542,
   "flModuleX": 0.273,
   "flModuleY": 0.273,
   "frModuleX": 0.273,
@@ -33,5 +33,8 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Funnel\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":-0.275,\"y\":0.0},\"size\":{\"width\":0.4,\"length\":0.15},\"borderRadius\":0.04,\"strokeWidth\":0.02,\"filled\":true}}",
+    "{\"name\":\"Elev\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.09,\"y\":-0.15},\"size\":{\"width\":0.1,\"length\":0.53},\"borderRadius\":0.025,\"strokeWidth\":0.02,\"filled\":true}}"
+  ]
 }
