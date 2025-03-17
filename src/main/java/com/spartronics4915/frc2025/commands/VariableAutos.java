@@ -83,6 +83,7 @@ public class VariableAutos {
         public BranchSide mirror(){
             switch (this) {
                 case LEFT: return RIGHT;
+                case MIDDLE: return MIDDLE;
                 default: return LEFT;
             }
         }
