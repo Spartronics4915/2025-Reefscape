@@ -382,6 +382,8 @@ public class RobotContainer {
 
         operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
+        operatorController.a().onTrue(dynamics.operatorScore(DynaPreset.L1));
+
         operatorController.start().onTrue(dynamics.intake()); //menu button
 
         // operatorController.rightStick().whileTrue(
@@ -399,15 +401,11 @@ public class RobotContainer {
 
         operatorController.leftStick().onTrue(
             dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
-        );
+        ).onFalse(dynamics.removeAlgaeArm());
 
         operatorController.rightStick().onTrue(
             dynamics.gotoScore(DynaPreset.ALGAE_LOW)
-        );
-
-        operatorController.a().onTrue(
-            dynamics.removeAlgaeArm()
-        );
+        ).onFalse(dynamics.removeAlgaeArm());
 
         operatorController.leftBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
                                        .onFalse(climberSubsystem.stopArmCommand());
