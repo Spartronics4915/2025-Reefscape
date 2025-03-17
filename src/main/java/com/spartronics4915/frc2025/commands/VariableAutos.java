@@ -220,22 +220,30 @@ public class VariableAutos {
             Commands.runOnce(() -> {
                 alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
             }),
+            Commands.print("auto align"),
             Commands.parallel(
                 pathPair.autoAlign,
                 Commands.sequence(
+                    Commands.print("auto prescoure"),
                     dynamics.autoPrescore(),
+                    Commands.print("is swerve close to reef?"),
                     Commands.waitUntil(() -> isSwerveCloseToReef()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
+            Commands.print("wait until preset"),
             dynamics.waitUntilPreset(height.preset),
+            Commands.print("score"),
             dynamics.score(),
+            Commands.print("parallel group stow"),
             Commands.parallel(
                 dynamics.stow(),
                 Commands.sequence(
                     Commands.waitTime(delay),
+                    Commands.print("is swerve moveable?"),
                     Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.print("returning"),
                     pathPair.returnPath
                 )
             ),
