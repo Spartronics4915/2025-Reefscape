@@ -179,12 +179,19 @@ public class AlignToReef {
      */
     private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
         if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
-            System.out.println("velocity is smol");
+            System.out.println("approach: straight line");
             var diff = target.getTranslation().minus(mSwerve.getPose().getTranslation());
-            System.out.println("diff calc: \nx: " + diff.getX() + "\ny: " + diff.getY() + "\nt: " + diff.getAngle().getDegrees());
+            System.out.println("diff calc: \nx: " + diff.getX() + "\ny: " + diff.getY() + "\nDoT: " + diff.getAngle().getDegrees());
             return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
         }
-        return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+
+        System.out.println("approach: compensating for velocity");
+
+        var rotation = new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+        
+        System.out.println("velocity calc: \nx: " + cs.vxMetersPerSecond + "\ny: " + cs.vyMetersPerSecond + "\nDoT: " + rotation);
+
+        return rotation;
     }
 
     private LinearVelocity getVelocityMagnitude(ChassisSpeeds cs){
