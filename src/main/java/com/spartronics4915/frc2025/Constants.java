@@ -510,7 +510,7 @@ public final class Constants {
 
         public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 0.5;
+        public static final double kSafeElevHeightForSwerve = 0.7;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
