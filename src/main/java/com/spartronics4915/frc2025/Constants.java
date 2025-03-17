@@ -524,6 +524,7 @@ public final class Constants {
 
         public static final double kScoreLaserCanDebounce = 0.1; //seconds
 
+        public static final Time kCheckIfScoredDelay = Seconds.of(0.075);
         public static final Time kCheckIfScoredDuration = Seconds.of(0.5);
 
         public static final Time kJustScoredThreshold = Seconds.of(1);

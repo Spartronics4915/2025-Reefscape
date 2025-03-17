@@ -343,6 +343,7 @@ public class DynamicsCommandFactory {
 
     public Command checkIfScored() {
         return Commands.sequence(
+            Commands.waitTime(kCheckIfScoredDelay),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
             Commands.race(Commands.waitUntil(this::isCoralInArm), Commands.waitTime(kCheckIfScoredDuration)),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
