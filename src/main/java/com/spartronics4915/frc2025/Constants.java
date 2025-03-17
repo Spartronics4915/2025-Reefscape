@@ -498,7 +498,7 @@ public final class Constants {
         // public static final double kA = 0.0;
 
         public static final class motorPIDConstants {
-            public static final double kP = 16;
+            public static final double kP = 20;
             public static final double kI = 0;
             public static final double kD = 0;
         }
