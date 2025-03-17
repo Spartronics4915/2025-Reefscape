@@ -231,7 +231,7 @@ public class AlignToReef {
         var translation = tag.getTranslation().plus(
             new Translation2d(
                 side.tagOffset.getY(),
-                side.tagOffset.getX() * (side == BranchSide.LEFT ? -1 : 1)
+                side.tagOffset.getX()
             ).rotateBy(tag.getRotation())
         );
 
