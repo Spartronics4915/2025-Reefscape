@@ -489,7 +489,7 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(6.0, 5.0); //12, 7.5
+        public static final Constraints constraints = new Constraints(6.0, 6.0); //12, 7.5
 
         public static final double minHeight = 0;
         public static final double maxHeight = 1.24;
@@ -504,7 +504,7 @@ public final class Constants {
         public static final class motorPIDConstants {
             public static final double kP = 20;
             public static final double kI = 0;
-            public static final double kD = 0;
+            public static final double kD = 0.1;
         }
     }
 
