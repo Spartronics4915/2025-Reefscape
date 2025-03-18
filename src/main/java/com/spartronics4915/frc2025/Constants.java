@@ -422,7 +422,7 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final double kMaxVelocity = 6.5;
+        public static final double kMaxVelocity = 7.0;
         public static final double kMaxAcceliration = 5.0 / 2.0;
 
         public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceliration); //8.0, 10
@@ -435,7 +435,7 @@ public final class Constants {
 
         public static final double kP = 300;
         public static final double kI = 0.0;
-        public static final double kD = 1.0;
+        public static final double kD = 1.5;
         
         //The values set here are placeholders for sim
         public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(5);
