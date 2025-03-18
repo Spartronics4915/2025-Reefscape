@@ -174,6 +174,9 @@ public class VariableAutos {
         var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kPathConstraints);
+            }),
             Commands.deadline(
                 pathPair.approachPath,
                 Commands.sequence(
@@ -250,7 +253,10 @@ public class VariableAutos {
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            )
+            ),
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kPathConstraints); //!!! should this be in command sequence??? -shark
+            })
         ).finallyDo(() -> {
             alignmentGenerator.changePathConstraints(kPathConstraints);
         }).withName("Starting Auto cycle")
