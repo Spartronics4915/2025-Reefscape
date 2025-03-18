@@ -257,13 +257,13 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Centimeter.of(1.0);
+            public static final Distance kPositionTolerance = Centimeter.of(2.0);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
-            public static final Time kEndTriggerDebounce = Seconds.of(0.1);
+            public static final Time kEndTriggerDebounce = Seconds.of(0.05);
 
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
-            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
+            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.75);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
