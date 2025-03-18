@@ -89,7 +89,7 @@ public final class Constants {
 
         public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
             .inverted(false)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
             .apply(kCLConfig)
             .apply(kEncoderConfig)
             .openLoopRampRate(kOpenLoopRampRate)
