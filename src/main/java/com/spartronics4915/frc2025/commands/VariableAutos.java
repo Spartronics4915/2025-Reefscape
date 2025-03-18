@@ -1,6 +1,6 @@
 package com.spartronics4915.frc2025.commands;
 
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
@@ -175,7 +175,7 @@ public class VariableAutos {
         
         return Commands.sequence(
             Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kPathConstraints);
+                alignmentGenerator.changePathConstraints(kAutoPathConstraints);
             }),
             Commands.deadline(
                 pathPair.approachPath,
@@ -255,10 +255,10 @@ public class VariableAutos {
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
             ),
             Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kPathConstraints); //!!! should this be in command sequence??? -shark
+                alignmentGenerator.changePathConstraints(kAutoPathConstraints); //!!! should this be in command sequence??? -shark
             })
         ).finallyDo(() -> {
-            alignmentGenerator.changePathConstraints(kPathConstraints);
+            alignmentGenerator.changePathConstraints(kAutoPathConstraints);
         }).withName("Starting Auto cycle")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }

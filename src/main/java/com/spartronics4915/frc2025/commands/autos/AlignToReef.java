@@ -2,8 +2,9 @@ package com.spartronics4915.frc2025.commands.autos;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlignAdjustTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAlignPredict;
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopAlignAdjustTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopPathConstraints;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class AlignToReef {
 
     private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
 
-    private PathConstraints pathConstraints = kPathConstraints;
+    private PathConstraints pathConstraints = kAutoPathConstraints;
 
     public void changePathConstraints(PathConstraints newPathConstraints){
         this.pathConstraints = newPathConstraints;
@@ -149,7 +150,7 @@ public class AlignToReef {
 
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
-            pathConstraints,
+            DriverStation.isAutonomous() ? pathConstraints : kTeleopPathConstraints,
             new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
             new GoalEndState(0.0, waypoint.getRotation())
         );

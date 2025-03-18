@@ -271,8 +271,9 @@ public final class Constants {
 
             public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.75, 3.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
+            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
             // X = side to side, Y = away from tag
