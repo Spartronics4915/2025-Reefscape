@@ -125,10 +125,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     // }
 
 
-    private boolean isClimbed() {
-        return .5 >= mEncoder.getPosition();
-    }
-
+    
     private boolean winchEngaged() {
         return 0.7<=mEncoder.getPosition();
     }
