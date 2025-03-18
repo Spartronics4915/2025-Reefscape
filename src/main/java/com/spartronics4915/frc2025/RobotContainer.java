@@ -415,9 +415,11 @@ public class RobotContainer {
         ).onFalse(dynamics.removeAlgaeArm());
 
         operatorController.leftBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
+                                       .onTrue(dynamics.gotoClimb())
                                        .onFalse(climberSubsystem.stopArmCommand());
 
         operatorController.rightBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
+                                       .onTrue(dynamics.gotoClimb())
                                        .onFalse(climberSubsystem.stopArmCommand());
         
 
