@@ -13,6 +13,8 @@ import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
@@ -127,12 +129,12 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     
     private boolean winchEngaged() {
-        return 0.7<=mEncoder.getPosition();
+        return kEngagedAngle <=mEncoder.getPosition();
     }
 
     @Override
     public void periodic() {
-        if (.5 >= mEncoder.getPosition()){
+        if (kRetractedAngle >= mEncoder.getPosition()){
             isClimbed = true;
         } else { isClimbed = false; }
     } 
