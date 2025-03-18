@@ -478,9 +478,9 @@ public final class Constants {
         public static final boolean followerInverted = true;
         public static final double motorPositionConversionFactor = (1/9.0) * 0.14044 * 2;
         public static final double motorVelocityConversionFactor = (1/9.0) * 0.14044 * 2;
-        public static final int motorSmartCurrentLimit = 35; //18
+        public static final int motorSmartCurrentLimit = 37; //18
         public static final int motorSecondaryCurrentLimit = 40; //20
-        public static final int followerSmartCurrentLimit = 35;
+        public static final int followerSmartCurrentLimit = 37;
         public static final int followerSecondaryCurrentLimit = 40;
 
         public static final double dt = 0.02;
