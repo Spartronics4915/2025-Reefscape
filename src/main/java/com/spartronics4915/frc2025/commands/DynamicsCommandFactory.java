@@ -77,6 +77,7 @@ public class DynamicsCommandFactory {
     }
 
     public enum DynaPreset{
+        RESET(0.0, Rotation2d.fromDegrees(270)),
         LOAD(0.0, Rotation2d.fromDegrees(234.4421)),
         PRESCORE(0.2, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
         AUTO_PRESCORE(0.4, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
