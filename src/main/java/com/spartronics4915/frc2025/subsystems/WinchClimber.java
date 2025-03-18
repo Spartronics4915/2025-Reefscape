@@ -132,6 +132,13 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private boolean winchEngaged() {
         return 0.7<=mEncoder.getPosition();
     }
+
+    @Override
+    public void periodic() {
+        if (.5 >= mEncoder.getPosition()){
+            isClimbed = true;
+        } else { isClimbed = false; }
+    } 
     
     @Override
     public void onModeSwitch() {
