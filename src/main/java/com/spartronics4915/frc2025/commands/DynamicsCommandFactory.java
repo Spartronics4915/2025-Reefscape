@@ -333,7 +333,8 @@ public class DynamicsCommandFactory {
         return Commands.sequence(
             makeSystemSafeToMove(true, false, true),
             armPriorityMove(DynaPreset.CLIMB.setpoint)
-        ).withName("Goto Climb");
+        ).onlyIf(() -> !(isElevAtSetpoint(DynaPreset.CLIMB.setpoint.heightMeters) && isArmAtSetpoint(DynaPreset.CLIMB.setpoint.armAngle, kArmAngleTolerance)))
+        .withName("Goto Climb");
     }
 
     public Command score(){
