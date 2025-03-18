@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         RumbleFeedbackHandler.handleControllers();
 
-        SmartDashboard.putData("PDH", powerDistribution);
+        // SmartDashboard.putData("PDH", powerDistribution);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

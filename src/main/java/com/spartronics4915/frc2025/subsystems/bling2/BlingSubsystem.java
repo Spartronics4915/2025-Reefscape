@@ -80,7 +80,7 @@ public class BlingSubsystem extends SubsystemBase {
             show.update();
         }
         if (LIGHTS_ENABLED) strip.setData(buffer);
-        logLEDs();
+        // logLEDs();
     }
 
 }
