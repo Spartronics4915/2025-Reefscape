@@ -70,7 +70,7 @@ public class VariableAutos {
         }
     }
 
-    public enum BranchSide{
+    public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
         LEFT(new Translation2d(-0.153209, 0.5406845)),
         RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565)),
         MIDDLE(new Translation2d(0.064853, 0.5408565));
@@ -186,7 +186,7 @@ public class VariableAutos {
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
                 pathPair.autoAlign,
-                Commands.sequence(
+                Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
                     Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
@@ -202,7 +202,7 @@ public class VariableAutos {
                     Commands.print("start delay"),
                     Commands.waitTime(delay),
                     Commands.print("end delay"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
                     Commands.print("returning path"),
                     pathPair.returnPath
                 )
@@ -245,7 +245,7 @@ public class VariableAutos {
                 Commands.sequence(
                     Commands.waitTime(delay),
                     Commands.print("is swerve moveable?"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
                     Commands.print("returning"),
                     pathPair.returnPath
                 )
