@@ -361,9 +361,9 @@ public final class Constants {
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
-                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
+                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.NOTHING),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.NOTHING),
-                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF), //TODO: CHANGE
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF),
                 new LimelightConstants("chucky", LimelightModel.LIMELIGHT_3, 14, LimelightRole.NOTHING),
                 new LimelightConstants("doug", LimelightModel.LIMELIGHT_3, 15, LimelightRole.NOTHING)
         };
