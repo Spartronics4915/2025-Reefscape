@@ -510,11 +510,11 @@ public final class Constants {
 
     public static final class DynamicsConstants {
         public static final Angle kArmAngleTolerance = Degrees.of(10);
-        public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(5);
+        public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(10);
 
         public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 0.8;
+        public static final double kSafeElevHeightForSwerve = 0.9;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
