@@ -13,6 +13,8 @@ import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
@@ -26,7 +28,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
     private boolean isClimbed = false;
-
+    private boolean winchEngaged = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     private final RelativeEncoder mEncoder;
@@ -115,21 +117,28 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         return setWinchCommand(speed.speed);
     }
 
+    public Command winchEngagedCommand() {
+        return this.runOnce(() -> winchEngaged());
+    }
+
     // @Override
     // public void periodic() {
     // mMotor.set(mSpeedSetpoint);
     // }
 
-    private boolean isClimbed() {
-        return 180d >= mEncoder.getPosition();
+
+    
+    private boolean winchEngaged() {
+        return kEngagedAngle <=mEncoder.getPosition();
     }
 
     @Override
     public void periodic() {
-
-    }
-
-
+        if (kRetractedAngle >= mEncoder.getPosition()){
+            isClimbed = true;
+        } else { isClimbed = false; }
+    } 
+    
     @Override
     public void onModeSwitch() {
         stopWinch();

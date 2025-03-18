@@ -78,7 +78,7 @@ public class ComplexAutoChooser extends SubsystemBase {
             Translation2d branchPose = reefSide.getCurrent().getTranslation().plus(
                 new Translation2d(
                     0.2,//branchSide.tagOffset.getY(),
-                    branchSide.tagOffset.getX() * (branchSide == BranchSide.LEFT ? -1 : 1) * 1.5
+                    branchSide.tagOffset.getX() * 1.5
                 ).rotateBy(reefSide.getCurrent().getRotation())
             );
 

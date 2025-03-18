@@ -590,9 +590,11 @@ public final class Constants {
         .apply(kEncoderConfig)
     ;
 
-        public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
-        public static final Rotation2d kEngagedAngle = Rotation2d.fromDegrees(270.0); //angle to engage the cage
-        public static final Rotation2d kRetractedAngle = Rotation2d.fromDegrees(180.0); //desired angle at the end of the match
+        public static final double  kStartingAngle = (0.25); //angle at the start of the match
+        public static final double kEngagedAngle = (0.75); //angle to engage the cage
+        public static final double kRetractedAngle = (0.5); //desired angle at the end of the match
+
+
 
 
     }
