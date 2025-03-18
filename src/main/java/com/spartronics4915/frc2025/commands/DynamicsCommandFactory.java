@@ -249,7 +249,7 @@ public class DynamicsCommandFactory {
 
     public Command waitUntilPreset(DynaPreset setpoint){
         return Commands.waitUntil(() -> {
-            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle);
+            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
         });
     }
 
