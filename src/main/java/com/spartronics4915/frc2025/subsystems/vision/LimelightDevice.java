@@ -118,15 +118,14 @@ public class LimelightDevice extends SubsystemBase {
         if (role == LimelightRole.NOTHING) return Optional.empty();
         PoseEstimate poseEstimate;
         Optional<Matrix<N3, N1>> stdDevs;
+        LimelightHelpers.SetFiducialIDFiltersOverride(name, tagFilter);
+        LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
         switch (method) {
             case MEGATAG_1:
-                LimelightHelpers.SetFiducialIDFiltersOverride(name, new int[]{});
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
                 stdDevs = calculateStdDevsMegaTag1(poseEstimate, swerve);
                 break;
             case MEGATAG_2:
-                LimelightHelpers.SetFiducialIDFiltersOverride(name, tagFilter);
-                LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
                 stdDevs = calculateStdDevsMegaTag2(poseEstimate, swerve);
                 break;
