@@ -449,7 +449,11 @@ public final class Constants {
             .withKD(kD);
 
         public static final CurrentLimitsConfigs kCurrentLimits = new CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(20);
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(70)
+            .withSupplyCurrentLowerLimit(40)
+            .withSupplyCurrentLowerTime(1.0);
+
         public static final FeedbackConfigs kFeedbackConfig = new FeedbackConfigs()
             .withSensorToMechanismRatio(25.7143)
         ;
