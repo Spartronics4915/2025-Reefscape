@@ -269,10 +269,10 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.25, 2.5, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
 
-            public static final PathConstraints kPathConstraints = new PathConstraints(2.5, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
             
             public static final double kTriggerDistance = 2.5;
             // X = side to side, Y = away from tag
