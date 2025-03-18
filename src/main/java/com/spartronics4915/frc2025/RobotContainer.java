@@ -441,7 +441,7 @@ public class RobotContainer {
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
         SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
 
-        SmartDashboard.putData("Reset Dynamics", dynamics.gotoScore(DynaPreset.RESET));
+        SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 
     
         debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))

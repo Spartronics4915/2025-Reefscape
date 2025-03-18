@@ -399,4 +399,11 @@ public class DynamicsCommandFactory {
         return armSubsystem.setSetpointCommand(new Rotation2d(kRemoveAlgaeArmAngle))
                .onlyIf(() -> !isArmStowed());
     }
+
+    public Command resetDynamics() {
+        return Commands.sequence(
+            makeSystemSafeToMove(true, false, true),
+            armPriorityMove(DynaPreset.RESET.setpoint)
+        ).withName("Reset Dynamics");
+    }
 }
