@@ -491,7 +491,7 @@ public final class Constants {
 
         public static final Constraints constraints = new Constraints(6.0, 6.0); //12, 7.5
 
-        public static final double minHeight = 0;
+        public static final double minHeight = 0.01;
         public static final double maxHeight = 1.24;
 
         // Not using elevator feedforward constants for now, so just commenting them out.
