@@ -258,10 +258,11 @@ public class DynamicsCommandFactory {
         );
     }
 
-    public Command waitUntilPreset(DynaPreset setpoint){
-        return Commands.waitUntil(() -> {
-            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
-        });
+    private Command elevatorConcurrentMove(DynamicsSetpoint setpoint, Rotation2d concurrentAngle){
+        return Commands.sequence(
+            armSubsystem.setSetpointCommand(concurrentAngle),
+            elevatorPriorityMove(setpoint)
+        );
     }
 
     /**
@@ -276,6 +277,19 @@ public class DynamicsCommandFactory {
         );
     }
 
+    private Command armConcurrentMove(DynamicsSetpoint setpoint, double concurrentHeightMeters){
+        return Commands.sequence(
+            elevatorSubsystem.setSetPointCommand(concurrentHeightMeters),
+            armPriorityMove(setpoint)
+        );
+    }
+
+    public Command waitUntilPreset(DynaPreset setpoint){
+        return Commands.waitUntil(() -> {
+            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
+        });
+    }
+
     //#endregion
 
     //#region small Commands
@@ -283,7 +297,7 @@ public class DynamicsCommandFactory {
     public Command scoreHeight(DynaPreset scoringPoint){
         return Commands.sequence(
             makeSystemSafeToMove(false, scoringPoint.setpoint.heightMeters < kMinSafeElevHeight, false),
-            elevatorPriorityMove(scoringPoint.setpoint)
+            elevatorConcurrentMove(scoringPoint.setpoint, new Rotation2d(kSafeArmAngle))
         );
     }
 
@@ -383,12 +397,7 @@ public class DynamicsCommandFactory {
     public Command returnLoadStow(){
         return Commands.sequence(
             makeSystemSafeToMove(isElevatorForceable(), false, true),
-
-            Commands.parallel(armSubsystem.setSetpointCommand(DynaPreset.LOAD.getArmAngle()), elevatorSubsystem.setSetPointCommand((kMinSafeElevHeight))),
-        
-            Commands.waitUntil(() -> isArmAtSetpoint(DynaPreset.LOAD.getArmAngle())).andThen(
-                elevatorPriorityMove(DynaPreset.LOAD.setpoint)
-            )
+            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
         );
     }
 
