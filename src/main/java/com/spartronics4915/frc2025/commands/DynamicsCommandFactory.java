@@ -113,16 +113,13 @@ public class DynamicsCommandFactory {
 
     //#region Composite Commands
 
-
-    //TODO swap out target with actual position
-
     /**
      * 
      * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
         var currAngle =  getArmRotation();
-        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); //TODO measure this so it's only if it's above the horizon (for climb)
+        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); 
     }
 
     private boolean isElevAtSetpoint(double setpoint){
@@ -409,7 +406,7 @@ public class DynamicsCommandFactory {
             intake(),
             Commands.waitUntil(
                 () -> funnelDetect() || isCoralInArm()
-            ).withTimeout(RobotBase.isSimulation() ? 0.5 : 15) //TODO remove for comps
+            ).withTimeout(RobotBase.isSimulation() ? 0.5 : 15)
         )
         .withName("Blocking Intake");
     }

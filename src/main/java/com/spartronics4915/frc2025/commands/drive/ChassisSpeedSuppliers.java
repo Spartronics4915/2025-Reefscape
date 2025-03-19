@@ -250,7 +250,7 @@ public final class ChassisSpeedSuppliers {
             return swerve.getPose().getRotation();
         }
 
-        if (shouldFlip()) { //CHECKUP can be replaced by the teleop offset? but also messes with behavior
+        if (shouldFlip()) {
             rightX = -rightX;
             rightY = -rightY;
         }
