@@ -72,7 +72,6 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         // swerveDrive.resetOdometry(new Pose2d(1.5, 5, Rotation2d.fromDegrees(45)));
 
         // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
-        // Shuffleboard.getTab("swerveLogging").add
 
         AutoBuilder.configure(
             this::getPose, 

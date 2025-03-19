@@ -23,7 +23,6 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -92,7 +91,6 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
             StructArrayTopic<Pose3d> visionTargetTopic = networkTableInstance.getStructArrayTopic(
                 "VisionDiagnostics/vision targets", Pose3d.struct);
             visionTargetPublisher = visionTargetTopic.publish();
-            // Shuffleboard.getTab("logging").addString("VisionDiagnostics/vision target ids", () -> this.getVisibleTagIDs().toString());
         } else visionTargetPublisher = null;
 
         updateTagFilters();

@@ -72,7 +72,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -161,29 +160,29 @@ public class RobotContainer {
             swerveSubsystem
         ); 
 
-        MechanismRenderer.generateRenderer(
-            elevatorSubsystem::getDesiredPosition, 
-            () -> armSubsystem.getTargetPosition().getMeasure(), 
-            () -> RPM.of(intakeSubsystem.setpoint), 
-            intakeSubsystem::detect,
-            "Target Position"
-        );
+        // MechanismRenderer.generateRenderer(
+        //     elevatorSubsystem::getDesiredPosition, 
+        //     () -> armSubsystem.getTargetPosition().getMeasure(), 
+        //     () -> RPM.of(intakeSubsystem.setpoint), 
+        //     intakeSubsystem::detect,
+        //     "Target Position"
+        // );
 
-        MechanismRenderer.generateRenderer(
-            () -> Meters.of(elevatorSubsystem.getPosition()), 
-            () -> armSubsystem.getPosition().getMeasure(), 
-            intakeSubsystem::getSpeed, 
-            intakeSubsystem::detect,
-            "Current Position"
-        );
+        // MechanismRenderer.generateRenderer(
+        //     () -> Meters.of(elevatorSubsystem.getPosition()), 
+        //     () -> armSubsystem.getPosition().getMeasure(), 
+        //     intakeSubsystem::getSpeed, 
+        //     intakeSubsystem::detect,
+        //     "Current Position"
+        // );
 
-        MechanismRenderer.generateRenderer(
-            () -> elevatorSubsystem.getSetpoint(), 
-            () -> armSubsystem.getSetpoint().getMeasure(), 
-            () -> RPM.of(intakeSubsystem.setpoint), 
-            intakeSubsystem::detect,
-            "setpoints"
-        );
+        // MechanismRenderer.generateRenderer(
+        //     () -> elevatorSubsystem.getSetpoint(), 
+        //     () -> armSubsystem.getSetpoint().getMeasure(), 
+        //     () -> RPM.of(intakeSubsystem.setpoint), 
+        //     intakeSubsystem::detect,
+        //     "setpoints"
+        // );
 
         if (swerveSubsystem != null) {
             swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
