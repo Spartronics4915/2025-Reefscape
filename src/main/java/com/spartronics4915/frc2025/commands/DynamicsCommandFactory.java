@@ -160,6 +160,14 @@ public class DynamicsCommandFactory {
         return intakeSubsystem.detect();
     }
 
+    public boolean isElevatorForceable(){
+        if (getElevHeight() <= kMinSafeElevHeight) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean funnelDetect(){
 
         if (RobotBase.isSimulation()) {
@@ -368,6 +376,18 @@ public class DynamicsCommandFactory {
         )
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("Autonomous Score");
+    }
+
+    public Command returnLoadStow(){
+        return Commands.sequence(
+            makeSystemSafeToMove(isElevatorForceable(), false, false),
+
+            Commands.parallel(armSubsystem.setSetpointCommand(Rotation2d.fromDegrees(DynaPreset.LOAD.)), elevatorSubsystem.setSetPointCommand((kMinSafeElevHeight))),
+        
+            Commands.waitUntil(() -> isArmAtSetpoint(Rotation2d.fromDegrees(234.4421))).andThen(
+                elevatorPriorityMove(DynaPreset.LOAD.setpoint)
+            )
+        );
     }
 
     /**
