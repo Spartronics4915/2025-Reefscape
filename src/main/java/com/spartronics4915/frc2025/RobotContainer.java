@@ -156,7 +156,9 @@ public class RobotContainer {
         ModeSwitchHandler.EnableModeSwitchHandler(
             intakeSubsystem,
             armSubsystem,
-            elevatorSubsystem
+            elevatorSubsystem,
+            climberSubsystem,
+            swerveSubsystem
         ); //TODO add any subsystems that extend ModeSwitchInterface
 
         MechanismRenderer.generateRenderer(
