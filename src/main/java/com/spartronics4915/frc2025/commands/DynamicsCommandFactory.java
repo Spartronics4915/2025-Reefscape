@@ -380,11 +380,11 @@ public class DynamicsCommandFactory {
 
     public Command returnLoadStow(){
         return Commands.sequence(
-            makeSystemSafeToMove(isElevatorForceable(), false, false),
+            makeSystemSafeToMove(isElevatorForceable(), false, true),
 
-            Commands.parallel(armSubsystem.setSetpointCommand(Rotation2d.fromDegrees(DynaPreset.LOAD.)), elevatorSubsystem.setSetPointCommand((kMinSafeElevHeight))),
+            Commands.parallel(armSubsystem.setSetpointCommand(DynaPreset.LOAD.getArmAngle()), elevatorSubsystem.setSetPointCommand((kMinSafeElevHeight))),
         
-            Commands.waitUntil(() -> isArmAtSetpoint(Rotation2d.fromDegrees(234.4421))).andThen(
+            Commands.waitUntil(() -> isArmAtSetpoint(DynaPreset.LOAD.getArmAngle())).andThen(
                 elevatorPriorityMove(DynaPreset.LOAD.setpoint)
             )
         );
