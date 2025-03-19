@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public final class RumbleFeedbackHandler{
     public enum RumblePresets{
         OPERATOR_INTAKE(new RumbleFeedback(RumbleType.kLeftRumble, 0.5)),
-        DRIVER_FUNNEL(new RumbleFeedback(RumbleType.kLeftRumble, 0.2)),
+        DRIVER_FUNNEL(new RumbleFeedback(RumbleType.kLeftRumble, 0.4)),
         ;
 
         public final RumbleFeedback rumble;
