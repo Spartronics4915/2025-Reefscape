@@ -77,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         SmartDashboard.putNumber("Arm_kI", ArmConstants.kI);
         SmartDashboard.putNumber("Arm_kD", ArmConstants.kD);
         SmartDashboard.putNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity);
-        SmartDashboard.putNumber("Arm_kMaxAcceliration", ArmConstants.kMaxAcceliration);
+        SmartDashboard.putNumber("Arm_kMaxAcceleration", ArmConstants.kMaxAcceleration);
 
         // SmartDashboard.putData("Arm_SetPID", Commands.defer(() -> {
         //     return Commands.runOnce(() -> {
