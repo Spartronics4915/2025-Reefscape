@@ -210,7 +210,9 @@ public class DynamicsCommandFactory {
 
             // it shouldn't realistically be possible for both of these to be true unless in the climb position during teleop
             
-            Command makeArmAngleSafe = armSubsystem.setSetpointCommand(new Rotation2d(kSafeArmAngle));
+            Angle safeArmSetpoint = (isSetpointBelowHorizon && kSafeArmAngle.gt(getArmRotation().getMeasure())) ? kReturnArmAngle : kSafeArmAngle;
+
+            Command makeArmAngleSafe = armSubsystem.setSetpointCommand(new Rotation2d(safeArmSetpoint));
 
             Command moveElevatorFirstIfRequired = (this.isArmStowed() || forceElevatorMovement) && this.isElevSafeToMove()  ? makeElevatorSafeToMove() : Commands.none();
 
