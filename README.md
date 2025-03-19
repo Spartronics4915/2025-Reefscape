@@ -41,9 +41,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Y | L4 scoring preset |
 | Left Trigger | Stow |
 | Right Trigger | Score |
-| Left Bumper | Retract climber |
-| Right Bumper | Engage climber |
-| Left/Right Bumper | Arm climb preset |
+| Left Bumper | Retract climber & arm climb preset |
+| Right Bumper | Engage climber & arm climb preset |
 | D-pad Up | (Manual) Elevator up |
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |
