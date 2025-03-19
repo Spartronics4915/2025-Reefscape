@@ -328,7 +328,7 @@ public class DynamicsCommandFactory {
     public Command stow(){
         return Commands.either(
             prescoreStow(), 
-            loadStow(), 
+            returnLoadStow(), 
             this::isCoralInArm
         )
         .withName("Stow");
