@@ -159,7 +159,7 @@ public class RobotContainer {
             elevatorSubsystem,
             climberSubsystem,
             swerveSubsystem
-        ); //TODO add any subsystems that extend ModeSwitchInterface
+        ); 
 
         MechanismRenderer.generateRenderer(
             elevatorSubsystem::getDesiredPosition, 
@@ -211,7 +211,7 @@ public class RobotContainer {
 
 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
-        blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
+        blingSubsystem = new BlingSubsystem(0, driverCommunication); 
     }
 
     /**

@@ -70,6 +70,7 @@ public class VariableAutos {
         }
     }
 
+    // X = side to side, Y = away from tag
     public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
         LEFT(new Translation2d(-0.153209, 0.5406845)),
         RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565)),

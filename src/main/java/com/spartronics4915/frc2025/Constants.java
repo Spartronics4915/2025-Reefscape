@@ -206,13 +206,13 @@ public final class Constants {
             );
 
             public enum PathplannerConfigs{
-                PROGRAMMER_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
+                PROGRAMMER_CHASSIS(new RobotConfig(
                     Kilogram.of(10), 
                     KilogramSquareMeters.of(1.9387211145),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(4),
-                        1.00, //CHECKUP guess
+                        1.00,
                         DCMotor.getNEO(1),
                         6.75,
                         Amps.of(40),
@@ -223,13 +223,13 @@ public final class Constants {
                     new Translation2d(Inches.of(-12), Inches.of(12.5)),
                     new Translation2d(Inches.of(-12.125), Inches.of(-12.4375))
                 )),
-                COMP_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
+                COMP_CHASSIS(new RobotConfig(
                     Kilogram.of(125), 
                     KilogramSquareMeters.of(4.86247863),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(5.273),
-                        1.542, //CHECKUP guess
+                        1.542,
                         DCMotor.getNEO(1),
                         5.900,
                         Amps.of(40),
@@ -276,8 +276,6 @@ public final class Constants {
             public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
-            // X = side to side, Y = away from tag
-            // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
 
             public static final class StationVisualizationConstants {
                     public static final Pose2d kBlueLeft = new Pose2d(0.947, 7.447, Rotation2d.fromDegrees(-50));
@@ -519,8 +517,8 @@ public final class Constants {
         public static final double kSafeElevHeightForSwerve = 1.0;
 
 
-        public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
-        public static final Angle kMoveableArmAngle = Degrees.of(83.801389); //used in cos math, so this is equivalent to ~80 degrees either side of the left horizon //TODO this is currently straight up, this might change
+        public static final Angle kSafeArmAngle = Degrees.of(90);
+        public static final Angle kMoveableArmAngle = Degrees.of(83.801389);
         public static final Angle kReturnArmAngle = Degrees.of(120);
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
