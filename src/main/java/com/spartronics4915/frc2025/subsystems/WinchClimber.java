@@ -21,6 +21,7 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -70,12 +71,14 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     }
 
     private void turnArmBrakeModeOn() {
+        if (RobotBase.isSimulation()) return;
         SparkBaseConfig newConfig = new SparkMaxConfig().idleMode(IdleMode.kBrake);
 
         mArmMotor.configureAsync(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     private void turnArmBrakeModeOff() {
+        if (RobotBase.isSimulation()) return;
         SparkBaseConfig newConfig = new SparkMaxConfig().idleMode(IdleMode.kCoast);
 
         mArmMotor.configureAsync(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
