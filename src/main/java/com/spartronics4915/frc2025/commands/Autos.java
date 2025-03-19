@@ -47,9 +47,6 @@ public final class Autos {
         ;
         public final String pathName;
 
-        //TODO create Mirroring so that we can switch different coral stations intuitively
-        //TODO create "getReverse", ie Coral-2 reversed is 2-Coral
-
         /**
          * @return The inverse of the current path (return to approach and vise versa)
          */
@@ -67,21 +64,6 @@ public final class Autos {
                 case FOUR_CORAL: return CORAL_FOUR;
                 case FIVE_CORAL: return CORAL_FIVE;
                 case SIX_CORAL: return CORAL_SIX;
-            }
-            return this;
-        }
-
-        /**
-         * @return The apporach / return path for the mirrored side 
-         */
-        public AutoPaths getMirror(){
-            switch (this) {
-                case CORAL_ONE: return CORAL_ONE;
-                case CORAL_TWO: return TWO_CORAL;
-                case CORAL_THREE: return THREE_CORAL;
-                case ONE_CORAL: return ONE_CORAL;
-                case TWO_CORAL: return CORAL_TWO;
-                case THREE_CORAL: return CORAL_THREE;
             }
             return this;
         }
