@@ -210,6 +210,6 @@ public class ComplexAutoChooser extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updatePreviewField(swerve.getPose());
+        if (DriverStation.isAutonomous()) updatePreviewField(swerve.getPose());
     }
 }
