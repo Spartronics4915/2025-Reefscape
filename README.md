@@ -10,7 +10,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | -------- | ------- |
 | Left Stick |  Drive |
 | Push Left Stick |  Reset field relative heading |
-| Right Stick | Field angle |
+| Right Stick | Rotate |
 | Push Right Stick | *None* |
 | A | Set field relative heading |
 | B | Toggle field relative |
