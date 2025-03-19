@@ -270,10 +270,6 @@ public class RobotContainer {
                 }, Set.of())
             );
 
-            
-
-            driverController.back().onTrue(dynamics.gotoClimb());
-
             driverController.x().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
                                     .onFalse(climberSubsystem.stopWinchCommand());
 

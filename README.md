@@ -24,7 +24,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Down | Nudge backwards |
 | D-pad Left | Nudge left |
 | D-pad Right | Nudge right |
-| Windows | Goto pre-climb preset |
+| Windows | *None* |
 | Menu | Auto-align to middle of reef |
 
 ## Operator controller
@@ -43,6 +43,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Right Trigger | Score |
 | Left Bumper | Retract climber |
 | Right Bumper | Engage climber |
+| Left/Right Bumper | Arm climb preset |
 | D-pad Up | (Manual) Elevator up |
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |
