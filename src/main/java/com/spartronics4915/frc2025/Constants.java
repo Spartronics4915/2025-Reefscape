@@ -257,7 +257,7 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(3.0);
-            public static final Distance kPositionTolerance = Centimeter.of(1.0);
+            public static final Distance kPositionTolerance = Centimeter.of(1.5);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(2);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.05);
