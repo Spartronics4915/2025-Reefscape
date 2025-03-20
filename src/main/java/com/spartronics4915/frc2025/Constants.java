@@ -257,7 +257,7 @@ public final class Constants {
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(3.0);
-            public static final Distance kPositionTolerance = Centimeter.of(1.0);
+            public static final Distance kPositionTolerance = Centimeter.of(1.5);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(2);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.05);
@@ -491,7 +491,7 @@ public final class Constants {
 
         public static final Constraints constraints = new Constraints(6.0, 6.0); //12, 7.5
 
-        public static final double minHeight = 0;
+        public static final double minHeight = 0.01;
         public static final double maxHeight = 1.24;
 
         // Not using elevator feedforward constants for now, so just commenting them out.

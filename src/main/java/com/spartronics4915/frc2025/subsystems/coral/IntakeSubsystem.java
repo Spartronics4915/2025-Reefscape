@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -23,13 +24,15 @@ import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,6 +49,13 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     // private var sensor;
     private LaserCan lc;
+
+    private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("applied out").publish();
+    private final DoublePublisher velocityPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Velocity").publish();
+    private final BooleanPublisher lCPub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("LC").publish();
+
+    private RelativeEncoder mEncoder;
+
 
     public IntakeSubsystem() {
         // mMotor1 = new SparkMax(IntakeConstants.kMotorID1, MotorType.kBrushless);
@@ -65,19 +75,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             System.out.println("Configuration failed! " + e);
           }
 
-        Shuffleboard.getTab("loggingIntake").addDouble("appliedOut", mMotor1::getAppliedOutput);
-        Shuffleboard.getTab("loggingIntake").addDouble("velocity", ()-> mMotor1.getEncoder().getVelocity());
-        Shuffleboard.getTab("loggingIntake").addBoolean("laserCAN", ()-> {
-            
-            LaserCan.Measurement measurement = lc.getMeasurement();
-            if (measurement == null) {
-                return false;
-            }
-
-            return measurement.distance_mm < IntakeConstants.laserCANDistance;
-        });
-
-
+        mEncoder = mMotor1.getEncoder();
 
         SmartDashboard.putData("IntakeSpeed: IN", setPresetSpeedCommand(IntakeSpeed.IN));
         SmartDashboard.putData("IntakeSpeed: NEUTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
@@ -137,10 +135,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public AngularVelocity getSpeed(){
         return RPM.of(mMotor1.getEncoder().getVelocity());
     }
-    // @Override
-    // public void periodic() {
-    //     detect();
-    // }
+    @Override
+    public void periodic() {
+        appliedOutPub.accept(mMotor1.getAppliedOutput());
+        velocityPub.accept(mEncoder.getVelocity());
+        lCPub.accept(detect());
+    }
 
     @Override
     public void onModeSwitch() {
