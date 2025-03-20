@@ -197,7 +197,7 @@ public final class Constants {
         public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(kMaxSpeed.in(MetersPerSecond) * Math.PI / kChassisRadius);
 
         public static final class AutoConstants {
-            public static final PIDConstants kTranslationPID = new PIDConstants(5.0,0,0);
+            public static final PIDConstants kTranslationPID = new PIDConstants(6.0,0,0);
             public static final PIDConstants kRotationPID = new PIDConstants(5.0,0,0);
 
             public static final PPHolonomicDriveController kDriveController = new PPHolonomicDriveController(
@@ -250,28 +250,28 @@ public final class Constants {
             }
 
             public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
-                new PIDConstants(5.25, 0.0, 0.0), 
+                new PIDConstants(5.5, 0.0, 0.1, 0.0), 
                 Drive.AutoConstants.kRotationPID
             );
 
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
             public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(3.0);
-            public static final Distance kPositionTolerance = Centimeter.of(1.5);
+            public static final Distance kPositionTolerance = Centimeter.of(1.75);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(2);
 
             public static final Time kEndTriggerDebounce = Seconds.of(0.04);
 
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
-            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.75);
+            public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
 
@@ -512,7 +512,7 @@ public final class Constants {
 
         public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 1.1;
+        public static final double kSafeElevHeightForSwerve = 1.2;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90);

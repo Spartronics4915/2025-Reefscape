@@ -181,7 +181,7 @@ public class DynamicsCommandFactory {
     }
 
     public boolean isSwerveMovable(){
-        return getElevHeight() < kSafeElevHeightForSwerve;
+        return (getElevHeight() < kSafeElevHeightForSwerve) && isElevSafeToMove();
     }
 
     public boolean hasNotJustScored() {

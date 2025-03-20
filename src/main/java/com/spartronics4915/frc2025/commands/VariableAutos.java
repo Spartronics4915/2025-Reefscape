@@ -71,9 +71,9 @@ public class VariableAutos {
 
     // X = side to side, Y = away from tag
     public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
-        LEFT(new Translation2d(-0.153209, 0.5406845 + 0.01)),
-        RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565 + 0.01)),
-        MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.01));
+        LEFT(new Translation2d(-0.153209, 0.5406845 + 0.02)),
+        RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565 + 0.02)),
+        MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.02));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -229,7 +229,7 @@ public class VariableAutos {
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
                 pathPair.autoAlign,
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
-                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
+                    Commands.waitUntil(() -> isSwerveCloseToReef()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
