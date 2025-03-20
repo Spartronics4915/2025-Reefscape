@@ -48,7 +48,7 @@
   "folder": "Pairs",
   "idealStartingState": {
     "velocity": 1.0,
-    "rotation": 119.99999999999999
+    "rotation": 144.44413884477916
   },
   "useDefaultConstraints": true
 }
