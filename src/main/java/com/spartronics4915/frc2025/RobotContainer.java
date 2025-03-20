@@ -160,13 +160,13 @@ public class RobotContainer {
             swerveSubsystem
         ); 
 
-        // MechanismRenderer.generateRenderer(
-        //     elevatorSubsystem::getDesiredPosition, 
-        //     () -> armSubsystem.getTargetPosition().getMeasure(), 
-        //     () -> RPM.of(intakeSubsystem.setpoint), 
-        //     intakeSubsystem::detect,
-        //     "Target Position"
-        // );
+        MechanismRenderer.generateRenderer(
+            elevatorSubsystem::getDesiredPosition, 
+            () -> armSubsystem.getTargetPosition().getMeasure(), 
+            () -> RPM.of(intakeSubsystem.setpoint), 
+            intakeSubsystem::detect,
+            "Target Position"
+        );
 
         // MechanismRenderer.generateRenderer(
         //     () -> Meters.of(elevatorSubsystem.getPosition()), 
