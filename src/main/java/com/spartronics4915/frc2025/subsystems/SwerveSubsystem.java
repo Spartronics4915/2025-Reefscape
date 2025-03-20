@@ -100,6 +100,9 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
             setPose(new Pose2d(16.3,4, Rotation2d.fromDegrees(180.0)));
         }));
 
+
+        System.out.println(swerveDrive.getMaximumModuleDriveVelocity() + "\t hello");
+
     }
 
     private static Pose2d guessStartingPosition() {

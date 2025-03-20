@@ -33,22 +33,23 @@ public final class Autos {
 
     public enum AutoPaths{
         CORAL_ONE("Coral-1"),
-        ONE_CORAL("1-Coral"),
+        ONE_CORAL("C1-Coral", true),
         CORAL_TWO("Coral-2"),
-        TWO_CORAL("2-Coral"),
+        TWO_CORAL("C2-Coral", true),
         CORAL_THREE("Coral-3"),
-        THREE_CORAL("3-Coral"),
+        THREE_CORAL("C3-Coral", true),
         CORAL_FOUR("Coral-4"),
-        FOUR_CORAL("4-Coral"),
+        FOUR_CORAL("C4-Coral", true),
         CORAL_FIVE("Coral-5"),
-        FIVE_CORAL("5-Coral"),
+        FIVE_CORAL("C5-Coral", true),
         CORAL_SIX("Coral-6"),
-        SIX_CORAL("6-Coral"),
+        SIX_CORAL("C6-Coral", true),
         START_FOUR("Start-4"),
         START_THREE("Start-3"),
         ;
         
         public final String pathName;
+        public final boolean isChoreo;
 
         /**
          * @return The inverse of the current path (return to approach and vise versa)
@@ -72,8 +73,14 @@ public final class Autos {
             return this;
         }
 
+        private AutoPaths(String path, boolean isChoreo) {
+            pathName = path;
+            this.isChoreo = isChoreo;
+        }
+
         private AutoPaths(String path) {
             pathName = path;
+            this.isChoreo = false;
         }
     }
 
@@ -84,7 +91,7 @@ public final class Autos {
     public static PathPlannerPath getAutoPath(AutoPaths pathChoice, boolean mirrored){
         PathPlannerPath path;
         try {
-            path = PathPlannerPath.fromPathFile(pathChoice.pathName);
+            path = (pathChoice.isChoreo) ? PathPlannerPath.fromChoreoTrajectory(pathChoice.pathName) : PathPlannerPath.fromPathFile(pathChoice.pathName);
         } catch (FileVersionException | IOException | ParseException e) {
             e.printStackTrace();
             throw new InvalidParameterException("invalid path");
