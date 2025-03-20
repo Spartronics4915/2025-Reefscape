@@ -1,6 +1,7 @@
 package com.spartronics4915.frc2025.commands;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
@@ -171,7 +172,7 @@ public class VariableAutos {
      * Outputs the entire auto cycle from station to branch with mechanism movement
      */
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side, false);
+        var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
             Commands.runOnce(() -> {
@@ -217,18 +218,19 @@ public class VariableAutos {
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side, true);
+        var pathPair = getPathPair(branch, side);
         
         return Commands.sequence(
-            Commands.deadline(
-                pathPair.approachPath,
-                Commands.sequence(
-                    dynamics.autoPrescore()
-                )
-            ),
-            Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
+            }),
+            Commands.print("auto align"),
+            Commands.parallel(
                 pathPair.autoAlign,
-                Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
+                Commands.sequence(
+                    Commands.print("auto prescoure"),
+                    dynamics.autoPrescore(),
+                    Commands.print("is swerve close to reef?"),
                     Commands.waitUntil(() -> isSwerveCloseToReef()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
@@ -252,39 +254,23 @@ public class VariableAutos {
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            )
-        ).withName("Starting Auto cycle")
+            ),
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kAutoPathConstraints); //!!! should this be in command sequence??? -shark
+            })
+        ).finallyDo(() -> {
+            alignmentGenerator.changePathConstraints(kAutoPathConstraints);
+        }).withName("Starting Auto cycle")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-    public PathPair getPathPair(FieldBranch branch, StationSide side, boolean starting){
+    public PathPair getPathPair(FieldBranch branch, StationSide side){
         boolean shouldMirror = side == StationSide.RIGHT;
 
         var branchSide = branch.simpleBranchInfo.branchSide;
         var reefSide = branch.simpleBranchInfo.reefSide;
 
-        var basePathPair = getPathPair(branchSide, reefSide, shouldMirror);
-
-        if (!starting) {
-            return basePathPair;
-        }
-
-        return new PathPair(getStartingPath(reefSide, branchSide), basePathPair.autoAlign, basePathPair.returnPath);
-    }
-
-    public Command getStartingPath(ReefSide reef, BranchSide branch){
-
-        switch (reef){
-            case FOUR:
-                return Autos.getAutoPathCommand(AutoPaths.START_FOUR, false);
-            case THREE:
-                return Autos.getAutoPathCommand(AutoPaths.START_THREE, false);
-            case FIVE:
-                return Autos.getAutoPathCommand(AutoPaths.START_THREE, true);
-            default:
-                return alignmentGenerator.generateCommand(reef, branch);
-        }
-
+        return getPathPair(branchSide, reefSide, shouldMirror);
     }
 
     public PathPair getPathPair(BranchSide fieldBranchSide, ReefSide fieldReefSide, boolean mirror){

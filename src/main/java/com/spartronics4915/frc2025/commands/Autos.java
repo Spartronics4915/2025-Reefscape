@@ -44,10 +44,7 @@ public final class Autos {
         FIVE_CORAL("C5-Coral", true),
         CORAL_SIX("Coral-6"),
         SIX_CORAL("C6-Coral", true),
-        START_FOUR("Start-4"),
-        START_THREE("Start-3"),
         ;
-        
         public final String pathName;
         public final boolean isChoreo;
 
@@ -68,7 +65,6 @@ public final class Autos {
                 case FOUR_CORAL: return CORAL_FOUR;
                 case FIVE_CORAL: return CORAL_FIVE;
                 case SIX_CORAL: return CORAL_SIX;
-                case START_FOUR: return START_FOUR;
             }
             return this;
         }
