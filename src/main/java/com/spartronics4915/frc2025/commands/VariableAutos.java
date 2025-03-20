@@ -1,7 +1,6 @@
 package com.spartronics4915.frc2025.commands;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
@@ -72,9 +71,9 @@ public class VariableAutos {
 
     // X = side to side, Y = away from tag
     public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
-        LEFT(new Translation2d(-0.153209, 0.5406845)),
-        RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565)),
-        MIDDLE(new Translation2d(0.064853, 0.5408565));
+        LEFT(new Translation2d(-0.153209, 0.5406845 + 0.01)),
+        RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565 + 0.01)),
+        MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.01));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {

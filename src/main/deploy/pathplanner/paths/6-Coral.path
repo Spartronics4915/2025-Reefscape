@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0014488636363637,
-        "y": 5.984417613636364
+        "x": 2.8254525691026107,
+        "y": 5.992351476686771
       },
       "isLocked": false,
       "linkedName": "Reef exit 6"
@@ -20,8 +20,8 @@
         "y": 6.891832386363636
       },
       "prevControl": {
-        "x": 1.7716193181818196,
-        "y": 6.208778409090908
+        "x": 1.4817878224349819,
+        "y": 6.749351146275949
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,8 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 4.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

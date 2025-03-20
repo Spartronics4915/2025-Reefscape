@@ -250,7 +250,7 @@ public final class Constants {
             }
 
             public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
-                Drive.AutoConstants.kTranslationPID, 
+                new PIDConstants(5.25, 0.0, 0.0), 
                 Drive.AutoConstants.kRotationPID
             );
 
@@ -260,7 +260,7 @@ public final class Constants {
             public static final Distance kPositionTolerance = Centimeter.of(1.5);
             public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(2);
 
-            public static final Time kEndTriggerDebounce = Seconds.of(0.05);
+            public static final Time kEndTriggerDebounce = Seconds.of(0.04);
 
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
             public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.75);
@@ -269,11 +269,9 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
-
             public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
 
