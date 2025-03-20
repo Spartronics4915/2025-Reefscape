@@ -172,7 +172,7 @@ public class VariableAutos {
      * Outputs the entire auto cycle from station to branch with mechanism movement
      */
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, false);
         
         return Commands.sequence(
             Commands.runOnce(() -> {
@@ -218,20 +218,19 @@ public class VariableAutos {
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, true);
         
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
-            }),
-            Commands.print("auto align"),
-            Commands.parallel(
-                pathPair.autoAlign,
+            Commands.deadline(
+                pathPair.approachPath,
                 Commands.sequence(
-                    Commands.print("auto prescoure"),
-                    dynamics.autoPrescore(),
-                    Commands.print("is swerve close to reef?"),
-                    Commands.waitUntil(() -> isSwerveCloseToReef()),
+                    dynamics.autoPrescore()
+                )
+            ),
+            Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
+                pathPair.autoAlign,
+                Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
+                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
                     Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
@@ -254,23 +253,39 @@ public class VariableAutos {
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            ),
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kAutoPathConstraints); //!!! should this be in command sequence??? -shark
-            })
-        ).finallyDo(() -> {
-            alignmentGenerator.changePathConstraints(kAutoPathConstraints);
-        }).withName("Starting Auto cycle")
+            )
+        ).withName("Starting Auto cycle")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-    public PathPair getPathPair(FieldBranch branch, StationSide side){
+    public PathPair getPathPair(FieldBranch branch, StationSide side, boolean starting){
         boolean shouldMirror = side == StationSide.RIGHT;
 
         var branchSide = branch.simpleBranchInfo.branchSide;
         var reefSide = branch.simpleBranchInfo.reefSide;
 
-        return getPathPair(branchSide, reefSide, shouldMirror);
+        var basePathPair = getPathPair(branchSide, reefSide, shouldMirror);
+
+        if (!starting) {
+            return basePathPair;
+        }
+
+        return new PathPair(getStartingPath(reefSide, branchSide), basePathPair.autoAlign, basePathPair.returnPath);
+    }
+
+    public Command getStartingPath(ReefSide reef, BranchSide branch){
+
+        switch (reef){
+            case FOUR:
+                return Autos.getAutoPathCommand(AutoPaths.START_FOUR, false);
+            case THREE:
+                return Autos.getAutoPathCommand(AutoPaths.START_THREE, false);
+            case FIVE:
+                return Autos.getAutoPathCommand(AutoPaths.START_THREE, true);
+            default:
+                return alignmentGenerator.generateCommand(reef, branch);
+        }
+
     }
 
     public PathPair getPathPair(BranchSide fieldBranchSide, ReefSide fieldReefSide, boolean mirror){

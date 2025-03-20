@@ -44,7 +44,10 @@ public final class Autos {
         FIVE_CORAL("5-Coral"),
         CORAL_SIX("Coral-6"),
         SIX_CORAL("6-Coral"),
+        START_FOUR("Start-4"),
+        START_THREE("Start-3"),
         ;
+        
         public final String pathName;
 
         /**
@@ -64,6 +67,7 @@ public final class Autos {
                 case FOUR_CORAL: return CORAL_FOUR;
                 case FIVE_CORAL: return CORAL_FIVE;
                 case SIX_CORAL: return CORAL_SIX;
+                case START_FOUR: return START_FOUR;
             }
             return this;
         }

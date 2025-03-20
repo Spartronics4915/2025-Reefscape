@@ -9,7 +9,7 @@
   "autoFolders": [
     "debug"
   ],
-  "defaultMaxVel": 4.0,
+  "defaultMaxVel": 5.0,
   "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

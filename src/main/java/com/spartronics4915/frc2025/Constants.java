@@ -269,11 +269,11 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.75, 3.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
             public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
 
@@ -491,7 +491,7 @@ public final class Constants {
 
         public static final Constraints constraints = new Constraints(6.0, 6.0); //12, 7.5
 
-        public static final double minHeight = 0.01;
+        public static final double minHeight = 0.0;
         public static final double maxHeight = 1.24;
 
         // Not using elevator feedforward constants for now, so just commenting them out.
@@ -514,7 +514,7 @@ public final class Constants {
 
         public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
 
-        public static final double kSafeElevHeightForSwerve = 1.0;
+        public static final double kSafeElevHeightForSwerve = 1.1;
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90);
