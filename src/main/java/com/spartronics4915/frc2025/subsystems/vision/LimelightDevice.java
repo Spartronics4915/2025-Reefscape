@@ -105,7 +105,7 @@ public class LimelightDevice extends SubsystemBase {
         final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01);
         final PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (!LimelightHelpers.validPoseEstimate(poseEstimate)) return Optional.empty();
-        if (poseEstimate.avgTagDist > VisionConstants.kMaxDistance) return Optional.empty();
+        if (!BEFORE_MATCH && poseEstimate.avgTagDist > VisionConstants.kMaxDistance) return Optional.empty();
         final boolean twoOrMoreTags = poseEstimate.tagCount >= 2;
         final boolean closeEnough = poseEstimate.avgTagDist < VisionConstants.kMaxDistanceForMegaTag1;
         double robotSpeed = swerve.getSpeed();
