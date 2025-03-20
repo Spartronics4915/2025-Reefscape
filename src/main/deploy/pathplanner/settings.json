@@ -1,5 +1,5 @@
 {
-  "robotWidth": 0.762,
+  "robotWidth": 0.76,
   "robotLength": 0.762,
   "holonomicMode": true,
   "pathFolders": [
@@ -14,7 +14,7 @@
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
-  "robotMass": 120.0,
+  "robotMass": 125.0,
   "robotMOI": 4.862,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.048,
