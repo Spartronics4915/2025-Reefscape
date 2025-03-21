@@ -84,6 +84,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         RumbleFeedbackHandler.handleControllers();
 
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
         // SmartDashboard.putData("PDH", powerDistribution);
     }
 
