@@ -224,12 +224,12 @@ public final class Constants {
                     new Translation2d(Inches.of(-12.125), Inches.of(-12.4375))
                 )),
                 COMP_CHASSIS(new RobotConfig(
-                    Kilogram.of(125), 
+                    Kilogram.of(142), 
                     KilogramSquareMeters.of(4.86247863),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(5.273),
-                        1.542,
+                        0.8,
                         DCMotor.getNEO(1),
                         5.900,
                         Amps.of(40),
