@@ -351,7 +351,7 @@ public final class Constants {
         public static final double kMaxAngularSpeed = 720;
         public static final double kMaxSpeedForMegaTag1 = 0.5; //meters
         public static final double kMaxDistanceForMegaTag1 = 3.75; //meters
-        public static final double kMaxDistance = 3; // FIXME for testing if readings at the coral station causes problems during auto, increase this value if this doesn't resolve issues
+        public static final double kMaxDistance = 8; // FIXME for testing if readings at the coral station causes problems during auto, increase this value if this doesn't resolve issues
         public static final boolean kVisionDiagnostics = true;
         
         public static final Time newMegaTag1ReadingThreshold = Seconds.of(10);
