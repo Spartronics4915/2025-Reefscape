@@ -33,17 +33,17 @@ public final class Autos {
 
     public enum AutoPaths{
         CORAL_ONE("Coral-1"),
-        ONE_CORAL("C1-Coral", true),
+        ONE_CORAL("1-Coral", false),
         CORAL_TWO("Coral-2"),
-        TWO_CORAL("C2-Coral", true),
+        TWO_CORAL("2-Coral", false),
         CORAL_THREE("Coral-3"),
-        THREE_CORAL("C3-Coral", true),
+        THREE_CORAL("3-Coral", false),
         CORAL_FOUR("Coral-4"),
-        FOUR_CORAL("C4-Coral", true),
+        FOUR_CORAL("4-Coral", false),
         CORAL_FIVE("Coral-5"),
-        FIVE_CORAL("C5-Coral", true),
+        FIVE_CORAL("5-Coral", false),
         CORAL_SIX("Coral-6"),
-        SIX_CORAL("C6-Coral", true),
+        SIX_CORAL("6-Coral", false),
         ;
         public final String pathName;
         public final boolean isChoreo;
