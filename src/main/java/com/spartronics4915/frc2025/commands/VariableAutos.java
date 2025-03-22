@@ -31,6 +31,7 @@ public class VariableAutos {
         L4(DynaPreset.L4),
         L3(DynaPreset.L3),
         L2(DynaPreset.L2),
+        L1(DynaPreset.L1)
         ;
 
         public final DynaPreset preset;
@@ -172,7 +173,7 @@ public class VariableAutos {
      * Outputs the entire auto cycle from station to branch with mechanism movement
      */
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, height);
         
         return Commands.sequence(
             Commands.runOnce(() -> {
@@ -218,7 +219,7 @@ public class VariableAutos {
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, height);
         
         return Commands.sequence(
             Commands.runOnce(() -> {
@@ -264,10 +265,10 @@ public class VariableAutos {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-    public PathPair getPathPair(FieldBranch branch, StationSide side){
+    public PathPair getPathPair(FieldBranch branch, StationSide side, BranchHeight height){
         boolean shouldMirror = side == StationSide.RIGHT;
 
-        var branchSide = branch.simpleBranchInfo.branchSide;
+        var branchSide = height == BranchHeight.L1 ? BranchSide.MIDDLE : branch.simpleBranchInfo.branchSide;
         var reefSide = branch.simpleBranchInfo.reefSide;
 
         return getPathPair(branchSide, reefSide, shouldMirror);
