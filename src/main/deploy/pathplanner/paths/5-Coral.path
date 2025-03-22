@@ -20,15 +20,20 @@
         "y": 7.000175739158278
       },
       "prevControl": {
-        "x": 1.4903251999000493,
-        "y": 6.762524809907136
+        "x": 1.4905402347156058,
+        "y": 6.762368432360079
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Coral Station"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6036036036036009,
+      "rotationDegrees": -54.011
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",

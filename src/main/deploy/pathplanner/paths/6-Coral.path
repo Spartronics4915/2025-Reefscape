@@ -28,7 +28,12 @@
       "linkedName": "Coral Station"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5315315315315339,
+      "rotationDegrees": -54.011
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
