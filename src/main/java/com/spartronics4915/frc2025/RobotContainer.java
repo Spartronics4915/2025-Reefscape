@@ -442,6 +442,7 @@ public class RobotContainer {
         SmartDashboard.putData("Climber: stop", climberSubsystem.stopArmCommand());
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
         SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
+        SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
 
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 
