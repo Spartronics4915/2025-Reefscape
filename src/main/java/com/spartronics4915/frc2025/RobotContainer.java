@@ -98,12 +98,12 @@ public class RobotContainer {
     private static final CommandXboxController operatorController = new CommandXboxController(
         OI.kOperatorControllerPort);
         
-    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+    private static final CommandXboxController debugController = DriverStation.isFMSAttached() ? null : new CommandXboxController(OI.kDebugControllerPort);
 
     private enum Rumble{
         DRIVER(driverController),
-        OPERATOR(operatorController),
-        DEBUG(debugController);
+        OPERATOR(operatorController);
+        // DEBUG(debugController);
 
         public final RumbleController controller;
 
@@ -447,11 +447,13 @@ public class RobotContainer {
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 
     
-        debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
-                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
+        if (debugController != null) {
+            debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
+                               .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
 
-        debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
-                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+            debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
+                               .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+        }
 
         operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
     
