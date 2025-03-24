@@ -487,7 +487,7 @@ public class RobotContainer {
             var variableAuto = Commands.defer(complexAutoChooser::getAuto, Set.of(swerveSubsystem));
             variableAuto.setName("variableAuto");
 
-            chooser.addOption("Create auto...", variableAuto);
+            chooser.setDefaultOption("Create auto...", variableAuto);
 
             // chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
             // chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
@@ -528,14 +528,17 @@ public class RobotContainer {
             ));
         }
 
-        chooser.onChange((c) -> {
-            SmartDashboard.putBoolean("Using Variable Auto?", c.getName() == "variableAuto");
-        });
-
+        chooser.onChange(RobotContainer::postIfUsingVariableAutos);
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
+        postIfUsingVariableAutos(chooser.getSelected());
+
         return chooser;
+    }
+
+    private static void postIfUsingVariableAutos(Command c) {
+        SmartDashboard.putBoolean("Using Variable Auto?", c.getName() == "variableAuto");
     }
 
     public static CommandXboxController getDriveController() {
