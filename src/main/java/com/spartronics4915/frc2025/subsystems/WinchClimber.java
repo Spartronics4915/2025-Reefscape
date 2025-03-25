@@ -17,12 +17,16 @@ import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngag
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
+
+import java.util.Set;
+
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
@@ -33,6 +37,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     private final RelativeEncoder mEncoder;
+
+    private ClimberSpeeds operatorArmState = ClimberSpeeds.ENGAGE;
+    private WinchSpeeds operatorWinchState = WinchSpeeds.RETRACT;
 
     public WinchClimber() {
         super();
@@ -122,6 +129,33 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     public Command winchEngagedCommand() {
         return this.runOnce(() -> winchEngaged());
+    }
+
+    public Command operatorClimberArmCommand(boolean isPressed) {
+        if (isPressed) return Commands.defer(() -> {
+            return setClimberSpeedsCommand(operatorArmState);
+        }, Set.of());
+        else return Commands.runOnce(() -> {
+            stopArm();
+            switch (operatorArmState) {
+                case ENGAGE: operatorArmState = ClimberSpeeds.RETRACT; break;
+                case RETRACT: operatorArmState = ClimberSpeeds.ENGAGE; break;
+            }
+        });
+    }
+
+    public Command operatorClimberWinchCommand(boolean isPressed) {
+        if (isPressed) return Commands.defer(() -> {
+            return setWinchSpeedsCommand(operatorWinchState);
+        }, Set.of());
+        else return Commands.runOnce(() -> {
+            stopWinch();
+            turnArmBrakeModeOn();
+            switch (operatorWinchState) {
+                case EASE: operatorWinchState = WinchSpeeds.RETRACT; break;
+                case RETRACT: operatorWinchState = WinchSpeeds.EASE; break;
+            }
+        });
     }
 
     // @Override

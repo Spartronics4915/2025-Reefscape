@@ -271,12 +271,6 @@ public class RobotContainer {
                 }, Set.of())
             );
 
-            driverController.x().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
-                                    .onFalse(climberSubsystem.stopWinchCommand());
-
-            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.EASE))
-                                    .onFalse(climberSubsystem.stopWinchCommand());
-
             driverController.leftBumper().whileTrue(
                 alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
                 //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
@@ -411,13 +405,12 @@ public class RobotContainer {
             dynamics.gotoScore(DynaPreset.ALGAE_LOW)
         ).onFalse(dynamics.removeAlgaeArm());
 
-        operatorController.leftBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT))
-                                       .onTrue(dynamics.gotoClimb())
-                                       .onFalse(climberSubsystem.stopArmCommand());
+        operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
+                                       .onFalse(climberSubsystem.operatorClimberWinchCommand(false));
 
-        operatorController.rightBumper().onTrue(climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE))
-                                       .onTrue(dynamics.gotoClimb())
-                                       .onFalse(climberSubsystem.stopArmCommand());
+        operatorController.rightBumper().onTrue(climberSubsystem.operatorClimberArmCommand(true))
+                                        .onFalse(climberSubsystem.operatorClimberArmCommand(false))
+                                        .onTrue(dynamics.gotoClimb());
         
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
