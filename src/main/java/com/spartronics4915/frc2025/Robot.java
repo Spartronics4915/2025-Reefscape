@@ -57,13 +57,13 @@ public class Robot extends TimedRobot {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         FollowPathCommand.warmupCommand().schedule();
 
-        // // BuildConstants will generate when you build
-        // SmartDashboard.putString("Git/SHA", BuildConstants.GIT_SHA);
-        // SmartDashboard.putString("Git/Branch", BuildConstants.GIT_BRANCH);
-        // SmartDashboard.putString("Git/Commit Date", BuildConstants.GIT_DATE);
-        // SmartDashboard.putString("Git/Build Date", BuildConstants.BUILD_DATE);
-        // SmartDashboard.putBoolean("Git/Dirty", BuildConstants.DIRTY == 1);
-        // SmartDashboard.putNumber("Git/Revision", BuildConstants.GIT_REVISION);
+        // BuildConstants will generate when you build
+        SmartDashboard.putString("Git/SHA", BuildConstants.GIT_SHA);
+        SmartDashboard.putString("Git/Branch", BuildConstants.GIT_BRANCH);
+        SmartDashboard.putString("Git/Commit Date", BuildConstants.GIT_DATE);
+        SmartDashboard.putString("Git/Build Date", BuildConstants.BUILD_DATE);
+        SmartDashboard.putBoolean("Git/Dirty", BuildConstants.DIRTY == 1);
+        SmartDashboard.putNumber("Git/Revision", BuildConstants.GIT_REVISION);
 
         DriverStation.silenceJoystickConnectionWarning(true);
     }
