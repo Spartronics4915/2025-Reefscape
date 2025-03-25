@@ -397,13 +397,15 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        operatorController.leftStick().onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
-        ).onFalse(dynamics.removeAlgaeArm());
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.999) && (Math.abs(operatorController.getLeftX()) < 0.001)); //top left paddle
+        Trigger leftStickDown = new Trigger(() -> (operatorController.getLeftY() > 0.999) && (Math.abs(operatorController.getLeftX()) < 0.001)); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.999) && (Math.abs(operatorController.getRightX()) < 0.001)); //top right paddle
+        Trigger rightStickDown = new Trigger(() -> (operatorController.getRightY() > 0.999) && (Math.abs(operatorController.getRightX()) < 0.001)); //bottom right paddle
 
-        operatorController.rightStick().onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_LOW)
-        ).onFalse(dynamics.removeAlgaeArm());
+        leftStickDown.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
+        rightStickDown.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
+
+        leftStickUp.or(rightStickUp).onTrue(dynamics.removeAlgaeArm());
 
         operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
                                        .onFalse(climberSubsystem.operatorClimberWinchCommand(false));

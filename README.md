@@ -31,10 +31,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | input   | action |
 | -------- | ------- |
 | Left Stick | *None* |
-| Push Left Stick | High algae preset |
 | Right Stick | *None* |
-| Push Right Stick | Low algae preset |
-| Release Left/Right Stick | Algae arm preset |
 | A | L1 scoring preset |
 | B | L2 scoring preset |
 | X | L3 scoring preset |
@@ -49,6 +46,9 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Right | (Manual) Arm CW |
 | Windows | Unstuck coral |
 | Menu | Intake |
+| Bottom Left Paddle | High pre-algae removal preset |
+| Bottom Right Paddle | Low pre-algae removal preset |
+| Top Left/Right Paddle | Arm algae removal |
 
 ## Debug controller
 this is a controller that shouldn't be used during competition matches
