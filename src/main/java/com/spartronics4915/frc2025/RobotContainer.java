@@ -397,13 +397,13 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.999) && (Math.abs(operatorController.getLeftX()) < 0.001)); //top left paddle
-        Trigger leftStickDown = new Trigger(() -> (operatorController.getLeftY() > 0.999) && (Math.abs(operatorController.getLeftX()) < 0.001)); //bottom left paddle
-        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.999) && (Math.abs(operatorController.getRightX()) < 0.001)); //top right paddle
-        Trigger rightStickDown = new Trigger(() -> (operatorController.getRightY() > 0.999) && (Math.abs(operatorController.getRightX()) < 0.001)); //bottom right paddle
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.999) && ((Math.abs(operatorController.getLeftX()) < 0.001) || operatorController.getLeftX() < -0.99)); //top left paddle
+        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.999) && ((Math.abs(operatorController.getLeftY()) < 0.001) || operatorController.getLeftY() < -0.99)); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.999) && ((Math.abs(operatorController.getRightX()) < 0.001) || operatorController.getRightX() < -0.99)); //top right paddle
+        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.999) && ((Math.abs(operatorController.getRightY()) < 0.001) || operatorController.getRightY() < -0.99)); //bottom right paddle
 
-        leftStickDown.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
-        rightStickDown.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
+        leftStickLeft.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
+        rightStickLeft.onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
 
         leftStickUp.or(rightStickUp).onTrue(dynamics.removeAlgaeArm());
 
