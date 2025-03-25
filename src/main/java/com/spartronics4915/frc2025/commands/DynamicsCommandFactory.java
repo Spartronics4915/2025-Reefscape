@@ -281,10 +281,12 @@ public class DynamicsCommandFactory {
         );
     }
 
+    public boolean isAtSetpoint(DynaPreset setpoint) {
+        return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
+    }
+
     public Command waitUntilPreset(DynaPreset setpoint){
-        return Commands.waitUntil(() -> {
-            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
-        });
+        return Commands.waitUntil(() -> isAtSetpoint(setpoint));
     }
 
     //#endregion
@@ -354,7 +356,7 @@ public class DynamicsCommandFactory {
         return Commands.sequence(
             makeSystemSafeToMove(true, false, true),
             armPriorityMove(DynaPreset.CLIMB.setpoint)
-        ).onlyIf(() -> !(isElevAtSetpoint(DynaPreset.CLIMB.setpoint.heightMeters) && isArmAtSetpoint(DynaPreset.CLIMB.setpoint.armAngle, kArmAngleTolerance)))
+        ).onlyIf(() -> !(isAtSetpoint(DynaPreset.CLIMB)))
         .withName("Goto Climb");
     }
 
