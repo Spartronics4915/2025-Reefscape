@@ -274,7 +274,7 @@ public class RobotContainer {
             driverController.x().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.RETRACT))
                                     .onFalse(climberSubsystem.stopWinchCommand());
 
-            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.ENGAGE))
+            driverController.y().onTrue(climberSubsystem.setWinchSpeedsCommand(WinchSpeeds.EASE))
                                     .onFalse(climberSubsystem.stopWinchCommand());
 
             driverController.leftBumper().whileTrue(

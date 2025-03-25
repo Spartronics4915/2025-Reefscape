@@ -543,7 +543,7 @@ public final class Constants {
         //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
 
         public enum WinchSpeeds{
-            ENGAGE(0.95), //speed which it'll rotate to move and engage the cage
+            EASE(0.95), //speed which it'll rotate to move and engage the cage
             RETRACT(-0.95), //speed which it'll rotate to bring the cage down
             ;
 
