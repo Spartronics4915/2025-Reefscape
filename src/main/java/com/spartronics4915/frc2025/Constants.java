@@ -518,7 +518,7 @@ public final class Constants {
 
 
         public static final Angle kSafeArmAngle = Degrees.of(90);
-        public static final Angle kMoveableArmAngle = Degrees.of(83.801389);
+        public static final Angle kMoveableArmAngle = Degrees.of(76);
         public static final Angle kReturnArmAngle = Degrees.of(120);
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
