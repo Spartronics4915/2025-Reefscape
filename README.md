@@ -48,7 +48,8 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Menu | Intake |
 | Bottom Left Paddle | High pre-algae removal preset |
 | Bottom Right Paddle | Low pre-algae removal preset |
-| Top Left/Right Paddle | Arm algae removal |
+| Top Left Paddle | Algae 'safety' (must be held for other algae controls to work) |
+| Top Right Paddle | Arm algae removal |
 
 ## Debug controller
 this is a controller that shouldn't be used during competition matches
