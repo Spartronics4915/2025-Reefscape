@@ -1,25 +1,23 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
-import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
-import com.spartronics4915.frc2025.commands.autos.AlignToReef;
-
-import static com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset.*;
-
+import static com.spartronics4915.frc2025.Constants.BlingConstants.BAD;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.CYAN;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.FRAME_WAIT;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.MATCH_END;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.OFF;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.PURPLE;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.SHOW_SPARTRONICS;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.WHITE;
 import com.spartronics4915.frc2025.Robot;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-
-import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
 
 public class DriverCommunication extends BlingSegment {
     private SwerveSubsystem swerve;
@@ -32,7 +30,6 @@ public class DriverCommunication extends BlingSegment {
 
     private BlingSegment current = OFF;
 
-    private static BlingSegment autoSegment = RAINBOW;
 
     public static enum Region {
         REEF(
@@ -69,6 +66,11 @@ public class DriverCommunication extends BlingSegment {
         }
     }
 
+    public enum Misc {
+        FUNNEL_NO_CORAL();
+
+    }
+
     /**
      * @param length Length of the segment
      * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
@@ -103,7 +105,11 @@ public class DriverCommunication extends BlingSegment {
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
-            current = autoSegment;
+            if (dynamics.funnelDetect() == false) {
+                current = PURPLE;
+            }else{
+                current = WHITE;
+            }
         // } else if (vision != null && vision.newMegaTag1Reading()) {
         //     current = CYAN;
         //     alertFrames = 10;
@@ -115,10 +121,15 @@ public class DriverCommunication extends BlingSegment {
             current = BAD;
         }
         else {
-            Region closest = getClosestRegion(this.swerve);
+            
+            
+            
+            
+            
+           /*  Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
-            switch (closest) {
+              switch (closest) {
                 case PROCESSOR: // Extension of Reef zone
                 case REEF:
                     Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
@@ -147,7 +158,7 @@ public class DriverCommunication extends BlingSegment {
                         default:
                             current = OFF;
                             break;
-                    }
+                    } 
 
                     break;
                 case CORAL_STATION:
@@ -162,11 +173,11 @@ public class DriverCommunication extends BlingSegment {
                         else if (subsystemsInCorrectSpot) current = PURPLE; // Robot needs to move
                         else if (robotInRightSpot) current = WARN; // Mechanisms need to move
                         else current = OFF; // Should never be that
-                    }
+                    } 
 
                     break;
                 case BARGE:
-                    /* Climber Lights
+                     Climber Lights
                     if (DriverStation.getLocation().isEmpty()) {
                         current = OFF;
                         break;
@@ -184,15 +195,17 @@ public class DriverCommunication extends BlingSegment {
                     if (distance <= -BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? BLUE : RED;
                     else if (distance >= BARGE_ALIGNMMENT_THRESHOLD) current = isBlue ? RED : BLUE;
                     else current = RAINBOW; // It's climbin' time.
-                     */
+                     
 
                     current = SHOW_RAINBOW_FUN;
 
                     break;
+                
                 default:
                     current = OFF;
             }
-        }
+         */}
+    
 
         current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;
@@ -200,9 +213,10 @@ public class DriverCommunication extends BlingSegment {
 
         alertFrames--;
     }
+    
 
-    public static Command setAutoSegmentCommand(BlingSegment segment) {
+    /*public static Command setAutoSegmentCommand(BlingSegment segment) {
         return Commands.runOnce(() -> autoSegment = segment);
-    }
+    }*/
 
 }
