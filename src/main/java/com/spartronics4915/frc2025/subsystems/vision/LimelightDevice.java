@@ -209,4 +209,9 @@ public class LimelightDevice extends SubsystemBase {
         }
         return visibleTags;
     }
+
+    public void setLEDForceOn(boolean b) {
+        if (b) LimelightHelpers.setLEDMode_ForceOn(name);
+        else LimelightHelpers.setLEDMode_PipelineControl(name);
+    }
 }

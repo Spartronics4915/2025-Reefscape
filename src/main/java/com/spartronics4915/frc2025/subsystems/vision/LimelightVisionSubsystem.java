@@ -1,6 +1,7 @@
 package com.spartronics4915.frc2025.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.spartronics4915.frc2025.LimelightHelpers;
 import com.spartronics4915.frc2025.Constants.VisionConstants;
 import com.spartronics4915.frc2025.Constants.VisionConstants.PoseEstimationMethod;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -148,6 +150,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionDev
         Time sinceLastReading = Milliseconds.of(currentTime - lastMegaTag1Reading);
         boolean wantNewMegaTag1Reading = sinceLastReading.gte(VisionConstants.newMegaTag1ReadingThreshold);
         SmartDashboard.putBoolean("VisionDiagnostics/Want New MT1 Reading?", wantNewMegaTag1Reading);
+
+        if (sinceLastReading.lte(Seconds.of(0.1)) || wantNewMegaTag1Reading) limelights.forEach(el -> el.setLEDForceOn(wantNewMegaTag1Reading));
 
         getVisionMeasurements().forEach((measurement) -> {
             if (!initalPoseSet) {
