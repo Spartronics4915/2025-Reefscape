@@ -82,9 +82,10 @@ public class DynamicsCommandFactory {
         PRESCORE(0.2, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
         AUTO_PRESCORE(0.4, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
         L1(0.0, Rotation2d.fromDegrees(20)),
+        //FIXME test L2/L3/L4 presets at comp on practice field when auto aligned and when up against the reef
         L2(0.01, Rotation2d.fromDegrees(44.65)),
         L3(Meters.of(0.269).in(Meters), Rotation2d.fromDegrees(75.5)),
-        L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
+        L4(Meters.of(1.12).in(Meters), Rotation2d.fromDegrees(32)),
         CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
         ALGAE_HIGH(0.78 - 0.03, Rotation2d.fromDegrees(90)),
         ALGAE_LOW(0.375 - 0.03, Rotation2d.fromDegrees(90));
