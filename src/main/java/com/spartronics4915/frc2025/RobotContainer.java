@@ -397,10 +397,10 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.999) && ((Math.abs(operatorController.getLeftX()) < 0.001) || operatorController.getLeftX() < -0.99)); //top left paddle
-        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.999) && ((Math.abs(operatorController.getLeftY()) < 0.001) || operatorController.getLeftY() < -0.99)); //bottom left paddle
-        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.999) && ((Math.abs(operatorController.getRightX()) < 0.001) || operatorController.getRightX() < -0.99)); //top right paddle
-        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.999) && ((Math.abs(operatorController.getRightY()) < 0.001) || operatorController.getRightY() < -0.99)); //bottom right paddle
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.99) && ((Math.abs(operatorController.getLeftX()) < 0.01) || operatorController.getLeftX() < -0.99)); //top left paddle
+        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.99) && ((Math.abs(operatorController.getLeftY()) < 0.01) || operatorController.getLeftY() < -0.99)); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.99) && ((Math.abs(operatorController.getRightX()) < 0.01) || operatorController.getRightX() < -0.99)); //top right paddle
+        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.99) && ((Math.abs(operatorController.getRightY()) < 0.01) || operatorController.getRightY() < -0.99)); //bottom right paddle
 
         Trigger algaeSafety = leftStickUp;
 
