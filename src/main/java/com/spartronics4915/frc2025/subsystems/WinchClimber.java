@@ -185,6 +185,12 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         if (kRetractedAngle >= mEncoder.getPosition()){
             isClimbed = true;
         } else { isClimbed = false; }
+
+        if (isWinchEngaged==true) {
+            mIntakeMotor.set(0.01);
+        } else {
+            mIntakeMotor.set(0.00);
+        }
     } 
     
     @Override
