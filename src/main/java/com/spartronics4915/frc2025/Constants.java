@@ -71,6 +71,7 @@ public final class Constants {
         public static final int kMotorID = 12;
 
         public static final int kLaserCANID = 21;
+        public static final int kPipeLCID = 25;
         public static final int laserCANDistance = 110;
 
         public static final int smartCurrentLimit = 18;
