@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
@@ -178,7 +179,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     @Override
     public void periodic() {
-        if (kEngagedAngle <=mEncoder.getPosition()){
+        if (kEngagedAngle <= mEncoder.getPosition()){
             isWinchEngaged = true;
         } else { isWinchEngaged = false; }
 
@@ -187,7 +188,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         } else { isClimbed = false; }
 
         if (isWinchEngaged==true) {
-            mIntakeMotor.set(0.01);
+            mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
         } else {
             mIntakeMotor.set(0.00);
         }
