@@ -9,11 +9,14 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorConfig;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
@@ -33,9 +36,10 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
     private boolean isClimbed = false;
-    private boolean winchEngaged = false;
+    private boolean isWinchEngaged = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
+    private final SparkBase mIntakeMotor;
     private final RelativeEncoder mEncoder;
 
     private ClimberSpeeds operatorArmState = ClimberSpeeds.ENGAGE;
@@ -50,8 +54,12 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         mArmMotor = new SparkMax(kArmMotorID, MotorType.kBrushless);
         mArmMotor.configure(kArmMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        mIntakeMotor = new SparkMax(kIntakeMotorID, MotorType.kBrushless);
+        mIntakeMotor.configure(kIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         mEncoder = mArmMotor.getEncoder();    //figure out conversions
 
+        isWinchEngaged = false;
         isClimbed = false;
 
         // mEncoder.setPosition(kStartingAngle.getRotations());
@@ -171,9 +179,19 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     @Override
     public void periodic() {
+        if (kEngagedAngle <= mEncoder.getPosition()){
+            isWinchEngaged = true;
+        } else { isWinchEngaged = false; }
+
         if (kRetractedAngle >= mEncoder.getPosition()){
             isClimbed = true;
         } else { isClimbed = false; }
+
+        if (isWinchEngaged==true) {
+            mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
+        } else {
+            mIntakeMotor.set(0.00);
+        }
     } 
     
     @Override
