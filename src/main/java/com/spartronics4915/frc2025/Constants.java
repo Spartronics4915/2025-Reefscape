@@ -570,6 +570,7 @@ public final class Constants {
         
         public static final int kWinchMotorID = 13;
         public static final int kArmMotorID = 23;
+        public static final int kIntakeMotorID = 24;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1/7.0 * 1/4.0)
@@ -584,6 +585,13 @@ public final class Constants {
             .idleMode(IdleMode.kBrake)
         ;
 
+        public static final SparkBaseConfig kIntakeMotorConfig = new SparkMaxConfig()
+        .smartCurrentLimit(18)                                            //need to set smartCurrentLimit + secondaryCurrentLimit
+        .secondaryCurrentLimit(20)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kBrake)
+    ;
         public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
         .smartCurrentLimit(18)
         .secondaryCurrentLimit(20)
@@ -597,7 +605,7 @@ public final class Constants {
         public static final double kEngagedAngle = (0.75); //angle to engage the cage
         public static final double kRetractedAngle = (0.5); //desired angle at the end of the match
 
-
+        public static final double intakeSpeed = 0.01;
 
 
     }
