@@ -10,9 +10,14 @@ import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -57,13 +62,21 @@ public class Robot extends TimedRobot {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         FollowPathCommand.warmupCommand().schedule();
 
+                // NetworkTables (also saved to DataLog by default)
+        NetworkTable metaData = NetworkTableInstance.getDefault().getTable("Metadata");
+
+        // DataLog (not published to NetworkTables)
+        StringLogEntry entry = new StringLogEntry(DataLogManager.getLog(), "/Metadata/MyKey");
+        entry.append("MyValue");
         // BuildConstants will generate when you build
-        SmartDashboard.putString("Git/SHA", BuildConstants.GIT_SHA);
-        SmartDashboard.putString("Git/Branch", BuildConstants.GIT_BRANCH);
-        SmartDashboard.putString("Git/Commit Date", BuildConstants.GIT_DATE);
-        SmartDashboard.putString("Git/Build Date", BuildConstants.BUILD_DATE);
-        SmartDashboard.putBoolean("Git/Dirty", BuildConstants.DIRTY == 1);
-        SmartDashboard.putNumber("Git/Revision", BuildConstants.GIT_REVISION);
+        metaData.getStringTopic("Git: SHA").publish().accept(BuildConstants.GIT_SHA);
+        metaData.getStringTopic("Git: Branch").publish().accept(BuildConstants.GIT_BRANCH);
+        metaData.getStringTopic("Git: Commit Date").publish().accept(BuildConstants.GIT_DATE);
+        metaData.getStringTopic("Git: Build Date").publish().accept(BuildConstants.BUILD_DATE);
+        metaData.getBooleanTopic("Git: Dirty").publish().accept(BuildConstants.DIRTY == 1);
+        metaData.getDoubleTopic("Git: Revision").publish().accept(BuildConstants.GIT_REVISION);
+        metaData.getBooleanTopic("Robot: IsSim").publish().accept(Robot.isSimulation());
+        metaData.getStringTopic("DS: EventName").publish().accept(DriverStation.getEventName());
 
         DriverStation.silenceJoystickConnectionWarning(true);
     }
