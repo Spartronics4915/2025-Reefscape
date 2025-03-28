@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.7820738636363638,
-        "y": 4.059900568181818
+        "x": 2.9914772727272725,
+        "y": 4.18953125
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4230965909090907,
-        "y": 4.698082386363636
+        "x": 2.5028693181818182,
+        "y": 4.777855113636363
       },
       "isLocked": false,
       "linkedName": "Reef exit 1"
@@ -47,12 +47,25 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.13057671381937055,
+      "constraints": {
+        "maxVelocity": 6.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 7.0,
+    "maxVelocity": 6.0,
     "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

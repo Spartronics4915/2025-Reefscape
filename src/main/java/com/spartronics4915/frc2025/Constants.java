@@ -41,6 +41,7 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
@@ -70,6 +71,7 @@ public final class Constants {
         public static final int kMotorID = 12;
 
         public static final int kLaserCANID = 21;
+        public static final int kPipeLCID = 25;
         public static final int laserCANDistance = 110;
 
         public static final int smartCurrentLimit = 18;
@@ -193,11 +195,11 @@ public final class Constants {
         public static final double kChassisRadius = Math.hypot(
                 kTrackWidth / 2, kWheelbase / 2);
 
-        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(5); //previously 5 (pathplanner max vel/acc divided by 2 as well)
+        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(5.5); //previously 5 (pathplanner max vel/acc divided by 2 as well)
         public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(kMaxSpeed.in(MetersPerSecond) * Math.PI / kChassisRadius);
 
         public static final class AutoConstants {
-            public static final PIDConstants kTranslationPID = new PIDConstants(6.0,0,0);
+            public static final PIDConstants kTranslationPID = new PIDConstants(5.0,0,0);
             public static final PIDConstants kRotationPID = new PIDConstants(5.0,0,0);
 
             public static final PPHolonomicDriveController kDriveController = new PPHolonomicDriveController(
@@ -224,11 +226,11 @@ public final class Constants {
                     new Translation2d(Inches.of(-12.125), Inches.of(-12.4375))
                 )),
                 COMP_CHASSIS(new RobotConfig(
-                    Kilogram.of(142), 
+                    Pounds.of(142), 
                     KilogramSquareMeters.of(4.86247863),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
-                        MetersPerSecond.of(5.273),
+                        MetersPerSecond.of(5.273 * 0.9),
                         0.8,
                         DCMotor.getNEO(1),
                         5.900,
@@ -269,11 +271,11 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.0, 2.25, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(3.0, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
 

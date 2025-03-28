@@ -49,10 +49,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     // private var sensor;
     private LaserCan lc;
+    private LaserCan pipeLC;
 
     private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("applied out").publish();
     private final DoublePublisher velocityPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Velocity").publish();
     private final BooleanPublisher lCPub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("LC").publish();
+    private final DoublePublisher pipeDistPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Pipe LC Dist").publish();
 
     private RelativeEncoder mEncoder;
 
@@ -74,6 +76,15 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
           }
+
+        pipeLC = new LaserCan(kPipeLCID);
+        try {
+            lc.setRangingMode(LaserCan.RangingMode.SHORT);
+            // lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("Configuration failed! " + e);
+        }
 
         mEncoder = mMotor1.getEncoder();
 
@@ -140,6 +151,13 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         appliedOutPub.accept(mMotor1.getAppliedOutput());
         velocityPub.accept(mEncoder.getVelocity());
         lCPub.accept(detect());
+
+        var measure = pipeLC.getMeasurement();
+        if (measure == null) {
+            pipeDistPub.accept(-1.0);
+        } else{
+            pipeDistPub.accept(measure.distance_mm);
+        }
     }
 
     @Override
