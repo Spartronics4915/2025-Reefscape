@@ -432,6 +432,10 @@ public class DynamicsCommandFactory {
         .withName("Intake");
     }
 
+    public Command stopIntake(){
+        return intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL);
+    }
+
     public Command removeAlgaeArm() {
         return armSubsystem.setSetpointCommand(new Rotation2d(kRemoveAlgaeArmAngle))
                .alongWith(intake())

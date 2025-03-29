@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2025.commands;
 
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoIntakeTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoIntakeWaitTime;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
@@ -14,6 +16,7 @@ import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.bling2.DriverCommunication.Region;
+import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -202,7 +205,13 @@ public class VariableAutos {
             dynamics.score(),
             Commands.print("Stow & return"),
             Commands.parallel(
-                dynamics.stow(),
+                Commands.sequence(
+                    dynamics.stow(),
+                    Commands.waitSeconds(kAutoIntakeWaitTime),
+                    dynamics.intake(),
+                    Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
+                    dynamics.stopIntake()
+                ),
                 Commands.sequence(
                     Commands.print("start delay"),
                     Commands.waitTime(delay),
@@ -249,7 +258,13 @@ public class VariableAutos {
             dynamics.score(),
             Commands.print("parallel group stow"),
             Commands.parallel(
-                dynamics.stow(),
+                Commands.sequence(
+                    dynamics.stow(),
+                    Commands.waitSeconds(kAutoIntakeWaitTime),
+                    dynamics.intake(),
+                    Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
+                    dynamics.stopIntake()
+                ),
                 Commands.sequence(
                     Commands.waitTime(delay),
                     Commands.print("is swerve moveable?"),

@@ -282,6 +282,9 @@ public final class Constants {
             
             public static final double kTriggerDistance = 2.5;
 
+            public static final double kAutoIntakeWaitTime = 0.1;
+            public static final double kAutoIntakeTimeout = 0.2;
+
             public static final class StationVisualizationConstants {
                     public static final Pose2d kBlueLeft = new Pose2d(0.947, 7.447, Rotation2d.fromDegrees(-50));
                     public static final Pose2d kBlueRight = new Pose2d(0.947, 0.614, Rotation2d.fromDegrees(50));
