@@ -69,6 +69,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -124,6 +125,9 @@ public class RobotContainer {
     public final ElevatorSubsystem elevatorSubsystem;
     public final WinchClimber climberSubsystem;
 
+    public boolean isTeleopAutoScoringEnabled = true; 
+
+    private final BooleanPublisher autoScoreEnabledPub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("AutoScoringEnabled").publish();
     
     public final DynamicsCommandFactory dynamics;
 
@@ -136,6 +140,7 @@ public class RobotContainer {
     private VariableAutos variableAutoFactory = null;
 
     private final SendableChooser<Command> autoChooser;
+
 
     private final ComplexAutoChooser complexAutoChooser;
 
@@ -335,9 +340,7 @@ public class RobotContainer {
             );
         }
         
-        new Trigger(() -> {
-            return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && intakeSubsystem.branchLC() && dynamics.isCoralInArm();
-        }).and(DriverStation::isTeleop).onTrue(Commands.sequence(
+        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
             Commands.waitSeconds(0.05),
             // Commands.print("yo scoring")
             dynamics.score()
@@ -392,6 +395,15 @@ public class RobotContainer {
         operatorController.a().onTrue(dynamics.operatorScore(DynaPreset.L1));
 
         operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+
+        operatorController.rightStick().onTrue(Commands.defer(() -> {
+            return Commands.runOnce(() -> {
+                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
+                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+            });
+        }, Set.of()));
 
         // operatorController.rightStick().whileTrue(
         //     Commands.repeatingSequence(

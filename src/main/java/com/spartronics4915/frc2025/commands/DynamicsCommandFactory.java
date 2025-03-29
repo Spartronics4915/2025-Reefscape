@@ -180,6 +180,12 @@ public class DynamicsCommandFactory {
         return  measurement.distance_mm < funnelLCTriggerDist.in(Millimeter) || intakeSubsystem.detect(); // the || is here as a way to prevent us stalling at a CS when we are already holding a coral
     }
 
+    public boolean canAutoScore(){
+        return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && 
+            intakeSubsystem.branchLC() && 
+            isCoralInArm();
+    }
+
     public boolean isSwerveMovable(){
         return (getElevHeight() < kSafeElevHeightForSwerve) && isElevSafeToMove();
     }
