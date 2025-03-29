@@ -68,8 +68,6 @@ public class DriverCommunication extends BlingSegment {
         }
     } */
 
-  
-
     /**
      * @param length Length of the segment
      * @param subsystems In no particular order, SwerveSubsystem, LimelightVisionSubsystem, ArmSubsystem, ElevatorSubsystem, DynamicsCommandFactory
@@ -105,24 +103,16 @@ public class DriverCommunication extends BlingSegment {
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
-
-
             if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
                 current = PURPLE;
             }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
                 ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
                 current = ORANGE;
-
             }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){ //elevator too low/high
                 current = ORANGE;
-
             }else if (Robot.AUTO_TIMER.hasElapsed(10)) {
                 current = BLUE;
             }
-        
-
-       
-
             //arm and elevator accuracy?
         // } else if (vision != null && vision.newMegaTag1Reading()) {
         //     current = CYAN;
@@ -131,7 +121,6 @@ public class DriverCommunication extends BlingSegment {
             //current = CYAN;
         } else if (Robot.TELEOP_TIMER.hasElapsed(140)) { // Match has ended, play show
             current = MATCH_END;
-
         } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
             current = BAD;
         }else if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
@@ -139,15 +128,12 @@ public class DriverCommunication extends BlingSegment {
         }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
                 ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
                 current = ORANGE;
-
         }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){ //elevator too low/high
                 current = ORANGE;
-
         }else if (Robot.AUTO_TIMER.hasElapsed(10)) {
                 current = BLUE;
             }
         else {
-
             /*Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
@@ -227,9 +213,6 @@ public class DriverCommunication extends BlingSegment {
                     current = OFF;
                 }
             */}
-
-    
-
         current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;
         current.updateLights();
