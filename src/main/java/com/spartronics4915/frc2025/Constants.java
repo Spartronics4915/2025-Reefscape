@@ -323,6 +323,8 @@ public final class Constants {
         public static final double ARM_THRESHOLD = 10; // Degrees
         public static final double ELEVATOR_THRESHOLD = .1; // Meters
         public static final double BARGE_ALIGNMMENT_THRESHOLD = .2; // Distance that the robot can be, in meters, from the barge starting position.
+        public static final double CLIMB_THRESHOLD = 4; // 4 Degrees
+        public static final double FALL_THRESHOLD = 70;
 
         // Segment constants
         public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 20);
@@ -343,6 +345,9 @@ public final class Constants {
 
         public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
         public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
+        public static final BlingShow SHOW_SAD = new BlingShow("bling/sad48.bling");
+        public static final BlingShow SHOW_CLIMB = new BlingShow("bling/climb48.bling");
+
 
         public static final BlingSegment MATCH_END = SHOW_RAINBOW_FUN;
     }

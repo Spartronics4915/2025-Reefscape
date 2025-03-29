@@ -2,14 +2,9 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.BAD;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.BLUE;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.FRAME_WAIT;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.MATCH_END;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.OFF;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.ORANGE;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.PURPLE;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.SHOW_SPARTRONICS;
+import com.spartronics4915.frc2025.Constants.BlingConstants;
+
+import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
@@ -19,7 +14,9 @@ import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class DriverCommunication extends BlingSegment {
     private Constants constants;
@@ -35,7 +32,7 @@ public class DriverCommunication extends BlingSegment {
     private BlingSegment current = OFF;
 
 
-   /*  public static enum Region {
+    public static enum Region {
         REEF(
             new Translation2d[] {new Translation2d(5, 4), new Translation2d(4, 4), new Translation2d(4.5, 4.5), new Translation2d(4.5, 3.5)}, 
             new Translation2d[] {new Translation2d(13.5, 4), new Translation2d(12.5, 4), new Translation2d(13, 4.5), new Translation2d(13, 4.5)}
@@ -68,7 +65,7 @@ public class DriverCommunication extends BlingSegment {
             this.bluePositions = blue;
             this.redPositions = red;
         }
-    } */
+    }
 
     /**
      * @param length Length of the segment
@@ -84,7 +81,7 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
     }
-     /* 
+      
     public static Region getClosestRegion(SwerveSubsystem swerve) {
         Region closest = null;
         double closestDistance = Double.MAX_VALUE;
@@ -97,8 +94,8 @@ public class DriverCommunication extends BlingSegment {
             }
         }
         return closest;
-    } */
-        
+    } 
+
 
     @Override
     protected void updateLights() {
@@ -135,7 +132,8 @@ public class DriverCommunication extends BlingSegment {
         }
 
         else {
-            /*Region closest = getClosestRegion(this.swerve);
+            /*
+            Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
               switch (closest) {
@@ -213,7 +211,12 @@ public class DriverCommunication extends BlingSegment {
                 default:
                     current = OFF;
                 }
-            */}
+            */
+        
+            double rotation = Math.abs(swerve.getInternalSwerve().getGyro().getRotation3d().getX() + swerve.getInternalSwerve().getGyro().getRotation3d().getZ());
+            if (rotation > FALL_THRESHOLD) current = SHOW_SAD;
+            if (rotation > CLIMB_THRESHOLD && getClosestRegion(swerve) == Region.BARGE) current = SHOW_CLIMB;
+        }
         current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;
         current.updateLights();
