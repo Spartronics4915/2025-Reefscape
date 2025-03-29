@@ -130,9 +130,8 @@ public class DriverCommunication extends BlingSegment {
                 current = ORANGE;
         }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){ //elevator too low/high
                 current = ORANGE;
-        }else if (Robot.AUTO_TIMER.hasElapsed(10)) {
-                current = BLUE;
-            }
+        }
+
         else {
             /*Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
