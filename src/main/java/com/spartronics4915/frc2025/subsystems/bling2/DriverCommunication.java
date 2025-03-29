@@ -3,6 +3,7 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.BAD;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.BLUE;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.FRAME_WAIT;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.MATCH_END;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.OFF;
@@ -106,14 +107,19 @@ public class DriverCommunication extends BlingSegment {
         } else if (DriverStation.isAutonomous()) {
 
 
-            if (dynamics.funnelDetect() == false) {
+            if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
                 current = PURPLE;
             }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
-                ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){
+                ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
                 current = ORANGE;
 
-            }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){
+            }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){ //elevator too low/high
                 current = ORANGE;
+
+            }else if (Robot.AUTO_TIMER.hasElapsed(10)) {
+                current = BLUE;
+            }
+        
 
        
 
@@ -128,8 +134,20 @@ public class DriverCommunication extends BlingSegment {
 
         } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
             current = BAD;
-        }
+        }else if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
+                current = PURPLE;
+        }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
+                ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
+                current = ORANGE;
+
+        }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){ //elevator too low/high
+                current = ORANGE;
+
+        }else if (Robot.AUTO_TIMER.hasElapsed(10)) {
+                current = BLUE;
+            }
         else {
+
             /*Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
