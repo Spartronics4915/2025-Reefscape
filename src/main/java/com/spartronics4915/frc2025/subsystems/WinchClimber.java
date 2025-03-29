@@ -37,7 +37,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
     private boolean isClimbed = false;
     private boolean isWinchEngaged = false;
-    private boolean disableMode = false;
+    private boolean disableIntake = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     private final SparkBase mIntakeMotor;
@@ -186,7 +186,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             isClimbed = true;
         } else { isClimbed = false; }
 
-        if (isWinchEngaged == true && disableMode == false) {
+        if (isWinchEngaged == true && disableIntake == false) {
             mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
         } else {
             mIntakeMotor.set(0.00);
@@ -199,14 +199,14 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     public void onModeSwitch() {
         stopWinch();
         stopArm();
-        disableMode = true;
+        disableIntake = true;
     }
 
     @Override
     public void onDisable() {
         stopWinch();
         stopArm();
-        disableMode = true;
+        disableIntake = true;
     }
 
 }
