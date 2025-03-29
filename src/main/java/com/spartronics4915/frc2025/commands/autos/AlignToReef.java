@@ -153,11 +153,21 @@ public class AlignToReef {
                 Commands.print("end position PID loop")
             );
         }
+        var startingVel = getVelocityMagnitude(mSwerve.getFieldVelocity());
+
+        if (DriverStation.isAutonomous()) {
+            startingVel = MetersPerSecond.of(
+                Math.max(startingVel.in(MetersPerSecond), 0.1)
+            );
+        }
 
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
             DriverStation.isAutonomous() ? pathConstraints : kTeleopPathConstraints,
-            new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
+            new IdealStartingState(
+                startingVel,
+                mSwerve.getHeading()
+            ), 
             new GoalEndState(0.0, waypoint.getRotation())
         );
 

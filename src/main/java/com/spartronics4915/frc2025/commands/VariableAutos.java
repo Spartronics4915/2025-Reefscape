@@ -179,9 +179,9 @@ public class VariableAutos {
         var pathPair = getPathPair(branch, side, height);
         
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kAutoPathConstraints);
-            }),
+            // Commands.runOnce(() -> {
+            //     alignmentGenerator.changePathConstraints(kAutoPathConstraints);
+            // }),
             Commands.deadline(
                 pathPair.approachPath,
                 Commands.sequence(
@@ -199,7 +199,7 @@ public class VariableAutos {
                 ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
                     Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
-                    Commands.print("moving to height"),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
@@ -236,12 +236,10 @@ public class VariableAutos {
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side, height);
         
+        alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
-            }),
-            Commands.print("auto align"),
             Commands.parallel(
+                Commands.print("auto align"),
                 Commands.race(
                     Commands.sequence(
                         Commands.waitUntil(dynamics::canAutoScore),
@@ -250,7 +248,6 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    Commands.print("auto prescoure"),
                     dynamics.autoPrescore(),
                     Commands.print("is swerve close to reef?"),
                     Commands.waitUntil(() -> isSwerveCloseToReef()),
@@ -258,11 +255,11 @@ public class VariableAutos {
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            Commands.print("wait until preset"),
+            // Commands.print("wait until preset"),
             dynamics.waitUntilPreset(height.preset),
-            Commands.print("score"),
+            // Commands.print("score"),
             dynamics.score(),
-            Commands.print("parallel group stow"),
+            // Commands.print("parallel group stow"),
             Commands.parallel(
                 Commands.sequence(
                     dynamics.stow(),
@@ -273,9 +270,9 @@ public class VariableAutos {
                 ),
                 Commands.sequence(
                     Commands.waitTime(delay),
-                    Commands.print("is swerve moveable?"),
+                    // Commands.print("is swerve moveable?"),
                     Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
-                    Commands.print("returning"),
+                    // Commands.print("returning"),
                     pathPair.returnPath
                 )
             ),
