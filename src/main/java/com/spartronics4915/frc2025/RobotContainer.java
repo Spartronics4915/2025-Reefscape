@@ -54,6 +54,7 @@ import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorHeightTolerance;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -333,6 +334,14 @@ public class RobotContainer {
                 Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
             );
         }
+        
+        new Trigger(() -> {
+            return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && intakeSubsystem.branchLC() && dynamics.isCoralInArm();
+        }).and(DriverStation::isTeleop).onTrue(Commands.sequence(
+            Commands.waitSeconds(0.05),
+            // Commands.print("yo scoring")
+            dynamics.score()
+        ));
 
         //#endregion
 

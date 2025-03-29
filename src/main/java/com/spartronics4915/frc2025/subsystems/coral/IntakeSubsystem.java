@@ -24,6 +24,7 @@ import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -55,6 +56,9 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private final DoublePublisher velocityPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Velocity").publish();
     private final BooleanPublisher lCPub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("LC").publish();
     private final DoublePublisher pipeDistPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Pipe LC Dist").publish();
+    private final BooleanPublisher l4pipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC").publish();
+
+    private Debouncer l4Debouncer = new Debouncer(kBranchLCDebounceTime);
 
     private RelativeEncoder mEncoder;
 
@@ -71,7 +75,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         lc = new LaserCan(kLaserCANID);
         try {
             lc.setRangingMode(LaserCan.RangingMode.SHORT);
-            // lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
             lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
@@ -79,9 +83,9 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
         pipeLC = new LaserCan(kPipeLCID);
         try {
-            lc.setRangingMode(LaserCan.RangingMode.SHORT);
-            // lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
-            lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            pipeLC.setRangingMode(LaserCan.RangingMode.SHORT);
+            pipeLC.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            pipeLC.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         }
@@ -146,6 +150,13 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public AngularVelocity getSpeed(){
         return RPM.of(mMotor1.getEncoder().getVelocity());
     }
+
+    public boolean branchLC(){
+        return branchLCCache;
+    }
+
+    private boolean branchLCCache = false;
+
     @Override
     public void periodic() {
         appliedOutPub.accept(mMotor1.getAppliedOutput());
@@ -155,8 +166,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         var measure = pipeLC.getMeasurement();
         if (measure == null) {
             pipeDistPub.accept(-1.0);
+            branchLCCache = l4Debouncer.calculate(false);
+            l4pipePub.accept(branchLCCache);;
         } else{
             pipeDistPub.accept(measure.distance_mm);
+            branchLCCache = l4Debouncer.calculate(measure.distance_mm < kBranchLCTriggerDist);
+            l4pipePub.accept(branchLCCache);
         }
     }
 
