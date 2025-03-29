@@ -108,14 +108,14 @@ public class DriverCommunication extends BlingSegment {
 
             if (dynamics.funnelDetect() == false) {
                 current = PURPLE;
-            }
+            }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
+                ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){
+                current = ORANGE;
 
-        }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
-         ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){
-            current = ORANGE;
+            }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){
+                current = ORANGE;
 
-        }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){
-            current = ORANGE;
+       
 
             //arm and elevator accuracy?
         // } else if (vision != null && vision.newMegaTag1Reading()) {
