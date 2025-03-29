@@ -1,13 +1,15 @@
 package com.spartronics4915.frc2025.subsystems.bling2;
 
+import com.spartronics4915.frc2025.Constants;
+import com.spartronics4915.frc2025.Constants.ArmConstants;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.BAD;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.CYAN;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.FRAME_WAIT;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.MATCH_END;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.OFF;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.ORANGE;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.PURPLE;
 import static com.spartronics4915.frc2025.Constants.BlingConstants.SHOW_SPARTRONICS;
-import static com.spartronics4915.frc2025.Constants.BlingConstants.WHITE;
+import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -15,11 +17,10 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class DriverCommunication extends BlingSegment {
+    private Constants constants;
     private SwerveSubsystem swerve;
     private LimelightVisionSubsystem vision;
     private ArmSubsystem arm;
@@ -31,7 +32,7 @@ public class DriverCommunication extends BlingSegment {
     private BlingSegment current = OFF;
 
 
-    public static enum Region {
+   /*  public static enum Region {
         REEF(
             new Translation2d[] {new Translation2d(5, 4), new Translation2d(4, 4), new Translation2d(4.5, 4.5), new Translation2d(4.5, 3.5)}, 
             new Translation2d[] {new Translation2d(13.5, 4), new Translation2d(12.5, 4), new Translation2d(13, 4.5), new Translation2d(13, 4.5)}
@@ -64,12 +65,9 @@ public class DriverCommunication extends BlingSegment {
             this.bluePositions = blue;
             this.redPositions = red;
         }
-    }
+    } */
 
-    public enum Misc {
-        FUNNEL_NO_CORAL();
-
-    }
+  
 
     /**
      * @param length Length of the segment
@@ -85,7 +83,7 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
         }
     }
-
+     /* 
     public static Region getClosestRegion(SwerveSubsystem swerve) {
         Region closest = null;
         double closestDistance = Double.MAX_VALUE;
@@ -98,35 +96,41 @@ public class DriverCommunication extends BlingSegment {
             }
         }
         return closest;
-    }
+    } */
+        
 
     @Override
     protected void updateLights() {
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
+
+
             if (dynamics.funnelDetect() == false) {
                 current = PURPLE;
-            }else{
-                current = WHITE;
             }
+
+        }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
+         ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){
+            current = ORANGE;
+
+        }else if (ElevatorConstants.minHeight > elevator.getPosition() == true || ElevatorConstants.maxHeight < elevator.getPosition()){
+            current = ORANGE;
+
+            //arm and elevator accuracy?
         // } else if (vision != null && vision.newMegaTag1Reading()) {
         //     current = CYAN;
         //     alertFrames = 10;
-        } else if (alertFrames > 0 && alertFrames % 2 == 0) {
-            current = CYAN;
+        //} else if (alertFrames > 0 && alertFrames % 2 == 0) {
+            //current = CYAN;
         } else if (Robot.TELEOP_TIMER.hasElapsed(140)) { // Match has ended, play show
             current = MATCH_END;
+
         } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
             current = BAD;
         }
         else {
-            
-            
-            
-            
-            
-           /*  Region closest = getClosestRegion(this.swerve);
+            /*Region closest = getClosestRegion(this.swerve);
             double elevHeight = elevator.getPosition();
             Rotation2d armRotation = arm.getPosition();
               switch (closest) {
@@ -203,8 +207,9 @@ public class DriverCommunication extends BlingSegment {
                 
                 default:
                     current = OFF;
-            }
-         */}
+                }
+            */}
+
     
 
         current.incrementFrame(FRAME_WAIT);
@@ -213,7 +218,6 @@ public class DriverCommunication extends BlingSegment {
 
         alertFrames--;
     }
-    
 
     /*public static Command setAutoSegmentCommand(BlingSegment segment) {
         return Commands.runOnce(() -> autoSegment = segment);
