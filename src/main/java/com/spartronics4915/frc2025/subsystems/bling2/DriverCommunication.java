@@ -222,7 +222,7 @@ public class DriverCommunication extends BlingSegment {
         
            double rotation = Math.abs(swerve.getInternalSwerve().getGyro().getRotation3d().getX() + swerve.getInternalSwerve().getGyro().getRotation3d().getZ());
             //if (rotation > FALL_THRESHOLD) current = SHOW_SAD;
-            if (rotation > CLIMB_THRESHOLD && getClosestRegion(swerve) == Region.BARGE) current = SHOW_CLIMB;
+            if (rotation > Constants.BlingConstants.CLIMB_THRESHOLD && getClosestRegion(swerve) == Region.BARGE) current = Constants.BlingConstants.SHOW_CLIMB;
         }
         current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;
