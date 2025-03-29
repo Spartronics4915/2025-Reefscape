@@ -28,6 +28,7 @@ import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -192,6 +193,8 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         } else {
             mIntakeMotor.set(0.00);
         }
+
+        SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
     } 
     
     @Override
