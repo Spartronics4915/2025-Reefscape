@@ -2,9 +2,14 @@ package com.spartronics4915.frc2025.subsystems.bling2;
 
 import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.ArmConstants;
-import com.spartronics4915.frc2025.Constants.BlingConstants;
-
-import static com.spartronics4915.frc2025.Constants.BlingConstants.*;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.BAD;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.BLUE;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.FRAME_WAIT;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.MATCH_END;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.OFF;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.ORANGE;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.PURPLE;
+import static com.spartronics4915.frc2025.Constants.BlingConstants.SHOW_SPARTRONICS;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
@@ -213,9 +218,9 @@ public class DriverCommunication extends BlingSegment {
                 }
             */
         
-            double rotation = Math.abs(swerve.getInternalSwerve().getGyro().getRotation3d().getX() + swerve.getInternalSwerve().getGyro().getRotation3d().getZ());
+            /*double rotation = Math.abs(swerve.getInternalSwerve().getGyro().getRotation3d().getX() + swerve.getInternalSwerve().getGyro().getRotation3d().getZ());
             if (rotation > FALL_THRESHOLD) current = SHOW_SAD;
-            if (rotation > CLIMB_THRESHOLD && getClosestRegion(swerve) == Region.BARGE) current = SHOW_CLIMB;
+            if (rotation > CLIMB_THRESHOLD && getClosestRegion(swerve) == Region.BARGE) current = SHOW_CLIMB;*/
         }
         current.incrementFrame(FRAME_WAIT);
         current.buffer = this.buffer;

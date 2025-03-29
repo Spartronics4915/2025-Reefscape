@@ -345,7 +345,7 @@ public final class Constants {
 
         public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
         public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
-        public static final BlingShow SHOW_SAD = new BlingShow("bling/sad48.bling");
+        //public static final BlingShow SHOW_SAD = new BlingShow("bling/sad48.bling");
         public static final BlingShow SHOW_CLIMB = new BlingShow("bling/climb48.bling");
 
 
