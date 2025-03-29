@@ -198,7 +198,7 @@ public final class Constants {
         public static final double kChassisRadius = Math.hypot(
                 kTrackWidth / 2, kWheelbase / 2);
 
-        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(5.5); //previously 5 (pathplanner max vel/acc divided by 2 as well)
+        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(7); //previously 5 (pathplanner max vel/acc divided by 2 as well)
         public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(kMaxSpeed.in(MetersPerSecond) * Math.PI / kChassisRadius);
 
         public static final class AutoConstants {
@@ -234,16 +234,16 @@ public final class Constants {
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(5.273 * 0.9),
-                        0.8,
+                        1.916,
                         DCMotor.getNEO(1),
                         5.900,
                         Amps.of(40),
                         1
                     ),
-                    new Translation2d(Inches.of(13.5), Inches.of(11.5)),
-                    new Translation2d(Inches.of(13.625), Inches.of(-11.625)),
-                    new Translation2d(Inches.of(-13.625), Inches.of(11.5)),
-                    new Translation2d(Inches.of(-13.5), Inches.of(-10.4375))
+                    new Translation2d(Inches.of(13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(13.375), Inches.of(-11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(-11.375))
             ));
 ;
 
@@ -274,11 +274,11 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3.0, 2.25, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
             public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(3.0, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
             public static final double kTriggerDistance = 2.5;
 
