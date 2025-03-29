@@ -197,7 +197,7 @@ public class RobotContainer {
             if (RobotBase.isSimulation()) {
                 visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
             } else {
-                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
+                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, getFieldLayout());
                 ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
             }
     

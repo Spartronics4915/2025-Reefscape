@@ -17,49 +17,49 @@ import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
 public class DriveToReefPoint {
 
-    private final ElementLocator elementLocator;
-    Field2d field;
-    private final int targetTagID;
-    private final Pose2d reefPoint, approachPoint;
-    private final SwerveSubsystem swerve;
+    // private final ElementLocator elementLocator;
+    // Field2d field;
+    // private final int targetTagID;
+    // private final Pose2d reefPoint, approachPoint;
+    // private final SwerveSubsystem swerve;
 
-    public DriveToReefPoint(SwerveSubsystem swerve, ElementLocator elementLocator, int targetTagID) {
+    // public DriveToReefPoint(SwerveSubsystem swerve, ElementLocator elementLocator, int targetTagID) {
 
-        this.elementLocator = elementLocator;
-        this.targetTagID = targetTagID;
-        this.swerve = swerve;
+    //     this.elementLocator = elementLocator;
+    //     this.targetTagID = targetTagID;
+    //     this.swerve = swerve;
 
-        if (RobotBase.isSimulation()) {
-            field = new Field2d();
-            SmartDashboard.putData("Field 2", field);
-        }
+    //     if (RobotBase.isSimulation()) {
+    //         field = new Field2d();
+    //         SmartDashboard.putData("Field 2", field);
+    //     }
 
-        reefPoint = elementLocator.getLeftReefPoint(targetTagID);
-        approachPoint = elementLocator.getApproachPoint(reefPoint, 1);
-    }
+    //     reefPoint = elementLocator.getLeftReefPoint(targetTagID);
+    //     approachPoint = elementLocator.getApproachPoint(reefPoint, 1);
+    // }
 
-    public Command generate() {
-        Command command = Commands.none();
+    // public Command generate() {
+    //     Command command = Commands.none();
 
-        if (RobotBase.isSimulation()) {
-            command = command.andThen(() -> {
-                field.getObject("TagPose").setPose(elementLocator.getLeftReefPoint(targetTagID));
-                field.getObject("ApproachPoint").setPose(approachPoint);
-                field.setRobotPose(swerve.getPose());
+    //     if (RobotBase.isSimulation()) {
+    //         command = command.andThen(() -> {
+    //             field.getObject("TagPose").setPose(elementLocator.getLeftReefPoint(targetTagID));
+    //             field.getObject("ApproachPoint").setPose(approachPoint);
+    //             field.setRobotPose(swerve.getPose());
 
-                System.out.println(elementLocator.getLeftReefPoint(targetTagID));
-                System.out.println(swerve.getPose());
-                System.out.println(approachPoint);
+    //             System.out.println(elementLocator.getLeftReefPoint(targetTagID));
+    //             System.out.println(swerve.getPose());
+    //             System.out.println(approachPoint);
                 
 
-            });
-        }
-        TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(5, 1);
-        command = command.andThen(
-                new DriveToPointCommand(approachPoint.getTranslation(), translationConstraints, 0.4, 0.5, swerve));
+    //         });
+    //     }
+    //     TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(5, 1);
+    //     command = command.andThen(
+    //             new DriveToPointCommand(approachPoint.getTranslation(), translationConstraints, 0.4, 0.5, swerve));
 
-        return command;
+    //     return command;
 
-    }
+    // }
 
 }
