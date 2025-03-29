@@ -16,12 +16,14 @@ import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
+import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class DriverCommunication extends BlingSegment {
     private Constants constants;
+    private IntakeSubsystem intake;
     private SwerveSubsystem swerve;
     private LimelightVisionSubsystem vision;
     private ArmSubsystem arm;
@@ -103,7 +105,7 @@ public class DriverCommunication extends BlingSegment {
         if ((!Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01)) && vision != null) { // Match has started
             current = vision.isInitialPoseSet() ? SHOW_SPARTRONICS : PURPLE; 
         } else if (DriverStation.isAutonomous()) {
-            if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
+            if (dynamics.funnelDetect() == true && intake.detect() == false) { // when the coral is stuck
                 current = PURPLE;
             }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
                 ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
@@ -123,7 +125,7 @@ public class DriverCommunication extends BlingSegment {
             current = MATCH_END;
         } else if (Robot.TELEOP_TIMER.hasElapsed(135)) { // Match has ended, show match end alert.
             current = BAD;
-        }else if (dynamics.funnelDetect() == false) { // when the funnel does not detect a coral
+        }else if (dynamics.funnelDetect() == true && intake.detect() == false) { // when the coral is stuck
                 current = PURPLE;
         }else if (ArmConstants.kMinAngle.getDegrees() > arm.getPosition().getDegrees() == true ||
                 ArmConstants.kMaxAngle.getDegrees() < arm.getPosition().getDegrees() == true){ // arm is too low/high
