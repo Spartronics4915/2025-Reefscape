@@ -191,7 +191,10 @@ public class VariableAutos {
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
                 Commands.race(
-                    Commands.waitUntil(dynamics::canAutoScore), 
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics::canAutoScore),
+                        Commands.print("auto scoring")
+                    ), 
                     pathPair.autoAlign
                 ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
@@ -240,7 +243,10 @@ public class VariableAutos {
             Commands.print("auto align"),
             Commands.parallel(
                 Commands.race(
-                    Commands.waitUntil(dynamics::canAutoScore), 
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics::canAutoScore),
+                        Commands.print("auto scoring")
+                    ),
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
