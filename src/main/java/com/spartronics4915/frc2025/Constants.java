@@ -72,10 +72,7 @@ public final class Constants {
 
         public static final int kLaserCANID = 21;
         public static final int kPipeLCID = 25;
-        public static final int laserCANDistance = 99;
-        public static final int kBranchLCTriggerDist = 410;
-        public static final double kBranchLCDebounceTime = 0.05;
-
+        public static final int laserCANDistance = 110;
 
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
@@ -591,8 +588,8 @@ public final class Constants {
             .idleMode(IdleMode.kBrake)
         ;
 
-        public static final SparkBaseConfig kIntakeMotorConfig = new SparkMaxConfig()
-        .smartCurrentLimit(18)                                            //need to set smartCurrentLimit + secondaryCurrentLimit
+        public static final SparkBaseConfig kIntakeMotorConfig = new SparkMaxConfig()   //neo 550
+        .smartCurrentLimit(15)                                          
         .secondaryCurrentLimit(20)
         .inverted(false)
         .openLoopRampRate(0.25)
