@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2025.subsystems;
 
+import java.util.Set;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -20,9 +22,6 @@ import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntak
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
-
-import java.util.Set;
-
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -38,6 +37,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private BooleanPublisher isClimbedPublisher = NetworkTableInstance.getDefault().getTable("log").getBooleanTopic("is climbed").publish();
     private boolean isClimbed = false;
     private boolean isWinchEngaged = false;
+    private boolean disableMode = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
     private final SparkBase mIntakeMotor;
@@ -60,9 +60,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         mEncoder = mArmMotor.getEncoder();    //figure out conversions
 
-        isWinchEngaged = false;
-        isClimbed = false;
-
+        
         // mEncoder.setPosition(kStartingAngle.getRotations());
 
         mWinchMotor.set(0.0);
@@ -188,7 +186,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             isClimbed = true;
         } else { isClimbed = false; }
 
-        if (isWinchEngaged==true) {
+        if (isWinchEngaged == true && disableMode == false) {
             mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
         } else {
             mIntakeMotor.set(0.00);
@@ -201,12 +199,14 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     public void onModeSwitch() {
         stopWinch();
         stopArm();
+        disableMode = true;
     }
 
     @Override
     public void onDisable() {
         stopWinch();
         stopArm();
+        disableMode = true;
     }
 
 }
