@@ -1,7 +1,7 @@
 {
   "conversionFactors": {
     "angle": {"gearRatio": 12.8},
-    "drive": {"gearRatio": 5.9, "diameter": 3.4685039370078745}
+    "drive": {"gearRatio": 5.9, "diameter": 3.75}
   },
   "currentLimit": {
     "drive": 40,
@@ -11,6 +11,6 @@
     "drive": 0.25,
     "angle": 0.25
   },
-  "wheelGripCoefficientOfFriction": 1.19,
+  "wheelGripCoefficientOfFriction": 1.916,
   "optimalVoltage": 12
 }

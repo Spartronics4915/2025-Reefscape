@@ -234,16 +234,16 @@ public final class Constants {
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(5.273 * 0.9),
-                        0.8,
+                        1.916,
                         DCMotor.getNEO(1),
                         5.900,
                         Amps.of(40),
                         1
                     ),
-                    new Translation2d(Inches.of(13.5), Inches.of(11.5)),
-                    new Translation2d(Inches.of(13.625), Inches.of(-11.625)),
-                    new Translation2d(Inches.of(-13.625), Inches.of(11.5)),
-                    new Translation2d(Inches.of(-13.5), Inches.of(-10.4375))
+                    new Translation2d(Inches.of(13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(13.375), Inches.of(-11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(-11.375))
             ));
 ;
 
