@@ -7,10 +7,13 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartin
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckDuration;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckWait;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.RobotContainer;
+import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
@@ -182,11 +185,20 @@ public class VariableAutos {
             // Commands.runOnce(() -> {
             //     alignmentGenerator.changePathConstraints(kAutoPathConstraints);
             // }),
-            Commands.deadline(
-                pathPair.approachPath,
-                Commands.sequence(
-                    Commands.waitUntil(dynamics.intakeSubsystem::detect),
-                    dynamics.autoPrescore()
+            Commands.parallel(
+                Commands.deadline(
+                    pathPair.approachPath,
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics.intakeSubsystem::detect),
+                        dynamics.autoPrescore()
+                    )
+                ),
+                Commands.deadline( //this attempts to unstuck coral in auto
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    Commands.waitTime(kUnstuckWait),
+                    dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
+                    Commands.waitTime(kUnstuckDuration),
+                    dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
                 )
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake

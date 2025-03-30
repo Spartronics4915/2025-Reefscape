@@ -270,6 +270,8 @@ public final class Constants {
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
             public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
+            public static final Time kUnstuckWait = Seconds.of(1.5);
+            public static final Time kUnstuckDuration = Seconds.of(0.35);
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
