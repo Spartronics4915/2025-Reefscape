@@ -387,16 +387,13 @@ public class DynamicsCommandFactory {
         );
     }
 
-    public Command autoScore(DynaPreset scoringLocation){
-        return Commands.sequence(
-            Commands.waitUntil(() -> 
-                isArmAtSetpoint(scoringLocation.setpoint.armAngle, kArmAngleAutoScoringTolerance) && 
-                isElevAtSetpoint(scoringLocation.setpoint.heightMeters)
-            ),
-            score()
-        )
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        .withName("Autonomous Score");
+    public Command autoScore(){
+        return //Commands.deadline(
+            // Commands.waitUntil(
+            //     hasScoredTrigger
+            // ).withTimeout(0.5),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT);
+        // ).withName("Autonomous Score");
     }
 
     public Command returnLoadStow(){

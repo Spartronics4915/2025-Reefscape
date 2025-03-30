@@ -75,7 +75,7 @@ public final class Constants {
 
         public static final int laserCANDistance = 90;
         public static final int kBranchLCTriggerDist = 410;
-        public static final double kBranchLCDebounceTime = 0.05;
+        public static final double kBranchLCDebounceTime = 0.10;
 
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
@@ -274,7 +274,7 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
             public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.5, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 

@@ -205,11 +205,12 @@ public class VariableAutos {
             ),
             Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
-            dynamics.score(),
-            Commands.print("Stow & return"),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
             Commands.parallel(
+                dynamics.stow(),
+                dynamics.stopIntake(),
                 Commands.sequence(
-                    dynamics.stow(),
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
                     Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
@@ -248,21 +249,23 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    dynamics.autoPrescore(),
-                    Commands.print("is swerve close to reef?"),
-                    Commands.waitUntil(() -> isSwerveCloseToReef()),
-                    Commands.print("moving to height"),
+                    // dynamics.autoPrescore(),
+                    // Commands.print("is swerve close to reef?"),
+                    // Commands.waitUntil(() -> isSwerveCloseToReef()),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
             // Commands.print("wait until preset"),
             dynamics.waitUntilPreset(height.preset),
             // Commands.print("score"),
-            dynamics.score(),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
             // Commands.print("parallel group stow"),
             Commands.parallel(
+                dynamics.stow(),
+                dynamics.stopIntake(),
                 Commands.sequence(
-                    dynamics.stow(),
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
                     Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
