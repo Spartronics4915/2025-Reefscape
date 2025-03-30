@@ -152,17 +152,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public boolean branchLC(){
-        return branchLCCache;
+        return updateCache();
     }
 
     private boolean branchLCCache = false;
 
-    @Override
-    public void periodic() {
-        appliedOutPub.accept(mMotor1.getAppliedOutput());
-        velocityPub.accept(mEncoder.getVelocity());
-        lCPub.accept(detect());
-
+    public boolean updateCache(){
         var measure = pipeLC.getMeasurement();
         if (measure == null) {
             pipeDistPub.accept(-1.0);
@@ -173,6 +168,16 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             branchLCCache = l4Debouncer.calculate(measure.distance_mm < kBranchLCTriggerDist);
             l4pipePub.accept(branchLCCache);
         }
+        return branchLCCache;
+    }
+
+    @Override
+    public void periodic() {
+        appliedOutPub.accept(mMotor1.getAppliedOutput());
+        velocityPub.accept(mEncoder.getVelocity());
+        lCPub.accept(detect());
+
+        updateCache();
     }
 
     @Override
