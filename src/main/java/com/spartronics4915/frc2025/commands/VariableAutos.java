@@ -249,9 +249,9 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    // dynamics.autoPrescore(),
+                    dynamics.autoPrescore(),
                     // Commands.print("is swerve close to reef?"),
-                    // Commands.waitUntil(() -> isSwerveCloseToReef()),
+                    Commands.waitUntil(() -> isSwerveCloseToReef()),
                     // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
