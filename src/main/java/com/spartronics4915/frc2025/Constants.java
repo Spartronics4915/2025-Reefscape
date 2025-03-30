@@ -280,7 +280,7 @@ public final class Constants {
 
             public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
-            public static final double kTriggerDistance = 2.5;
+            public static final double kTriggerDistance = 2.75;
 
             public static final double kAutoIntakeWaitTime = 0.1;
             public static final double kAutoIntakeTimeout = 0.2;
