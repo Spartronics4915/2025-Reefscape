@@ -193,6 +193,8 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         }
 
         SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
+        SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
+
     } 
     
     @Override
