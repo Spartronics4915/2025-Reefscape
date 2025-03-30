@@ -186,7 +186,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             isClimbed = true;
         } else { isClimbed = false; }
 
-        if (isWinchEngaged == true && disableMode == false) {
+        if (isWinchEngaged == true) {
             mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
         } else {
             mIntakeMotor.set(0.00);
