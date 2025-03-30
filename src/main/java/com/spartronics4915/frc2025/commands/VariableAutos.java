@@ -18,8 +18,6 @@ import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import com.spartronics4915.frc2025.subsystems.bling2.DriverCommunication.Region;
-import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,8 +26,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class VariableAutos {
 
@@ -192,13 +190,6 @@ public class VariableAutos {
                         Commands.waitUntil(dynamics.intakeSubsystem::detect),
                         dynamics.autoPrescore()
                     )
-                ),
-                Commands.deadline( //this attempts to unstuck coral in auto
-                    Commands.waitUntil(dynamics::isCoralInArm),
-                    Commands.waitTime(kUnstuckWait),
-                    dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
-                    Commands.waitTime(kUnstuckDuration),
-                    dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
                 )
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
@@ -210,9 +201,18 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
-                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
+                    Commands.waitUntil(dynamics::isCoralInArm),
                     // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
+                ),
+                Commands.deadline( //this attempts to unstuck coral in auto
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    Commands.sequence(
+                        Commands.waitTime(kUnstuckWait),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
+                        Commands.waitTime(kUnstuckDuration),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
+                    )
                 )
             ),
             Commands.print("end step"),
