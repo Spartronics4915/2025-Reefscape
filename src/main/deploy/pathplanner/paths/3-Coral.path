@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.434517045454546,
-        "y": 2.695454545454545
+        "x": 5.1054545454545455,
+        "y": 2.54421875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.469613184703496,
-        "y": 2.0446617298023293
+        "x": 4.140550684703495,
+        "y": 1.8934259343477846
       },
       "isLocked": false,
       "linkedName": "Reef exit 3"
@@ -52,12 +52,38 @@
   ],
   "constraintZones": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.7801958650707281,
+      "name": "End",
+      "minWaypointRelativePos": 1.7062023939064181,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
-        "maxVelocity": 2.5,
-        "maxAcceleration": 1.0,
+        "maxVelocity": 6.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Start",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.09140369967355824,
+      "constraints": {
+        "maxVelocity": 6.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Bend",
+      "minWaypointRelativePos": 0.5658324265505994,
+      "maxWaypointRelativePos": 1.2622415669205487,
+      "constraints": {
+        "maxVelocity": 7.0,
+        "maxAcceleration": 4.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
