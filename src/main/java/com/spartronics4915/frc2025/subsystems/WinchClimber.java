@@ -17,6 +17,7 @@ import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kCageEngagedAmps;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
@@ -194,7 +195,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
         SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
-
+        SmartDashboard.putBoolean("Cage engaged", mIntakeMotor.getOutputCurrent() > kCageEngagedAmps);
     } 
     
     @Override
