@@ -199,7 +199,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     public void onModeSwitch() {
         stopWinch();
         stopArm();
-        disableIntake = true;
+        //disableIntake = true; 
     }
 
     @Override
