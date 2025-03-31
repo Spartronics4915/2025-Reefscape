@@ -73,9 +73,9 @@ public final class Constants {
         public static final int kLaserCANID = 21;
         public static final int kPipeLCID = 25;
 
-        public static final int laserCANDistance = 110;
+        public static final int laserCANDistance = 90;
         public static final int kBranchLCTriggerDist = 410;
-        public static final double kBranchLCDebounceTime = 0.05;
+        public static final double kBranchLCDebounceTime = 0.10;
 
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
@@ -270,17 +270,19 @@ public final class Constants {
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
             public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
+            public static final Time kUnstuckWait = Seconds.of(1.5);
+            public static final Time kUnstuckDuration = Seconds.of(0.35);
 
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.5, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
             public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
-            public static final double kTriggerDistance = 2.5;
+            public static final double kTriggerDistance = 2.75;
 
             public static final double kAutoIntakeWaitTime = 0.1;
             public static final double kAutoIntakeTimeout = 0.2;
@@ -431,7 +433,7 @@ public final class Constants {
         public static final double kDt = 0.02;
 
         public static final double kMaxVelocity = 7.0;
-        public static final double kMaxAcceleration = 5.0 / 2.0;
+        public static final double kMaxAcceleration = 8.5 / 2.0;
 
         public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceleration); //8.0, 10
         public static final int kPeriodMs = 0;
@@ -497,7 +499,7 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(6.0, 6.0); //12, 7.5
+        public static final Constraints constraints = new Constraints(6.5, 7.0); //12, 7.5
 
         public static final double minHeight = 0.01;
         public static final double maxHeight = 1.24;
@@ -527,7 +529,7 @@ public final class Constants {
 
         public static final Angle kSafeArmAngle = Degrees.of(90);
         public static final Angle kMoveableArmAngle = Degrees.of(76);
-        public static final Angle kReturnArmAngle = Degrees.of(120);
+        public static final Angle kReturnArmAngle = Degrees.of(135);
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
     

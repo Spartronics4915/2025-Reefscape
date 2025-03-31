@@ -18,6 +18,7 @@ import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
@@ -44,11 +45,8 @@ public class AlignToReef {
     public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
     public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
 
-    public boolean isPIDLoopRunning = false;
-
-
-    public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
-        this.mSwerve = mSwerve;
+    static{
+        var field = RobotContainer.getFieldLayout();
 
         Arrays.stream(AprilTagRegion.kReef.blue()).forEach((i) -> {
             field.getTagPose(i).ifPresent((p) -> {
@@ -79,6 +77,14 @@ public class AlignToReef {
                 ));
             });
         });
+    }
+
+    public boolean isPIDLoopRunning = false;
+
+
+    public AlignToReef(SwerveSubsystem mSwerve) {
+        this.mSwerve = mSwerve;
+
     }
 
     /**
@@ -147,11 +153,21 @@ public class AlignToReef {
                 Commands.print("end position PID loop")
             );
         }
+        var startingVel = getVelocityMagnitude(mSwerve.getFieldVelocity());
+
+        if (DriverStation.isAutonomous()) {
+            startingVel = MetersPerSecond.of(
+                Math.max(startingVel.in(MetersPerSecond), 0.1)
+            );
+        }
 
         PathPlannerPath path = new PathPlannerPath(
             waypoints, 
             DriverStation.isAutonomous() ? pathConstraints : kTeleopPathConstraints,
-            new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
+            new IdealStartingState(
+                startingVel,
+                mSwerve.getHeading()
+            ), 
             new GoalEndState(0.0, waypoint.getRotation())
         );
 

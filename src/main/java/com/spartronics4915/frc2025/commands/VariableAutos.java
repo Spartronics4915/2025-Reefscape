@@ -7,16 +7,17 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartin
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckDuration;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckWait;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.RobotContainer;
+import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import com.spartronics4915.frc2025.subsystems.bling2.DriverCommunication.Region;
-import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,8 +26,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class VariableAutos {
 
@@ -76,8 +77,8 @@ public class VariableAutos {
 
     // X = side to side, Y = away from tag
     public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
-        LEFT(new Translation2d(-0.153209, 0.5406845 + 0.02)),
-        RIGHT(new Translation2d(0.218062 - 0.0508, 0.5408565 + 0.02)),
+        LEFT(new Translation2d(-0.109236, 0.5406845 + 0.02)),//-0.153209, 0.5406845 + 0.02)),
+        RIGHT(new Translation2d(0.218918 - 0.0508, 0.5408565 + 0.02)),//0.218062 - 0.0508, 0.5408565 + 0.02)),
         MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.02));
 
         public Translation2d tagOffset;
@@ -179,14 +180,16 @@ public class VariableAutos {
         var pathPair = getPathPair(branch, side, height);
         
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kAutoPathConstraints);
-            }),
-            Commands.deadline(
-                pathPair.approachPath,
-                Commands.sequence(
-                    Commands.waitUntil(dynamics.intakeSubsystem::detect),
-                    dynamics.autoPrescore()
+            // Commands.runOnce(() -> {
+            //     alignmentGenerator.changePathConstraints(kAutoPathConstraints);
+            // }),
+            Commands.parallel(
+                Commands.deadline(
+                    pathPair.approachPath,
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics.intakeSubsystem::detect),
+                        dynamics.autoPrescore()
+                    )
                 )
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
@@ -198,18 +201,28 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
-                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
-                    Commands.print("moving to height"),
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
+                ),
+                Commands.deadline( //this attempts to unstuck coral in auto
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    Commands.sequence(
+                        Commands.waitTime(kUnstuckWait),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
+                        Commands.waitTime(kUnstuckDuration),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
+                    )
                 )
             ),
             Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
-            dynamics.score(),
-            Commands.print("Stow & return"),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
             Commands.parallel(
+                dynamics.stow(),
+                dynamics.stopIntake(),
                 Commands.sequence(
-                    dynamics.stow(),
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
                     Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
@@ -236,12 +249,10 @@ public class VariableAutos {
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
         var pathPair = getPathPair(branch, side, height);
         
+        alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
-            }),
-            Commands.print("auto align"),
             Commands.parallel(
+                Commands.print("auto align"),
                 Commands.race(
                     Commands.sequence(
                         Commands.waitUntil(dynamics::canAutoScore),
@@ -250,22 +261,23 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    Commands.print("auto prescoure"),
                     dynamics.autoPrescore(),
-                    Commands.print("is swerve close to reef?"),
+                    // Commands.print("is swerve close to reef?"),
                     Commands.waitUntil(() -> isSwerveCloseToReef()),
-                    Commands.print("moving to height"),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            Commands.print("wait until preset"),
+            // Commands.print("wait until preset"),
             dynamics.waitUntilPreset(height.preset),
-            Commands.print("score"),
-            dynamics.score(),
-            Commands.print("parallel group stow"),
+            // Commands.print("score"),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
+            // Commands.print("parallel group stow"),
             Commands.parallel(
+                dynamics.stow(),
+                dynamics.stopIntake(),
                 Commands.sequence(
-                    dynamics.stow(),
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
                     Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
@@ -273,9 +285,9 @@ public class VariableAutos {
                 ),
                 Commands.sequence(
                     Commands.waitTime(delay),
-                    Commands.print("is swerve moveable?"),
+                    // Commands.print("is swerve moveable?"),
                     Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
-                    Commands.print("returning"),
+                    // Commands.print("returning"),
                     pathPair.returnPath
                 )
             ),

@@ -192,12 +192,12 @@ public class RobotContainer {
 
         if (swerveSubsystem != null) {
             swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
-            alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
+            alignmentCommandFactory = new AlignToReef(swerveSubsystem);
             variableAutoFactory = new VariableAutos(alignmentCommandFactory, dynamics, swerveSubsystem);
             if (RobotBase.isSimulation()) {
                 visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
             } else {
-                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
+                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, getFieldLayout());
                 ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
             }
     
