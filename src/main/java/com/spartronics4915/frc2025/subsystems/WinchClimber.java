@@ -27,6 +27,7 @@ import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinch
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -48,6 +49,8 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     private ClimberSpeeds operatorArmState = ClimberSpeeds.ENGAGE;
     private WinchSpeeds operatorWinchState = WinchSpeeds.RETRACT;
+
+    private MedianFilter cageAmpFilter = new MedianFilter(5);
 
     public WinchClimber() {
         super();
@@ -72,6 +75,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         SmartDashboard.putData("ClimberIntakeOn", setClimbIntakeSpeed(intakeSpeed));
         SmartDashboard.putData("ClimberIntakeOff", setClimbIntakeSpeed(0.0));
+        
     }
 
     public void setArmSpeed(double speed) {
@@ -205,9 +209,12 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             mIntakeMotor.set(0.00);
         }
 
+        double filteredAmps = cageAmpFilter.calculate(mIntakeMotor.getOutputCurrent());
+
         SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
         SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
-        SmartDashboard.putBoolean("Cage engaged", mIntakeMotor.getOutputCurrent() > kCageEngagedAmps);
+        SmartDashboard.putNumber("climberCurrentDrawFiltered", filteredAmps);
+        SmartDashboard.putBoolean("Cage engaged", filteredAmps > kCageEngagedAmps);
     } 
     
     @Override
