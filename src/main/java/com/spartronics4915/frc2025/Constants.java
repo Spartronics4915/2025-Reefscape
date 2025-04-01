@@ -609,9 +609,9 @@ public final class Constants {
         .apply(kEncoderConfig)
     ;
 
-        public static final double  kStartingAngle = (0.25); //angle at the start of the match
-        public static final double kEngagedAngle = (0.75); //angle to engage the cage
-        public static final double kRetractedAngle = (0.5); //desired angle at the end of the match
+        public static final double  kStartingAngle = (0.0); //angle at the start of the match
+        public static final double kEngagedAngle = (-0.35); //angle to engage the cage
+        public static final double kRetractedAngle = (-0.3); //desired angle at the end of the match
 
         public static final double kCageEngagedAmps = 10;
 

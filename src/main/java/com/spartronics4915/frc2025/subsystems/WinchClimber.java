@@ -63,6 +63,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         mEncoder = mArmMotor.getEncoder();    //figure out conversions
 
+        mEncoder.setPosition(0.0);
         
         // mEncoder.setPosition(kStartingAngle.getRotations());
 
@@ -190,7 +191,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     @Override
     public void periodic() {
-        if (kEngagedAngle <= mEncoder.getPosition()){
+        if (mEncoder.getPosition() <= kEngagedAngle){
             isWinchEngaged = true;
         } else { isWinchEngaged = false; }
 
