@@ -430,6 +430,8 @@ public class RobotContainer {
 
         rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
 
+        operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
+
         operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
                                        .onFalse(climberSubsystem.operatorClimberWinchCommand(false));
 
