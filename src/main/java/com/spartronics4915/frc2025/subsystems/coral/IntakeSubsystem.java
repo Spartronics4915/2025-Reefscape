@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -19,16 +20,20 @@ import static edu.wpi.first.units.Units.RPM;
 import com.spartronics4915.frc2025.Constants.IntakeConstants;
 import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,8 +46,22 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private SparkMax mMotor1;
     private SparkClosedLoopController closedLoopController;
 
+    public double setpoint = 0.0; 
+
     // private var sensor;
     private LaserCan lc;
+    private LaserCan pipeLC;
+
+    private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("applied out").publish();
+    private final DoublePublisher velocityPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Velocity").publish();
+    private final BooleanPublisher lCPub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("LC").publish();
+    private final DoublePublisher pipeDistPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Pipe LC Dist").publish();
+    private final BooleanPublisher l4pipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC").publish();
+
+    private Debouncer l4Debouncer = new Debouncer(kBranchLCDebounceTime);
+
+    private RelativeEncoder mEncoder;
+
 
     public IntakeSubsystem() {
         // mMotor1 = new SparkMax(IntakeConstants.kMotorID1, MotorType.kBrushless);
@@ -56,25 +75,22 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         lc = new LaserCan(kLaserCANID);
         try {
             lc.setRangingMode(LaserCan.RangingMode.SHORT);
-            // lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
             lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
           }
 
-        Shuffleboard.getTab("loggingIntake").addDouble("appliedOut", mMotor1::getAppliedOutput);
-        Shuffleboard.getTab("loggingIntake").addDouble("velocity", ()-> mMotor1.getEncoder().getVelocity());
-        Shuffleboard.getTab("loggingIntake").addBoolean("laserCAN", ()-> {
-            
-            LaserCan.Measurement measurement = lc.getMeasurement();
-            if (measurement == null) {
-                return false;
-            }
+        pipeLC = new LaserCan(kPipeLCID);
+        try {
+            pipeLC.setRangingMode(LaserCan.RangingMode.SHORT);
+            pipeLC.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            pipeLC.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("Configuration failed! " + e);
+        }
 
-            return measurement.distance_mm < IntakeConstants.laserCANDistance;
-        });
-
-
+        mEncoder = mMotor1.getEncoder();
 
         SmartDashboard.putData("IntakeSpeed: IN", setPresetSpeedCommand(IntakeSpeed.IN));
         SmartDashboard.putData("IntakeSpeed: NEUTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
@@ -89,9 +105,12 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             newSpeed,
             ControlType.kVelocity
         );
+
+        setpoint = newSpeed;
     }
 
     private void setPercentage(double newPercentage) {
+        setpoint = newPercentage;
         mMotor1.set(newPercentage);
     }
 
@@ -104,7 +123,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     public boolean detect(){
         if (RobotBase.isSimulation()) {
-            return true;
+            return CoralSim.getIntakeLC();
         }
 
         LaserCan.Measurement measurement = lc.getMeasurement();
@@ -131,10 +150,35 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     public AngularVelocity getSpeed(){
         return RPM.of(mMotor1.getEncoder().getVelocity());
     }
-    // @Override
-    // public void periodic() {
-    //     detect();
-    // }
+
+    public boolean branchLC(){
+        return updateCache();
+    }
+
+    private boolean branchLCCache = false;
+
+    public boolean updateCache(){
+        var measure = pipeLC.getMeasurement();
+        if (measure == null) {
+            pipeDistPub.accept(-1.0);
+            branchLCCache = l4Debouncer.calculate(false);
+            l4pipePub.accept(branchLCCache);;
+        } else{
+            pipeDistPub.accept(measure.distance_mm);
+            branchLCCache = l4Debouncer.calculate(measure.distance_mm < kBranchLCTriggerDist);
+            l4pipePub.accept(branchLCCache);
+        }
+        return branchLCCache;
+    }
+
+    @Override
+    public void periodic() {
+        appliedOutPub.accept(mMotor1.getAppliedOutput());
+        velocityPub.accept(mEncoder.getVelocity());
+        lCPub.accept(detect());
+
+        updateCache();
+    }
 
     @Override
     public void onModeSwitch() {

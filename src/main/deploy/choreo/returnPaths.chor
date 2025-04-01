@@ -1,0 +1,101 @@
+{
+ "name":"returnPaths",
+ "version":1,
+ "type":"Swerve",
+ "variables":{
+  "expressions":{
+   "Approach":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"0.7 m / s",
+     "val":0.7
+    }
+   }
+  },
+  "poses":{
+   "Coral":{
+    "x":{
+     "exp":"1.1319907903671265 m",
+     "val":1.1319907903671265
+    },
+    "y":{
+     "exp":"7.1696858406066895 m",
+     "val":7.1696858406066895
+    },
+    "heading":{
+     "exp":"-0.9272949866269541 rad",
+     "val":-0.927294986626954
+    }
+   }
+  }
+ },
+ "config":{
+  "frontLeft":{
+   "x":{
+    "exp":"12 in",
+    "val":0.30479999999999996
+   },
+   "y":{
+    "exp":"12 in",
+    "val":0.30479999999999996
+   }
+  },
+  "backLeft":{
+   "x":{
+    "exp":"-12 in",
+    "val":-0.30479999999999996
+   },
+   "y":{
+    "exp":"12 in",
+    "val":0.30479999999999996
+   }
+  },
+  "mass":{
+   "exp":"135 lbs",
+   "val":61.23496995
+  },
+  "inertia":{
+   "exp":"4.862 kg m ^ 2",
+   "val":4.862
+  },
+  "gearing":{
+   "exp":"5.9",
+   "val":5.9
+  },
+  "radius":{
+   "exp":"(4 / 2) in",
+   "val":0.0508
+  },
+  "vmax":{
+   "exp":"5820 * 0.8 * rpm",
+   "val":487.57517983713586
+  },
+  "tmax":{
+   "exp":"1.086 N * m",
+   "val":1.086
+  },
+  "cof":{
+   "exp":"0.7",
+   "val":0.7
+  },
+  "bumper":{
+   "front":{
+    "exp":"15 in",
+    "val":0.381
+   },
+   "side":{
+    "exp":"15 in",
+    "val":0.381
+   },
+   "back":{
+    "exp":"15 in",
+    "val":0.381
+   }
+  },
+  "differentialTrackWidth":{
+   "exp":"22 in",
+   "val":0.5588
+  }
+ },
+ "generationFeatures":[]
+}

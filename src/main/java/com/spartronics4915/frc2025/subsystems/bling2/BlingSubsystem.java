@@ -43,6 +43,8 @@ public class BlingSubsystem extends SubsystemBase {
         this.blingPort = port;
         if (LIGHTS_ENABLED) strip = new AddressableLED(port);
         updateSegments(shows);
+
+        SmartDashboard.putData("Stop lights", clearLights());
     }
 
     private void logLEDs() {
@@ -60,8 +62,11 @@ public class BlingSubsystem extends SubsystemBase {
     public Command clearLights() {
         return Commands.runOnce(() -> {
             if (LIGHTS_ENABLED) {
-                System.out.println("hey you aren't supposed to do that with lights enabled");
+                strip.stop();
+                strip.close();
+                LIGHTS_ENABLED = false;
             } else {
+                System.out.println("worked");
                 AddressableLED clearStrip = new AddressableLED(blingPort);
                 clearStrip.stop();
                 clearStrip.close();
@@ -75,7 +80,7 @@ public class BlingSubsystem extends SubsystemBase {
             show.update();
         }
         if (LIGHTS_ENABLED) strip.setData(buffer);
-        logLEDs();
+        // logLEDs();
     }
 
 }

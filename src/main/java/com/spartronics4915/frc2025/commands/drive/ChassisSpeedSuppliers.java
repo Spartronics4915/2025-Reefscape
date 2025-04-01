@@ -10,7 +10,7 @@ import com.spartronics4915.frc2025.Constants.OI;
 import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
-import static com.spartronics4915.frc2025.Constants.DriveCommandConstants.*;
+import static com.spartronics4915.frc2025.Constants.ChassisSpeedSupplierConstants.*;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -26,13 +26,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,6 +46,10 @@ import static com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConst
 public final class ChassisSpeedSuppliers {
     private static final PIDController mAnglePIDRad = new PIDController(kAnglePIDConstants.kP(), kAnglePIDConstants.kI(), kAnglePIDConstants.kD());
     
+    private static StructPublisher<Rotation2d> targetAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("targetAngleRad", Rotation2d.struct).publish();
+    private static StructPublisher<Rotation2d> currentAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("currentAngleRad", Rotation2d.struct).publish();
+
+
     static{
         mAnglePIDRad.enableContinuousInput(-Math.PI, Math.PI);
         RobotModeTriggers.teleop()
@@ -174,8 +180,15 @@ public final class ChassisSpeedSuppliers {
     
     public static Supplier<ChassisSpeeds> gotoAngle(Supplier<Rotation2d> fieldRelativeAngleSupplier, SwerveSubsystem mSwerve){
         return () -> {
+
+            Rotation2d currentRotation = mSwerve.getPose().getRotation();
+            Rotation2d targetRotation = fieldRelativeAngleSupplier.get();
+
+            targetAnglePublisher.accept(currentRotation);
+            currentAnglePublisher.accept(targetRotation);
+
             return new ChassisSpeeds(0, 0,
-                mAnglePIDRad.calculate(mSwerve.getPose().getRotation().getRadians(), fieldRelativeAngleSupplier.get().getRadians())
+                mAnglePIDRad.calculate(currentRotation.getRadians(), targetRotation.getRadians())
             );
         };
     }
@@ -236,7 +249,7 @@ public final class ChassisSpeedSuppliers {
             return swerve.getPose().getRotation();
         }
 
-        if (shouldFlip()) { //CHECKUP can be replaced by the teleop offset? but also messes with behavior
+        if (shouldFlip()) {
             rightX = -rightX;
             rightY = -rightY;
         }
@@ -270,6 +283,9 @@ public final class ChassisSpeedSuppliers {
                     if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                     else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
+                default:{
+                    return Rotation2d.kZero; //unreachable
+                }
                 // case BARGE: {
                 //     int location = DriverStation.getLocation().getAsInt() - 1;
                 //     if (isBlue)
@@ -278,7 +294,6 @@ public final class ChassisSpeedSuppliers {
                 //         return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 // }
             }
-            return swerve.getHeading();
         };
     }
 

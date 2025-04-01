@@ -4,14 +4,22 @@
 
 package com.spartronics4915.frc2025;
 
-import java.util.Arrays;
 import java.util.Optional;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
@@ -24,16 +32,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
@@ -43,19 +41,17 @@ import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.EncoderConfig;
-import com.revrobotics.spark.config.SoftLimitConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.SlotConfigs;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -75,14 +71,18 @@ public final class Constants {
         public static final int kMotorID = 12;
 
         public static final int kLaserCANID = 21;
-        public static final int laserCANDistance = 110;
+        public static final int kPipeLCID = 25;
+
+        public static final int laserCANDistance = 90;
+        public static final int kBranchLCTriggerDist = 410;
+        public static final double kBranchLCDebounceTime = 0.10;
 
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
 
         public static final double kOpenLoopRampRate = 0.1;
 
-        public static final double kLaserCanDebounce = 0.05;
+        public static final double kLaserCanDebounce = 0.075;
 
         public static final EncoderConfig kEncoderConfig = new EncoderConfig()
             .positionConversionFactor(1/4.0)
@@ -94,7 +94,7 @@ public final class Constants {
 
         public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
             .inverted(false)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
             .apply(kCLConfig)
             .apply(kEncoderConfig)
             .openLoopRampRate(kOpenLoopRampRate)
@@ -131,6 +131,8 @@ public final class Constants {
         public static final double kDriverTriggerDeadband = 0.3;
         public static final double kOperatorTriggerDeadband = 0.3;
 
+        public static final boolean RUMBLE_ENABLED = true;
+        public static final double rumbleTime = 0.5;
     }
 
     public static final class ClimberConstants{
@@ -196,7 +198,7 @@ public final class Constants {
         public static final double kChassisRadius = Math.hypot(
                 kTrackWidth / 2, kWheelbase / 2);
 
-        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(5); //previously 5 (pathplanner max vel/acc divided by 2 as well)
+        public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(7); //previously 5 (pathplanner max vel/acc divided by 2 as well)
         public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(kMaxSpeed.in(MetersPerSecond) * Math.PI / kChassisRadius);
 
         public static final class AutoConstants {
@@ -209,13 +211,13 @@ public final class Constants {
             );
 
             public enum PathplannerConfigs{
-                PROGRAMMER_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
+                PROGRAMMER_CHASSIS(new RobotConfig(
                     Kilogram.of(10), 
                     KilogramSquareMeters.of(1.9387211145),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
                         MetersPerSecond.of(4),
-                        1.00, //CHECKUP guess
+                        1.00,
                         DCMotor.getNEO(1),
                         6.75,
                         Amps.of(40),
@@ -226,22 +228,22 @@ public final class Constants {
                     new Translation2d(Inches.of(-12), Inches.of(12.5)),
                     new Translation2d(Inches.of(-12.125), Inches.of(-12.4375))
                 )),
-                COMP_CHASSIS(new RobotConfig( // FIXME replace constants with more accurate values
-                    Kilogram.of(125), 
+                COMP_CHASSIS(new RobotConfig(
+                    Pounds.of(142), 
                     KilogramSquareMeters.of(4.86247863),
                     new ModuleConfig(
                         Inches.of(3.75/2.0),
-                        MetersPerSecond.of(4),
-                        1.3, //CHECKUP guess
+                        MetersPerSecond.of(5.273 * 0.9),
+                        1.916,
                         DCMotor.getNEO(1),
-                        6.75,
+                        5.900,
                         Amps.of(40),
                         1
                     ),
-                    new Translation2d(Inches.of(13.5), Inches.of(11.5)),
-                    new Translation2d(Inches.of(13.625), Inches.of(-11.625)),
-                    new Translation2d(Inches.of(-13.625), Inches.of(11.5)),
-                    new Translation2d(Inches.of(-13.5), Inches.of(-10.4375))
+                    new Translation2d(Inches.of(13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(13.375), Inches.of(-11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(11.375)),
+                    new Translation2d(Inches.of(-13.375), Inches.of(-11.375))
             ));
 ;
 
@@ -253,32 +255,37 @@ public final class Constants {
             }
 
             public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
-                Drive.AutoConstants.kTranslationPID, 
+                new PIDConstants(5.5, 0.0, 0.1, 0.0), 
                 Drive.AutoConstants.kRotationPID
             );
 
             public static final Time kAutoAlignPredict = Seconds.of(0.0);
 
-            public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
-            public static final Distance kPositionTolerance = Centimeter.of(1.0);
-            public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
+            public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(3.0);
+            public static final Distance kPositionTolerance = Centimeter.of(1.5);
+            public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(2);
 
-            public static final Time kEndTriggerDebounce = Seconds.of(0.1);
+            public static final Time kEndTriggerDebounce = Seconds.of(0.04);
 
             public static final Time kTeleopAlignAdjustTimeout = Seconds.of(2);
             public static final Time kAutoAlignAdjustTimeout = Seconds.of(0.6);
 
+            public static final Time kUnstuckWait = Seconds.of(1.0);
+            public static final Time kUnstuckDuration = Seconds.of(0.35);
 
-            public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(5);
+            public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(3, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
+            public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.5, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kPathConstraints = new PathConstraints(2, 1.75, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
-        
-            // X = side to side, Y = away from tag
-            // public static final Translation2d kTagOffset = new Translation2d(0.10, 0.55); //TODO fix based off field cad
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            
+            public static final double kTriggerDistance = 2.75;
+
+            public static final double kAutoIntakeWaitTime = 0.1;
+            public static final double kAutoIntakeTimeout = 0.2;
 
             public static final class StationVisualizationConstants {
                     public static final Pose2d kBlueLeft = new Pose2d(0.947, 7.447, Rotation2d.fromDegrees(-50));
@@ -290,8 +297,8 @@ public final class Constants {
 
     }
 
-    public static final class DriveCommandConstants {
-        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.0, 0);
+    public static final class ChassisSpeedSupplierConstants {
+        public static final PIDFConstants kAnglePIDConstants = new PIDFConstants(5.0, 0.0, 0.5, 0);
     }
 
     public static final class OrientTowardsNearestPOIConstants {
@@ -310,15 +317,17 @@ public final class Constants {
             new Translation2d(8.8, 6.1),
             new Translation2d(8.8, 5)
         };
+        public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
+        public static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
     }
 
     public static final class BlingConstants {
-        public static boolean LIGHTS_ENABLED = true; // Turn this off for rumble but no LED strips.
+        public static boolean LIGHTS_ENABLED = true;
 
-        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 35; // 0-100
+        public static final int BLING_BRIGHTNESS = RobotBase.isSimulation() ? 100 : 70; // 0-100
         public static final int FRAME_WAIT = 5; // Frames to wait before updating bling again
 
-        public static final int BLING_LENGTH = 23+24;
+        public static final int BLING_LENGTH = 48;
 
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
@@ -342,13 +351,17 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
-        public static final BlingShow SHOW_SPARTRONICS47 = new BlingShow("bling/spartronics47.bling");
+        public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
+        public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
+
+        public static final BlingSegment MATCH_END = SHOW_RAINBOW_FUN;
     }
 
     public static final class VisionConstants {
         public static final double kMaxAngularSpeed = 720;
         public static final double kMaxSpeedForMegaTag1 = 0.5; //meters
         public static final double kMaxDistanceForMegaTag1 = 3.75; //meters
+        public static final double kMaxDistance = 8; // FIXME for testing if readings at the coral station causes problems during auto, increase this value if this doesn't resolve issues
         public static final boolean kVisionDiagnostics = true;
         
         public static final Time newMegaTag1ReadingThreshold = Seconds.of(10);
@@ -356,9 +369,9 @@ public final class Constants {
         // Commenting this out for now because loading this is expensive and we want to have control over load times in auto.
         // public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
         public static final LimelightConstants kLimelights[] = {
-                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.REEF),
+                new LimelightConstants("alex", LimelightModel.LIMELIGHT_3G, 11, LimelightRole.NOTHING),
                 new LimelightConstants("randy", LimelightModel.LIMELIGHT_3, 12, LimelightRole.NOTHING),
-                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF), //TODO: CHANGE
+                new LimelightConstants("ben", LimelightModel.LIMELIGHT_3G, 13, LimelightRole.REEF),
                 new LimelightConstants("chucky", LimelightModel.LIMELIGHT_3, 14, LimelightRole.NOTHING),
                 new LimelightConstants("doug", LimelightModel.LIMELIGHT_3, 15, LimelightRole.NOTHING)
         };
@@ -419,13 +432,20 @@ public final class Constants {
         
         public static final double kDt = 0.02;
 
-        public static final Constraints kConstraints = new Constraints(4.5, 3.5 / 2.0); //8.0, 10
+        public static final double kMaxVelocity = 7.0;
+        public static final double kMaxAcceleration = 8.5 / 2.0;
+
+        public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceleration); //8.0, 10
         public static final int kPeriodMs = 0;
 
         public static final double kS = 0.0;
         public static final double kG = 0.0;
         public static final double kV = 0.0;
         public static final double kA = 0.0;
+
+        public static final double kP = 300;
+        public static final double kI = 0.0;
+        public static final double kD = 1.6;
         
         //The values set here are placeholders for sim
         public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(5);
@@ -434,12 +454,16 @@ public final class Constants {
         public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(270);
 
         public static final SlotConfigs kPIDConfigs = new SlotConfigs()
-            .withKP(200)
-            .withKI(0.0)
-            .withKD(0.0);
+            .withKP(kP)
+            .withKI(kI)
+            .withKD(kD);
 
         public static final CurrentLimitsConfigs kCurrentLimits = new CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(20);
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(70)
+            .withSupplyCurrentLowerLimit(40)
+            .withSupplyCurrentLowerTime(1.0);
+
         public static final FeedbackConfigs kFeedbackConfig = new FeedbackConfigs()
             .withSensorToMechanismRatio(25.7143)
         ;
@@ -466,8 +490,8 @@ public final class Constants {
         public static final int elevatorFollowerID = 10; //right motor
         public static final boolean motorInverted = true;
         public static final boolean followerInverted = true;
-        public static final double motorPositionConversionFactor = (1/20.0) * 0.14044 * 2;
-        public static final double motorVelocityConversionFactor = (1/20.0) * 0.14044 * 2;
+        public static final double motorPositionConversionFactor = (1/9.0) * 0.14044 * 2;
+        public static final double motorVelocityConversionFactor = (1/9.0) * 0.14044 * 2;
         public static final int motorSmartCurrentLimit = 35; //18
         public static final int motorSecondaryCurrentLimit = 40; //20
         public static final int followerSmartCurrentLimit = 35;
@@ -475,9 +499,9 @@ public final class Constants {
 
         public static final double dt = 0.02;
 
-        public static final Constraints constraints = new Constraints(3.0, 3.5); //12, 7.5
+        public static final Constraints constraints = new Constraints(6.5, 7.0); //12, 7.5
 
-        public static final double minHeight = 0;
+        public static final double minHeight = 0.01;
         public static final double maxHeight = 1.24;
 
         // Not using elevator feedforward constants for now, so just commenting them out.
@@ -488,27 +512,37 @@ public final class Constants {
         // public static final double kA = 0.0;
 
         public static final class motorPIDConstants {
-            public static final double kP = 16;
+            public static final double kP = 20;
             public static final double kI = 0;
-            public static final double kD = 0;
+            public static final double kD = 0.1;
         }
     }
 
     public static final class DynamicsConstants {
-        public static final Angle kArmAngleTolerance = Degrees.of(1);
-        public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
+        public static final Angle kArmAngleTolerance = Degrees.of(10);
+        public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(10);
 
-        public static final double kSafeElevHeightForSwerve = 0.4;
+        public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
+
+        public static final double kSafeElevHeightForSwerve = 1.2;
 
 
-        public static final Angle kSafeArmAngle = Degrees.of(90); //TODO this is currently straight up, this might change
-        public static final Angle kMoveableArmAngle = Degrees.of(83.801389); //used in cos math, so this is equivalent to ~80 degrees either side of the left horizon //TODO this is currently straight up, this might change
+        public static final Angle kSafeArmAngle = Degrees.of(90);
+        public static final Angle kMoveableArmAngle = Degrees.of(76);
+        public static final Angle kReturnArmAngle = Degrees.of(135);
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
     
-        public static final double kMinSafeElevHeight = 0.385; //previously 4.361// height of the elevator for when the arm is stowed and needs to move
+        public static final double kMinSafeElevHeight = 0.3; //previously 4.361// height of the elevator for when the arm is stowed and needs to move
+        
+        public static final double kElevatorSafeHeightSetpoint =  0.4;
 
         public static final double kScoreLaserCanDebounce = 0.1; //seconds
+
+        public static final Time kCheckIfScoredDelay = Seconds.of(0.075);
+        public static final Time kCheckIfScoredDuration = Seconds.of(0.5);
+
+        public static final Time kJustScoredThreshold = Seconds.of(1);
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
@@ -519,8 +553,8 @@ public final class Constants {
         //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
 
         public enum WinchSpeeds{
-            ENGAGE(0.0), //speed which it'll rotate to move and engage the cage
-            RETRACT(0.0), //speed which it'll rotate to bring the cage down
+            EASE(0.95), //speed which it'll rotate to move and engage the cage
+            RETRACT(-0.95), //speed which it'll rotate to bring the cage down
             ;
 
             public final double speed;
@@ -529,27 +563,59 @@ public final class Constants {
                 this.speed = speed;
             }
         }
+
+        public enum ClimberSpeeds{
+            ENGAGE(-0.2),
+            RETRACT(0.2),
+            ;
+
+            public final double speed;
+
+            private ClimberSpeeds(double speed) {
+                this.speed = speed;
+            }
+        }
         
-        public static final int kMotorID = 13;
+        public static final int kWinchMotorID = 13;
+        public static final int kArmMotorID = 23;
+        public static final int kIntakeMotorID = 24;
 
         private static final EncoderConfig kEncoderConfig = new EncoderConfig()
-            .positionConversionFactor(1.0)
-            .velocityConversionFactor(1.0)
+            .positionConversionFactor(1/7.0 * 1/4.0)
+            .velocityConversionFactor(1/7.0 * 1/4.0)
         ;
 
-        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
+        public static final SparkBaseConfig kWinchMotorConfig = new SparkMaxConfig()
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
             .openLoopRampRate(0.25)
             .idleMode(IdleMode.kBrake)
-            .apply(kEncoderConfig)
         ;
 
+        public static final SparkBaseConfig kIntakeMotorConfig = new SparkMaxConfig()   //neo 550
+        .smartCurrentLimit(15)                                          
+        .secondaryCurrentLimit(20)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kBrake)
+    ;
+        public static final SparkBaseConfig kArmMotorConfig = new SparkMaxConfig()
+        .smartCurrentLimit(18)
+        .secondaryCurrentLimit(20)
+        .inverted(false)
+        .openLoopRampRate(0.25)
+        .idleMode(IdleMode.kBrake)
+        .apply(kEncoderConfig)
+    ;
 
-        public static final Rotation2d kStartingAngle = Rotation2d.fromDegrees(90.0); //angle at the start of the match
-        public static final Rotation2d kEngagedAngle = Rotation2d.fromDegrees(270.0); //angle to engage the cage
-        public static final Rotation2d kRetractedAngle = Rotation2d.fromDegrees(180.0); //desired angle at the end of the match
+        public static final double  kStartingAngle = (0.0); //angle at the start of the match
+        public static final double kEngagedAngle = (-0.35); //angle to engage the cage
+        public static final double kRetractedAngle = (-0.3); //desired angle at the end of the match
+
+        public static final double kCageEngagedAmps = 12;
+
+        public static final double intakeSpeed = 1.0;
 
 
     }

@@ -72,7 +72,6 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         // swerveDrive.resetOdometry(new Pose2d(1.5, 5, Rotation2d.fromDegrees(45)));
 
         // NetworkTableInstance.getDefault().getTable("swerveLogging").getStructArrayTopic("modules", SwerveModulePosition.struct)
-        // Shuffleboard.getTab("swerveLogging").add
 
         AutoBuilder.configure(
             this::getPose, 
@@ -100,6 +99,9 @@ public class SwerveSubsystem extends SubsystemBase implements ModeSwitchInterfac
         SmartDashboard.putData("set pose to M coral mark", Commands.runOnce(() -> {
             setPose(new Pose2d(16.3,4, Rotation2d.fromDegrees(180.0)));
         }));
+
+
+        System.out.println(swerveDrive.getMaximumModuleDriveVelocity() + "\t hello");
 
     }
 

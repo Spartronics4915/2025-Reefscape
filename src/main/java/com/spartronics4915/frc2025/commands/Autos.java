@@ -33,22 +33,20 @@ public final class Autos {
 
     public enum AutoPaths{
         CORAL_ONE("Coral-1"),
-        ONE_CORAL("1-Coral"),
+        ONE_CORAL("1-Coral", false),
         CORAL_TWO("Coral-2"),
-        TWO_CORAL("2-Coral"),
+        TWO_CORAL("2-Coral", false),
         CORAL_THREE("Coral-3"),
-        THREE_CORAL("3-Coral"),
+        THREE_CORAL("3-Coral", false),
         CORAL_FOUR("Coral-4"),
-        FOUR_CORAL("4-Coral"),
+        FOUR_CORAL("4-Coral", false),
         CORAL_FIVE("Coral-5"),
-        FIVE_CORAL("5-Coral"),
+        FIVE_CORAL("5-Coral", false),
         CORAL_SIX("Coral-6"),
-        SIX_CORAL("6-Coral"),
+        SIX_CORAL("6-Coral", false),
         ;
         public final String pathName;
-
-        //TODO create Mirroring so that we can switch different coral stations intuitively
-        //TODO create "getReverse", ie Coral-2 reversed is 2-Coral
+        public final boolean isChoreo;
 
         /**
          * @return The inverse of the current path (return to approach and vise versa)
@@ -71,23 +69,14 @@ public final class Autos {
             return this;
         }
 
-        /**
-         * @return The apporach / return path for the mirrored side 
-         */
-        public AutoPaths getMirror(){
-            switch (this) {
-                case CORAL_ONE: return CORAL_ONE;
-                case CORAL_TWO: return TWO_CORAL;
-                case CORAL_THREE: return THREE_CORAL;
-                case ONE_CORAL: return ONE_CORAL;
-                case TWO_CORAL: return CORAL_TWO;
-                case THREE_CORAL: return CORAL_THREE;
-            }
-            return this;
+        private AutoPaths(String path, boolean isChoreo) {
+            pathName = path;
+            this.isChoreo = isChoreo;
         }
 
         private AutoPaths(String path) {
             pathName = path;
+            this.isChoreo = false;
         }
     }
 
@@ -98,7 +87,7 @@ public final class Autos {
     public static PathPlannerPath getAutoPath(AutoPaths pathChoice, boolean mirrored){
         PathPlannerPath path;
         try {
-            path = PathPlannerPath.fromPathFile(pathChoice.pathName);
+            path = (pathChoice.isChoreo) ? PathPlannerPath.fromChoreoTrajectory(pathChoice.pathName) : PathPlannerPath.fromPathFile(pathChoice.pathName);
         } catch (FileVersionException | IOException | ParseException e) {
             e.printStackTrace();
             throw new InvalidParameterException("invalid path");

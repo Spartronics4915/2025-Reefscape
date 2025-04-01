@@ -1,13 +1,19 @@
 package com.spartronics4915.frc2025.commands;
 
-import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoIntakeTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoIntakeWaitTime;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStartingPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachSpeed;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStationApproachTimeout;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckDuration;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckWait;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.spartronics4915.frc2025.RobotContainer;
+import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
@@ -20,8 +26,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class VariableAutos {
 
@@ -29,6 +35,7 @@ public class VariableAutos {
         L4(DynaPreset.L4),
         L3(DynaPreset.L3),
         L2(DynaPreset.L2),
+        L1(DynaPreset.L1)
         ;
 
         public final DynaPreset preset;
@@ -68,9 +75,11 @@ public class VariableAutos {
         }
     }
 
-    public enum BranchSide{
-        LEFT(new Translation2d(0.108759 + 0.0381 + 0.00635, 0.5152845 + 0.0254)),
-        RIGHT(new Translation2d(0.218062, 0.5154565 + 0.0254));
+    // X = side to side, Y = away from tag
+    public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
+        LEFT(new Translation2d(-0.109236, 0.5406845 + 0.02)),//-0.153209, 0.5406845 + 0.02)),
+        RIGHT(new Translation2d(0.218918 - 0.0508, 0.5408565 + 0.02)),//0.218062 - 0.0508, 0.5408565 + 0.02)),
+        MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.02));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -80,6 +89,7 @@ public class VariableAutos {
         public BranchSide mirror(){
             switch (this) {
                 case LEFT: return RIGHT;
+                case MIDDLE: return MIDDLE;
                 default: return LEFT;
             }
         }
@@ -136,6 +146,16 @@ public class VariableAutos {
 
     private final ChassisSpeeds reverseIntoStation;
 
+    public boolean isSwerveCloseToReef() {
+        Translation2d currentReef = 
+        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ?
+            new Translation2d(4.5, 4.0) :
+            new Translation2d(13, 4.0)
+        ;
+
+        return (currentReef.getDistance(swerve.getPose().getTranslation()) < kTriggerDistance);
+    }
+
     public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
         super();
         this.alignmentGenerator = alignmentGenerator;
@@ -157,35 +177,62 @@ public class VariableAutos {
      * Outputs the entire auto cycle from station to branch with mechanism movement
      */
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, height);
         
         return Commands.sequence(
-            Commands.deadline(
-                pathPair.approachPath,
-                Commands.sequence(
-                    Commands.waitUntil(dynamics.intakeSubsystem::detect),
-                    dynamics.autoPrescore()
+            // Commands.runOnce(() -> {
+            //     alignmentGenerator.changePathConstraints(kAutoPathConstraints);
+            // }),
+            Commands.parallel(
+                Commands.deadline(
+                    pathPair.approachPath,
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics.intakeSubsystem::detect),
+                        dynamics.autoPrescore()
+                    )
                 )
             ),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
-                pathPair.autoAlign,
-                Commands.sequence(
-                    Commands.waitUntil(() -> dynamics.intakeSubsystem.detect()),
-                    Commands.print("moving to height"),
+                Commands.race(
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics::canAutoScore),
+                        Commands.print("auto scoring")
+                    ), 
+                    pathPair.autoAlign
+                ),
+                Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
+                ),
+                Commands.deadline( //this attempts to unstuck coral in auto
+                    Commands.waitUntil(dynamics::isCoralInArm),
+                    Commands.sequence(
+                        Commands.waitTime(kUnstuckWait),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
+                        Commands.waitTime(kUnstuckDuration),
+                        dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
+                    )
                 )
             ),
             Commands.print("end step"),
             dynamics.waitUntilPreset(height.preset),
-            dynamics.score(),
-            Commands.print("Stow & return"),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
             Commands.parallel(
                 dynamics.stow(),
+                dynamics.stopIntake(),
+                Commands.sequence(
+                    Commands.waitSeconds(kAutoIntakeWaitTime),
+                    dynamics.intake(),
+                    Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
+                    dynamics.stopIntake()
+                ),
                 Commands.sequence(
                     Commands.print("start delay"),
                     Commands.waitTime(delay),
                     Commands.print("end delay"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
                     Commands.print("returning path"),
                     pathPair.returnPath
                 )
@@ -200,48 +247,67 @@ public class VariableAutos {
     }
 
     public Command generateStartingAutoCycle(FieldBranch branch, StationSide side, BranchHeight height, Time delay) {
-        var pathPair = getPathPair(branch, side);
+        var pathPair = getPathPair(branch, side, height);
         
+        alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
         return Commands.sequence(
-            Commands.runOnce(() -> {
-                alignmentGenerator.changePathConstraints(kStartingPathConstraints); //!!! should this be in command sequence??? -shark
-            }),
             Commands.parallel(
-                Commands.parallel(
+                Commands.print("auto align"),
+                Commands.race(
+                    Commands.sequence(
+                        Commands.waitUntil(dynamics::canAutoScore),
+                        Commands.print("auto scoring")
+                    ),
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
                     dynamics.autoPrescore(),
-                    Commands.waitUntil(() -> alignmentGenerator.isPIDLoopRunning),
-                    Commands.print("moving to height"), //!!! did not trigger -shark
+                    // Commands.print("is swerve close to reef?"),
+                    Commands.waitUntil(() -> isSwerveCloseToReef()),
+                    // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            // dynamics.gotoScore(height.preset),
+            // Commands.print("wait until preset"),
             dynamics.waitUntilPreset(height.preset),
-            dynamics.score(),
+            // Commands.print("score"),
+            dynamics.autoScore(),
+            Commands.waitUntil(dynamics.hasScoredTrigger),
+            // Commands.print("parallel group stow"),
             Commands.parallel(
                 dynamics.stow(),
+                dynamics.stopIntake(),
+                Commands.sequence(
+                    Commands.waitSeconds(kAutoIntakeWaitTime),
+                    dynamics.intake(),
+                    Commands.waitUntil(() -> dynamics.isCoralInArm()).withTimeout(kAutoIntakeTimeout),
+                    dynamics.stopIntake()
+                ),
                 Commands.sequence(
                     Commands.waitTime(delay),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()),
+                    // Commands.print("is swerve moveable?"),
+                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
+                    // Commands.print("returning"),
                     pathPair.returnPath
                 )
             ),
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            )
+            ),
+            Commands.runOnce(() -> {
+                alignmentGenerator.changePathConstraints(kAutoPathConstraints); //!!! should this be in command sequence??? -shark
+            })
         ).finallyDo(() -> {
-            alignmentGenerator.changePathConstraints(kPathConstraints);
+            alignmentGenerator.changePathConstraints(kAutoPathConstraints);
         }).withName("Starting Auto cycle")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-    public PathPair getPathPair(FieldBranch branch, StationSide side){
+    public PathPair getPathPair(FieldBranch branch, StationSide side, BranchHeight height){
         boolean shouldMirror = side == StationSide.RIGHT;
 
-        var branchSide = branch.simpleBranchInfo.branchSide;
+        var branchSide = height == BranchHeight.L1 ? BranchSide.MIDDLE : branch.simpleBranchInfo.branchSide;
         var reefSide = branch.simpleBranchInfo.reefSide;
 
         return getPathPair(branchSide, reefSide, shouldMirror);

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1799715909090909,
-        "y": 7.107883522727272
+        "x": 1.1541005152510533,
+        "y": 7.000175739158278
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4202857846743233,
-        "y": 7.03896989363283
+        "x": 2.153373158286536,
+        "y": 6.375981947917593
       },
       "isLocked": false,
       "linkedName": "Coral Station"
     },
     {
       "anchor": {
-        "x": 3.091193181818182,
-        "y": 6.285227272727273
+        "x": 2.542755681818182,
+        "y": 6.193821022727272
       },
       "prevControl": {
-        "x": 2.534446022727273,
-        "y": 7.232528409090909
+        "x": 2.2033359614270673,
+        "y": 6.4217894916466784
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,15 +33,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 7.0,
+    "maxAcceleration": 7.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 2.0,
+    "velocity": 1.8,
     "rotation": -59.99999999999999
   },
   "reversed": false,

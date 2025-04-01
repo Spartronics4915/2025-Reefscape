@@ -11,6 +11,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
+import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
@@ -45,13 +47,18 @@ import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
+import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorHeightTolerance;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
+
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
@@ -62,11 +69,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -93,12 +100,12 @@ public class RobotContainer {
     private static final CommandXboxController operatorController = new CommandXboxController(
         OI.kOperatorControllerPort);
         
-    private static final CommandXboxController debugController = new CommandXboxController(OI.kDebugControllerPort);
+    private static final CommandXboxController debugController = DriverStation.isFMSAttached() ? null : new CommandXboxController(OI.kDebugControllerPort);
 
     private enum Rumble{
         DRIVER(driverController),
-        OPERATOR(operatorController),
-        DEBUG(debugController);
+        OPERATOR(operatorController);
+        // DEBUG(debugController);
 
         public final RumbleController controller;
 
@@ -116,8 +123,11 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
-    // public final WinchClimber climberSubsystem;
+    public final WinchClimber climberSubsystem;
 
+    public boolean isTeleopAutoScoringEnabled = true; 
+
+    private final BooleanPublisher autoScoreEnabledPub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("AutoScoringEnabled").publish();
     
     public final DynamicsCommandFactory dynamics;
 
@@ -131,6 +141,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+
     private final ComplexAutoChooser complexAutoChooser;
 
     /**
@@ -141,48 +152,52 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         armSubsystem = new ArmSubsystem();
         elevatorSubsystem = new ElevatorSubsystem();
-        // climberSubsystem = new WinchClimber();
+        climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
+
+        if (RobotBase.isSimulation()) CoralSim.setup(swerveSubsystem, intakeSubsystem);
 
         ModeSwitchHandler.EnableModeSwitchHandler(
             intakeSubsystem,
             armSubsystem,
-            elevatorSubsystem
-        ); //TODO add any subsystems that extend ModeSwitchInterface
+            elevatorSubsystem,
+            climberSubsystem,
+            swerveSubsystem
+        ); 
 
         MechanismRenderer.generateRenderer(
             elevatorSubsystem::getDesiredPosition, 
             () -> armSubsystem.getTargetPosition().getMeasure(), 
-            intakeSubsystem::getSpeed, 
+            () -> RPM.of(intakeSubsystem.setpoint), 
             intakeSubsystem::detect,
             "Target Position"
         );
 
-        MechanismRenderer.generateRenderer(
-            () -> Meters.of(elevatorSubsystem.getPosition()), 
-            () -> armSubsystem.getPosition().getMeasure(), 
-            intakeSubsystem::getSpeed, 
-            intakeSubsystem::detect,
-            "Current Position"
-        );
+        // MechanismRenderer.generateRenderer(
+        //     () -> Meters.of(elevatorSubsystem.getPosition()), 
+        //     () -> armSubsystem.getPosition().getMeasure(), 
+        //     intakeSubsystem::getSpeed, 
+        //     intakeSubsystem::detect,
+        //     "Current Position"
+        // );
 
-        MechanismRenderer.generateRenderer(
-            () -> elevatorSubsystem.getSetpoint(), 
-            () -> armSubsystem.getSetpoint().getMeasure(), 
-            intakeSubsystem::getSpeed, 
-            intakeSubsystem::detect,
-            "setpoints"
-        );
+        // MechanismRenderer.generateRenderer(
+        //     () -> elevatorSubsystem.getSetpoint(), 
+        //     () -> armSubsystem.getSetpoint().getMeasure(), 
+        //     () -> RPM.of(intakeSubsystem.setpoint), 
+        //     intakeSubsystem::detect,
+        //     "setpoints"
+        // );
 
         if (swerveSubsystem != null) {
             swerveTeleopCommand = new SwerveTeleopCommand(driverController, swerveSubsystem);
-            alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
+            alignmentCommandFactory = new AlignToReef(swerveSubsystem);
             variableAutoFactory = new VariableAutos(alignmentCommandFactory, dynamics, swerveSubsystem);
             if (RobotBase.isSimulation()) {
                 visionSubsystem = new SimVisionSubsystem(swerveSubsystem);
             } else {
-                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, elementLocator.getFieldLayout());
+                visionSubsystem = new LimelightVisionSubsystem(swerveSubsystem, getFieldLayout());
                 ModeSwitchHandler.EnableModeSwitchHandler((LimelightVisionSubsystem) visionSubsystem);
             }
     
@@ -200,9 +215,8 @@ public class RobotContainer {
                 buildAutoChooser();
 
 
-        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, intakeSubsystem, dynamics, visionSubsystem);
-        driverCommunication.setRumbleControllers(Rumble.DRIVER.controller, Rumble.OPERATOR.controller);
-        blingSubsystem = new BlingSubsystem(0, driverCommunication); //FIXME THIS LINE SHOULDN"T BE COMMITED
+        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
+        blingSubsystem = new BlingSubsystem(0, driverCommunication); 
     }
 
     /**
@@ -277,6 +291,11 @@ public class RobotContainer {
                 .withName("Align Right Branch")
             );
 
+            driverController.start().whileTrue(
+                alignmentCommandFactory.generateCommand(FieldBranchSide.MIDDLE)
+                .withName("Align Middle Branch")
+            );
+
             driverController.povUp().whileTrue(
                 Commands.run(() -> {
                     swerveSubsystem.drive(new ChassisSpeeds(0.25, 0, 0));
@@ -304,15 +323,41 @@ public class RobotContainer {
 
         //#endregion
 
+        //#region Rumble
+
+        if (OI.RUMBLE_ENABLED) {
+            // Score is currently not used, maybe later?
+            // dynamics.hasScoredTrigger.onTrue(
+            //     Rumble.DEBUG.controller.timedRumble(RumblePresets.PRESET0L.rumble, 1.0)
+            // );
+
+            new Trigger(dynamics::funnelDetect).onTrue(
+                Rumble.DRIVER.controller.timedRumble(RumblePresets.DRIVER_FUNNEL.rumble, OI.rumbleTime)
+            );
+
+            new Trigger(dynamics::isCoralInArm).onTrue(
+                Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
+            );
+        }
+        
+        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
+            Commands.waitSeconds(0.05),
+            // Commands.print("yo scoring")
+            dynamics.score()
+        ));
+
+        //#endregion
+
         //#region automated controls
 
-        dynamics.hasScoredTrigger.onTrue(dynamics.stow());
+        dynamics.hasScoredTrigger.onTrue(dynamics.returnLoadStow());
 
         new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop)
             .debounce(0.02).onTrue(
                 Commands.parallel(
                     dynamics.stow()
                 ).withName("auto stowing (trigger))")
+                .onlyIf(dynamics::hasNotJustScored)
             );
 
         new Trigger(dynamics::funnelDetect).onTrue(
@@ -324,7 +369,10 @@ public class RobotContainer {
         //#region Operator Controls
 
         operatorController.rightTrigger().onTrue( //whileTrue
-            dynamics.score()
+            Commands.parallel(
+                dynamics.score(),
+                Commands.print("scoring")
+            )
         );/*.onFalse(Commands.parallel(
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
             dynamics.stow()
@@ -344,7 +392,18 @@ public class RobotContainer {
 
         operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
+        operatorController.a().onTrue(dynamics.operatorScore(DynaPreset.L1));
+
         operatorController.start().onTrue(dynamics.intake()); //menu button
+
+        autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+
+        operatorController.rightStick().onTrue(Commands.defer(() -> {
+            return Commands.runOnce(() -> {
+                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
+                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+            });
+        }, Set.of()));
 
         // operatorController.rightStick().whileTrue(
         //     Commands.repeatingSequence(
@@ -359,53 +418,70 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        operatorController.leftStick().onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
-        );
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.99) && ((Math.abs(operatorController.getLeftX()) < 0.01) || operatorController.getLeftX() < -0.99)); //top left paddle
+        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.99) && ((Math.abs(operatorController.getLeftY()) < 0.01) || operatorController.getLeftY() < -0.99)); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.99) && ((Math.abs(operatorController.getRightX()) < 0.01) || operatorController.getRightX() < -0.99)); //top right paddle
+        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.99) && ((Math.abs(operatorController.getRightY()) < 0.01) || operatorController.getRightY() < -0.99)); //bottom right paddle
 
-        operatorController.rightStick().onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_LOW)
-        );
+        Trigger algaeSafety = leftStickUp;
 
-        operatorController.a().onTrue(
-            dynamics.removeAlgaeArm()
-        );
+        leftStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
+        rightStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
 
-        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+        rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
 
-        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+        operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
+                                       .onFalse(climberSubsystem.operatorClimberWinchCommand(false));
 
-        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
-
-        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
+        operatorController.rightBumper().onTrue(climberSubsystem.operatorClimberArmCommand(true))
+                                        .onFalse(climberSubsystem.operatorClimberArmCommand(false))
+                                        .onTrue(dynamics.gotoClimb());
         
-        // operatorController.rightBumper()
-        //     .whileTrue(climberSubsystem.driveWinch(0.5).withName("Move Climber Pos"));
-        //     // .onTrue(dynamics.gotoClimb());
-
-        // operatorController.leftBumper()
-        //     .whileTrue(climberSubsystem.driveWinch(-0.5).withName("Move Climber Neg"));
-        //     // .onTrue(dynamics.gotoClimb());
-
-        //#endregion
 
         SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
 
-        SmartDashboard.putData("setPreset1", armSubsystem.setMechanismAngleCommand(Rotation2d.fromDegrees(270)));
+        SmartDashboard.putData("preset1Arm", armSubsystem.presetCommand(ArmSubsystemState.EH));
 
         SmartDashboard.putData("preset1elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.STOW));
         SmartDashboard.putData("preset2elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L1));
         SmartDashboard.putData("preset3elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L3));
         SmartDashboard.putData("preset4elevator", elevatorSubsystem.presetCommand(ElevatorSubsystemState.L4));
 
+        SmartDashboard.putData("Stow", dynamics.stow());
+        SmartDashboard.putData("Stow Load", dynamics.loadStow());
+        SmartDashboard.putData("Stow Prescore", dynamics.prescoreStow());
+        SmartDashboard.putData("Climb", dynamics.gotoClimb());
+        SmartDashboard.putData("L4", dynamics.gotoScore(DynaPreset.L4));
+        SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
+        SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
+        SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
+
+        SmartDashboard.putData("Score", dynamics.score());
+        SmartDashboard.putData("Climber: stop", climberSubsystem.stopArmCommand());
+        SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
+        SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
+        SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
+
+        SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
+
     
-        debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
-                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
+        if (debugController != null) {
+            debugController.b().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(true)))
+                               .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setMegaTag1Override(false)));
 
-        debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
-                           .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+            debugController.x().onTrue(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(true)))
+                               .onFalse(Commands.runOnce(() -> LimelightVisionSubsystem.setDiscardMeasurements(false)));
+        }
+
+        operatorController.povUp().whileTrue(elevatorSubsystem.manualMode(0.002));
+    
+        operatorController.povDown().whileTrue(elevatorSubsystem.manualMode(-0.002));
+    
+        operatorController.povLeft().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(-0.3)));
+    
+        operatorController.povRight().whileTrue(armSubsystem.manualMode(Rotation2d.fromDegrees(0.3)));
     }
-
+    
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
@@ -431,7 +507,7 @@ public class RobotContainer {
             var variableAuto = Commands.defer(complexAutoChooser::getAuto, Set.of(swerveSubsystem));
             variableAuto.setName("variableAuto");
 
-            chooser.addOption("Create auto...", variableAuto);
+            chooser.setDefaultOption("Create auto...", variableAuto);
 
             // chooser.addOption("ReverseLeave", Autos.reverseForSeconds(swerveSubsystem, 3));
             // chooser.addOption("Drive to Reef Point", new DriveToReefPoint(swerveSubsystem, elementLocator, 11).generate());
@@ -472,14 +548,17 @@ public class RobotContainer {
             ));
         }
 
-        chooser.onChange((c) -> {
-            SmartDashboard.putBoolean("Using Variable Auto?", c.getName() == "variableAuto");
-        });
-
+        chooser.onChange(RobotContainer::postIfUsingVariableAutos);
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
+        postIfUsingVariableAutos(chooser.getSelected());
+
         return chooser;
+    }
+
+    private static void postIfUsingVariableAutos(Command c) {
+        SmartDashboard.putBoolean("Using Variable Auto?", c.getName() == "variableAuto");
     }
 
     public static CommandXboxController getDriveController() {

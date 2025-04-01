@@ -4,6 +4,11 @@
       "visible": true
     }
   },
+  "Keyboard 1 Settings": {
+    "window": {
+      "visible": true
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -21,6 +26,7 @@
           "keyRate": 0.009999999776482582
         },
         {
+          "decKey": 256,
           "incKey": 69
         },
         {
@@ -44,7 +50,7 @@
         55,
         56,
         57,
-        280
+        48
       ],
       "povConfig": [
         {
@@ -63,10 +69,8 @@
     {
       "axisConfig": [
         {
-          "decKey": 74
-        },
-        {
-          "decKey": 73
+          "decKey": 74,
+          "incKey": 73
         }
       ],
       "axisCount": 2,
@@ -101,9 +105,6 @@
   "robotJoysticks": [
     {
       "guid": "Keyboard0"
-    },
-    {
-      "guid": "030000004c050000c405000000000000"
     }
   ],
   "useEnableDisableHotkeys": true

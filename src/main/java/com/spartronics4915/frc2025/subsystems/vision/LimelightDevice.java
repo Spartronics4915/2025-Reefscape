@@ -79,6 +79,8 @@ public class LimelightDevice extends SubsystemBase {
                     break;
             }
         }
+
+        LimelightHelpers.SetFiducialIDFiltersOverride(name, tagFilter);
     }
 
     public LimelightRole getRole() {
@@ -103,6 +105,7 @@ public class LimelightDevice extends SubsystemBase {
         final boolean BEFORE_MATCH = !Robot.AUTO_TIMER.hasElapsed(0.01) && !Robot.TELEOP_TIMER.hasElapsed(0.01);
         final PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (!LimelightHelpers.validPoseEstimate(poseEstimate)) return Optional.empty();
+        if (!BEFORE_MATCH && poseEstimate.avgTagDist > VisionConstants.kMaxDistance) return Optional.empty();
         final boolean twoOrMoreTags = poseEstimate.tagCount >= 2;
         final boolean closeEnough = poseEstimate.avgTagDist < VisionConstants.kMaxDistanceForMegaTag1;
         double robotSpeed = swerve.getSpeed();
@@ -117,15 +120,13 @@ public class LimelightDevice extends SubsystemBase {
         if (role == LimelightRole.NOTHING) return Optional.empty();
         PoseEstimate poseEstimate;
         Optional<Matrix<N3, N1>> stdDevs;
+        LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
         switch (method) {
             case MEGATAG_1:
-                LimelightHelpers.SetFiducialIDFiltersOverride(name, new int[]{});
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
                 stdDevs = calculateStdDevsMegaTag1(poseEstimate, swerve);
                 break;
             case MEGATAG_2:
-                LimelightHelpers.SetFiducialIDFiltersOverride(name, tagFilter);
-                LimelightHelpers.SetRobotOrientation(name, swerve.getHeading().getDegrees(), 0, 0, 0, 0, 0);
                 poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
                 stdDevs = calculateStdDevsMegaTag2(poseEstimate, swerve);
                 break;

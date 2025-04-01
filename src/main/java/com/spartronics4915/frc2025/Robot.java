@@ -10,10 +10,17 @@ import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,6 +35,8 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
+
+    private final PowerDistribution powerDistribution = new PowerDistribution(22, ModuleType.kRev);
 
     public static final Timer AUTO_TIMER = new Timer();
     public static final Timer TELEOP_TIMER = new Timer();
@@ -48,9 +57,28 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    @SuppressWarnings("all")
     public void robotInit() {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         FollowPathCommand.warmupCommand().schedule();
+
+                // NetworkTables (also saved to DataLog by default)
+        NetworkTable metaData = NetworkTableInstance.getDefault().getTable("Metadata");
+
+        // DataLog (not published to NetworkTables)
+        StringLogEntry entry = new StringLogEntry(DataLogManager.getLog(), "/Metadata/MyKey");
+        entry.append("MyValue");
+        // BuildConstants will generate when you build
+        metaData.getStringTopic("Git: SHA").publish().accept(BuildConstants.GIT_SHA);
+        metaData.getStringTopic("Git: Branch").publish().accept(BuildConstants.GIT_BRANCH);
+        metaData.getStringTopic("Git: Commit Date").publish().accept(BuildConstants.GIT_DATE);
+        metaData.getStringTopic("Git: Build Date").publish().accept(BuildConstants.BUILD_DATE);
+        metaData.getBooleanTopic("Git: Dirty").publish().accept(BuildConstants.DIRTY == 1);
+        metaData.getDoubleTopic("Git: Revision").publish().accept(BuildConstants.GIT_REVISION);
+        metaData.getBooleanTopic("Robot: IsSim").publish().accept(Robot.isSimulation());
+        metaData.getStringTopic("DS: EventName").publish().accept(DriverStation.getEventName());
+
+        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     /**
@@ -68,6 +96,10 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
         RumbleFeedbackHandler.handleControllers();
+
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+        // SmartDashboard.putData("PDH", powerDistribution);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

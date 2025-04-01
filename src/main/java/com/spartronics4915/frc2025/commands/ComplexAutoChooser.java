@@ -69,16 +69,17 @@ public class ComplexAutoChooser extends SubsystemBase {
             heightChooser.setDefaultOption("L4", BranchHeight.L4);
             heightChooser.addOption("L3", BranchHeight.L3);
             heightChooser.addOption("L2", BranchHeight.L2);
+            heightChooser.addOption("L1", BranchHeight.L1);
         }
 
         protected void setBranchPreview(FieldBranch branch) {
             var reefSide = branch.simpleBranchInfo.reefSide();
-            var branchSide = branch.simpleBranchInfo.branchSide();
+            var branchSide = getBranchHeight() == BranchHeight.L1 ? BranchSide.MIDDLE : branch.simpleBranchInfo.branchSide();
 
             Translation2d branchPose = reefSide.getCurrent().getTranslation().plus(
                 new Translation2d(
                     0.2,//branchSide.tagOffset.getY(),
-                    branchSide.tagOffset.getX() * (branchSide == BranchSide.LEFT ? -1 : 1) * 1.5
+                    branchSide.tagOffset.getX() * 1.5
                 ).rotateBy(reefSide.getCurrent().getRotation())
             );
 
@@ -210,6 +211,6 @@ public class ComplexAutoChooser extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updatePreviewField(swerve.getPose());
+        if (DriverStation.isAutonomous()) updatePreviewField(swerve.getPose());
     }
 }

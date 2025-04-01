@@ -5,16 +5,21 @@ import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
+import com.spartronics4915.frc2025.util.CoralSim;
 
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
@@ -22,6 +27,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeter;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
 
@@ -30,6 +36,8 @@ public class DynamicsCommandFactory {
     public IntakeSubsystem intakeSubsystem;
     private ElevatorSubsystem elevatorSubsystem;
     private ArmSubsystem armSubsystem;
+
+    private Timer lastScoredTimer = new Timer();
 
     private LaserCan funnelLC;
     public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
@@ -61,19 +69,19 @@ public class DynamicsCommandFactory {
         tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
-
-
-
+        lastScoredTimer.start();
+        hasScoredTrigger.onTrue(Commands.runOnce(() -> lastScoredTimer.reset()));
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
     }
 
     public enum DynaPreset{
+        RESET(0.0, Rotation2d.fromDegrees(270)),
         LOAD(0.0, Rotation2d.fromDegrees(234.4421)),
         PRESCORE(0.2, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
-        AUTO_PRESCORE(kMinSafeElevHeight, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
-        L1(0.1, Rotation2d.fromDegrees(47.900)),
+        AUTO_PRESCORE(0.4, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
+        L1(0.0, Rotation2d.fromDegrees(20)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
         L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
@@ -100,21 +108,18 @@ public class DynamicsCommandFactory {
     }
 
     private Rotation2d getArmRotation(){
-        return RobotBase.isSimulation() ? armSubsystem.getSetpoint() : armSubsystem.getPosition();
+        return RobotBase.isSimulation() ? armSubsystem.getTargetPosition() : armSubsystem.getPosition();
     }
 
     //#region Composite Commands
-
-
-    //TODO swap out target with actual position
 
     /**
      * 
      * @return Whether the elevator is safe to move (based on the arm's position)
      */
     private boolean isElevSafeToMove(){
-        var currAngle =  armSubsystem.getPosition();
-        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); //TODO measure this so it's only if it's above the horizon (for climb)
+        var currAngle =  getArmRotation();
+        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); 
     }
 
     private boolean isElevAtSetpoint(double setpoint){
@@ -122,7 +127,11 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
-        return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), kArmAngleTolerance);
+        return isArmAtSetpoint(angle, kArmAngleTolerance);
+    }
+
+    private boolean isArmAtSetpoint(Rotation2d angle, Angle tolerance){
+        return getArmRotation().minus(angle).getMeasure().isNear(Degrees.of(0), tolerance);
     }
 
     /**
@@ -143,12 +152,24 @@ public class DynamicsCommandFactory {
         return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
     }
 
-    private boolean isCoralInArm(){
+    public boolean isCoralInArm(){
         // return false;
         return intakeSubsystem.detect();
     }
 
+    public boolean isElevatorForceable(){
+        if (getElevHeight() <= kMinSafeElevHeight) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean funnelDetect(){
+
+        if (RobotBase.isSimulation()) {
+            return CoralSim.getFunnelLC() || intakeSubsystem.detect();
+        }
 
         var measurement = funnelLC.getMeasurement();
 
@@ -159,14 +180,24 @@ public class DynamicsCommandFactory {
         return  measurement.distance_mm < funnelLCTriggerDist.in(Millimeter) || intakeSubsystem.detect(); // the || is here as a way to prevent us stalling at a CS when we are already holding a coral
     }
 
+    public boolean canAutoScore(){
+        return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && 
+            intakeSubsystem.branchLC() && 
+            isCoralInArm();
+    }
+
     public boolean isSwerveMovable(){
-        return getElevHeight() < kSafeElevHeightForSwerve;
+        return (getElevHeight() < kSafeElevHeightForSwerve) && isElevSafeToMove();
+    }
+
+    public boolean hasNotJustScored() {
+        return lastScoredTimer.hasElapsed(kJustScoredThreshold.in(Seconds));
     }
 
     private Command makeElevatorSafeToMove(){
         return Commands.sequence(
                 Commands.waitUntil(this::isElevSafeToMove),
-                elevatorSubsystem.setSetPointCommand(kMinSafeElevHeight),
+                elevatorSubsystem.setSetPointCommand(kElevatorSafeHeightSetpoint),
                 Commands.waitUntil(() -> !this.isElevStowed())
             ); 
     }
@@ -182,7 +213,9 @@ public class DynamicsCommandFactory {
 
             // it shouldn't realistically be possible for both of these to be true unless in the climb position during teleop
             
-            Command makeArmAngleSafe = armSubsystem.setSetpointCommand(new Rotation2d(kSafeArmAngle));
+            Angle safeArmSetpoint = (isSetpointBelowHorizon && kSafeArmAngle.gt(getArmRotation().getMeasure())) ? kReturnArmAngle : kSafeArmAngle;
+
+            Command makeArmAngleSafe = armSubsystem.setSetpointCommand(new Rotation2d(safeArmSetpoint));
 
             Command moveElevatorFirstIfRequired = (this.isArmStowed() || forceElevatorMovement) && this.isElevSafeToMove()  ? makeElevatorSafeToMove() : Commands.none();
 
@@ -228,10 +261,11 @@ public class DynamicsCommandFactory {
         );
     }
 
-    public Command waitUntilPreset(DynaPreset setpoint){
-        return Commands.waitUntil(() -> {
-            return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle);
-        });
+    private Command elevatorConcurrentMove(DynamicsSetpoint setpoint, Rotation2d concurrentAngle){
+        return Commands.sequence(
+            armSubsystem.setSetpointCommand(concurrentAngle),
+            elevatorPriorityMove(setpoint)
+        );
     }
 
     /**
@@ -246,6 +280,21 @@ public class DynamicsCommandFactory {
         );
     }
 
+    private Command armConcurrentMove(DynamicsSetpoint setpoint, double concurrentHeightMeters){
+        return Commands.sequence(
+            elevatorSubsystem.setSetPointCommand(concurrentHeightMeters),
+            armPriorityMove(setpoint)
+        );
+    }
+
+    public boolean isAtSetpoint(DynaPreset setpoint) {
+        return isElevAtSetpoint(setpoint.setpoint.heightMeters) && isArmAtSetpoint(setpoint.setpoint.armAngle, (DriverStation.isAutonomous()) ? kArmAngleAutoScoringTolerance : kArmAngleTolerance);
+    }
+
+    public Command waitUntilPreset(DynaPreset setpoint){
+        return Commands.waitUntil(() -> isAtSetpoint(setpoint));
+    }
+
     //#endregion
 
     //#region small Commands
@@ -253,7 +302,7 @@ public class DynamicsCommandFactory {
     public Command scoreHeight(DynaPreset scoringPoint){
         return Commands.sequence(
             makeSystemSafeToMove(false, scoringPoint.setpoint.heightMeters < kMinSafeElevHeight, false),
-            elevatorPriorityMove(scoringPoint.setpoint)
+            elevatorConcurrentMove(scoringPoint.setpoint, new Rotation2d(kSafeArmAngle))
         );
     }
 
@@ -284,7 +333,7 @@ public class DynamicsCommandFactory {
     public Command stow(){
         return Commands.either(
             prescoreStow(), 
-            loadStow(), 
+            returnLoadStow(), 
             this::isCoralInArm
         )
         .withName("Stow");
@@ -313,7 +362,8 @@ public class DynamicsCommandFactory {
         return Commands.sequence(
             makeSystemSafeToMove(true, false, true),
             armPriorityMove(DynaPreset.CLIMB.setpoint)
-        ).withName("Goto Climb");
+        ).onlyIf(() -> !(isAtSetpoint(DynaPreset.CLIMB)))
+        .withName("Goto Climb");
     }
 
     public Command score(){
@@ -323,18 +373,34 @@ public class DynamicsCommandFactory {
             ).withTimeout(0.5),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
         ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
+        .andThen(checkIfScored().onlyIf(DriverStation::isTeleop))
         .withName("Score");
     }
 
-    public Command autoScore(DynaPreset scoringLocation){
+    public Command checkIfScored() {
         return Commands.sequence(
-            Commands.waitUntil(() -> 
-                isArmAtSetpoint(scoringLocation.setpoint.armAngle) && 
-                isElevAtSetpoint(scoringLocation.setpoint.heightMeters)
-            ),
-            score()
-        )
-        .withName("Autonomous Score");
+            Commands.waitTime(kCheckIfScoredDelay),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN),
+            Commands.race(Commands.waitUntil(this::isCoralInArm), Commands.waitTime(kCheckIfScoredDuration)),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
+            gotoLastInputtedScore().onlyIf(this::isCoralInArm)
+        );
+    }
+
+    public Command autoScore(){
+        return //Commands.deadline(
+            // Commands.waitUntil(
+            //     hasScoredTrigger
+            // ).withTimeout(0.5),
+            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT);
+        // ).withName("Autonomous Score");
+    }
+
+    public Command returnLoadStow(){
+        return Commands.sequence(
+            makeSystemSafeToMove(isElevatorForceable(), false, true),
+            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
+        );
     }
 
     /**
@@ -345,7 +411,7 @@ public class DynamicsCommandFactory {
             intake(),
             Commands.waitUntil(
                 () -> funnelDetect() || isCoralInArm()
-            ).withTimeout(RobotBase.isSimulation() ? 0.5 : 15) //TODO remove for comps
+            ).withTimeout(RobotBase.isSimulation() ? 0.5 : 15)
         )
         .withName("Blocking Intake");
     }
@@ -363,8 +429,20 @@ public class DynamicsCommandFactory {
         .withName("Intake");
     }
 
+    public Command stopIntake(){
+        return intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL);
+    }
+
     public Command removeAlgaeArm() {
         return armSubsystem.setSetpointCommand(new Rotation2d(kRemoveAlgaeArmAngle))
+               .alongWith(intake())
                .onlyIf(() -> !isArmStowed());
+    }
+
+    public Command resetDynamics() {
+        return Commands.sequence(
+            makeSystemSafeToMove(true, false, true),
+            armPriorityMove(DynaPreset.RESET.setpoint)
+        ).withName("Reset Dynamics");
     }
 }
