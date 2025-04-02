@@ -341,8 +341,6 @@ public class RobotContainer {
         }
         
         new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
-            Commands.waitSeconds(0.05),
-            // Commands.print("yo scoring")
             dynamics.score()
         ));
 
