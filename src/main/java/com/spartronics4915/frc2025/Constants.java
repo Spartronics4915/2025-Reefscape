@@ -133,6 +133,8 @@ public final class Constants {
 
         public static final boolean RUMBLE_ENABLED = true;
         public static final double rumbleTime = 0.5;
+
+        public static final double kPaddleTolerance = 0.03;
     }
 
     public static final class ClimberConstants{
