@@ -254,12 +254,15 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
                 Commands.waitUntil(() ->
                     mEncoder.getPosition() < kEngageTarget
                 ),
-                unSpoolWinch(),
+                setWinchSpeedsCommand(WinchSpeeds.EASE),
                 setClimberSpeedsCommand(ClimberSpeeds.ENGAGE)
             ),
             stopArmCommand(),
             stopArmCommand()
-        );
+        ).finallyDo(() -> {
+            stopArm();
+            stopWinch();
+        });
     }
 
     public Command retractCommand(){
@@ -273,7 +276,10 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             ),
             stopWinchCommand(),
             stopArmCommand()
-        );
+        ).finallyDo(() -> {
+            stopArm();
+            stopWinch();
+        });
     }
 
 }
