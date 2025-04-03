@@ -175,7 +175,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     public Command operatorClimberWinchCommand(boolean isPressed) {
         if (isPressed) return Commands.defer(() -> {
-            return setWinchSpeedsCommand(invertedControls ? WinchSpeeds.EASE : WinchSpeeds.RETRACT);
+            return setWinchSpeedsCommand(invertedControls ? WinchSpeeds.RETRACT : WinchSpeeds.EASE);
         }, Set.of());
         else return Commands.runOnce(() -> {
             stopWinch();
