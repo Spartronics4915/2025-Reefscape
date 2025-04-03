@@ -38,7 +38,7 @@
     {
       "name": "Start",
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 0.17192600652883394,
+      "maxWaypointRelativePos": 0.09793253536452343,
       "constraints": {
         "maxVelocity": 6.0,
         "maxAcceleration": 3.0,
