@@ -614,7 +614,8 @@ public final class Constants {
         public static final double  kStartingAngle = (0.0); //angle at the start of the match
         public static final double kEngagedAngle = (-0.35); //angle to engage the cage
         public static final double kRetractedAngle = (-0.3); //desired angle at the end of the match
-
+        public static final double kEngageTarget = -0.4;
+        public static final double kRetractTarget = -0.25;
         public static final double kCageEngagedAmps = 12;
 
         public static final double intakeSpeed = 1.0;

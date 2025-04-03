@@ -20,8 +20,10 @@ import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMo
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kCageEngagedAmps;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngageTarget;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorID;
+import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractTarget;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
@@ -242,6 +244,34 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         stopWinch();
         stopArm();
         disableIntake = true;
+    }
+
+    public Command engageCommand(){
+        return Commands.sequence(
+            Commands.deadline(
+                Commands.waitUntil(() ->
+                    mEncoder.getPosition() < kEngageTarget
+                ),
+                unSpoolWinch(),
+                setClimberSpeedsCommand(ClimberSpeeds.ENGAGE)
+            ),
+            stopArmCommand(),
+            stopArmCommand()
+        );
+    }
+
+    public Command retractCommand(){
+        return Commands.sequence(
+            Commands.deadline(
+                Commands.waitUntil(() ->
+                    mEncoder.getPosition() > kRetractTarget
+                ),
+                stopArmCommand(),
+                setWinchSpeedsCommand(WinchSpeeds.RETRACT)
+            ),
+            stopWinchCommand(),
+            stopArmCommand()
+        );
     }
 
 }
