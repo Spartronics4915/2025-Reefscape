@@ -396,12 +396,7 @@ public class RobotContainer {
 
         autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
 
-        operatorController.rightStick().onTrue(Commands.defer(() -> {
-            return Commands.runOnce(() -> {
-                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
-                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
-            });
-        }, Set.of()));
+        operatorController.rightStick().onTrue(climberSubsystem.unSpoolWinch());
 
         // operatorController.rightStick().whileTrue(
         //     Commands.repeatingSequence(
@@ -461,6 +456,13 @@ public class RobotContainer {
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
         SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
+
+        SmartDashboard.putData("Toggle Auto Score", Commands.defer(() -> {
+            return Commands.runOnce(() -> {
+                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
+                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+            });
+        }, Set.of()));
 
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 
