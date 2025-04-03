@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeter;
 import static edu.wpi.first.units.Units.Radians;
@@ -182,7 +183,7 @@ public class DynamicsCommandFactory {
     }
 
     public boolean canAutoScore(){
-        return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && 
+        return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - Inches.of(10).in(Meters)) && 
             isArmAtSetpoint(DynaPreset.L4.setpoint.armAngle, Degrees.of(10)) &&
             intakeSubsystem.branchLC() && 
             isCoralInArm();
