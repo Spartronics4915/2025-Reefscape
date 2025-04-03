@@ -47,8 +47,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private final SparkBase mIntakeMotor;
     private final RelativeEncoder mEncoder;
 
-    private ClimberSpeeds operatorArmState = ClimberSpeeds.ENGAGE;
-    private WinchSpeeds operatorWinchState = WinchSpeeds.RETRACT;
+    private boolean invertedControls = false;
 
     private MedianFilter cageAmpFilter = new MedianFilter(5);
 
@@ -151,29 +150,25 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
     public Command operatorClimberArmCommand(boolean isPressed) {
         if (isPressed) return Commands.defer(() -> {
-            return setClimberSpeedsCommand(operatorArmState);
+            return setClimberSpeedsCommand(invertedControls ? ClimberSpeeds.RETRACT : ClimberSpeeds.ENGAGE);
         }, Set.of());
         else return Commands.runOnce(() -> {
             stopArm();
-            switch (operatorArmState) {
-                case ENGAGE: operatorArmState = ClimberSpeeds.RETRACT; break;
-                case RETRACT: operatorArmState = ClimberSpeeds.ENGAGE; break;
-            }
         });
     }
 
     public Command operatorClimberWinchCommand(boolean isPressed) {
         if (isPressed) return Commands.defer(() -> {
-            return setWinchSpeedsCommand(operatorWinchState);
+            return setWinchSpeedsCommand(invertedControls ? WinchSpeeds.EASE : WinchSpeeds.RETRACT);
         }, Set.of());
         else return Commands.runOnce(() -> {
             stopWinch();
             turnArmBrakeModeOn();
-            switch (operatorWinchState) {
-                case EASE: operatorWinchState = WinchSpeeds.RETRACT; break;
-                case RETRACT: operatorWinchState = WinchSpeeds.EASE; break;
-            }
         });
+    }
+
+    public Command invertOperatorClimberControls() {
+        return Commands.runOnce(() -> invertedControls = !invertedControls);
     }
 
     // @Override
@@ -211,7 +206,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         double filteredAmps = cageAmpFilter.calculate(mIntakeMotor.getOutputCurrent());
 
-        SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
+        SmartDashboard.putNumber("climberEncoder", Math.floor(mEncoder.getPosition() * 1000) / 1000);
         SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
         SmartDashboard.putNumber("climberCurrentDrawFiltered", filteredAmps);
         SmartDashboard.putBoolean("Cage engaged", filteredAmps > kCageEngagedAmps);

@@ -341,8 +341,6 @@ public class RobotContainer {
         }
         
         new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
-            Commands.waitSeconds(0.05),
-            // Commands.print("yo scoring")
             dynamics.score()
         ));
 
@@ -418,10 +416,10 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.99) && ((Math.abs(operatorController.getLeftX()) < 0.01) || operatorController.getLeftX() < -0.99)); //top left paddle
-        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.99) && ((Math.abs(operatorController.getLeftY()) < 0.01) || operatorController.getLeftY() < -0.99)); //bottom left paddle
-        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.99) && ((Math.abs(operatorController.getRightX()) < 0.01) || operatorController.getRightX() < -0.99)); //top right paddle
-        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.99) && ((Math.abs(operatorController.getRightY()) < 0.01) || operatorController.getRightY() < -0.99)); //bottom right paddle
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getLeftX()) < OI.kPaddleTolerance) || operatorController.getLeftX() < (-1 + OI.kPaddleTolerance))); //top left paddle
+        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getLeftY()) < OI.kPaddleTolerance) || operatorController.getLeftY() < (-1 + OI.kPaddleTolerance))); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightX()) < OI.kPaddleTolerance) || operatorController.getRightX() < (-1 + OI.kPaddleTolerance))); //top right paddle
+        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightY()) < OI.kPaddleTolerance) || operatorController.getRightY() < (-1 + OI.kPaddleTolerance))); //bottom right paddle
 
         Trigger algaeSafety = leftStickUp;
 
@@ -429,6 +427,8 @@ public class RobotContainer {
         rightStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
 
         rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
+
+        operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
 
         operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
                                        .onFalse(climberSubsystem.operatorClimberWinchCommand(false));
