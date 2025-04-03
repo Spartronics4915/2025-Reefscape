@@ -80,6 +80,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         SmartDashboard.putData("ClimberIntakeOn", setClimbIntakeSpeed(intakeSpeed));
         SmartDashboard.putData("ClimberIntakeOff", setClimbIntakeSpeed(0.0));
+        SmartDashboard.putData("ClimberUnspool", unSpoolWinch());
         
     }
 
