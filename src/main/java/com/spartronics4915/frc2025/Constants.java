@@ -591,7 +591,7 @@ public final class Constants {
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
-            .openLoopRampRate(0.25)
+            .openLoopRampRate(0.05)
             .idleMode(IdleMode.kBrake)
         ;
 
