@@ -46,6 +46,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private final SparkBase mArmMotor;
     private final SparkBase mIntakeMotor;
     private final RelativeEncoder mEncoder;
+    private final RelativeEncoder mWinchEncoder;
+
+    private double initialWinchPosition;
 
     private boolean invertedControls = false;
 
@@ -59,6 +62,9 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         mArmMotor = new SparkMax(kArmMotorID, MotorType.kBrushless);
         mArmMotor.configure(kArmMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        mWinchEncoder = mWinchMotor.getEncoder();
+        initialWinchPosition= mWinchEncoder.getPosition();
 
         mIntakeMotor = new SparkMax(kIntakeMotorID, MotorType.kBrushless);
         mIntakeMotor.configure(kIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -136,6 +142,16 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         });
     }
 
+    public Command unSpoolWinch(){
+        return Commands.sequence(
+            setWinchSpeedsCommand(WinchSpeeds.EASE),
+            Commands.waitUntil(() -> {
+                return mWinchEncoder.getPosition() > initialWinchPosition;
+            }),
+            stopWinchCommand()
+        );
+    }
+
     public Command setClimberSpeedsCommand(ClimberSpeeds speed) {
         return setArmCommand(speed.speed);
     }
@@ -206,9 +222,10 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         double filteredAmps = cageAmpFilter.calculate(mIntakeMotor.getOutputCurrent());
 
-        SmartDashboard.putNumber("climberEncoder", Math.floor(mEncoder.getPosition() * 1000) / 1000);
+        SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
         SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
         SmartDashboard.putNumber("climberCurrentDrawFiltered", filteredAmps);
+        SmartDashboard.putNumber("winchEncoder", mWinchEncoder.getPosition());
         SmartDashboard.putBoolean("Cage engaged", filteredAmps > kCageEngagedAmps);
     } 
     
