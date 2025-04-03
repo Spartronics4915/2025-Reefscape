@@ -67,6 +67,7 @@ public class DynamicsCommandFactory {
         tab.addBoolean("coralInArm", this::isCoralInArm);
         tab.addBoolean("funnelIntake", this::funnelDetect);
         tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
+        tab.addBoolean("canAutoScore", this::canAutoScore);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
         lastScoredTimer.start();
