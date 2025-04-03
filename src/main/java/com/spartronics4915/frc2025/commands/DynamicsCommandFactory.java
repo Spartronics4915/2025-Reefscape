@@ -183,6 +183,7 @@ public class DynamicsCommandFactory {
 
     public boolean canAutoScore(){
         return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && 
+            isArmAtSetpoint(DynaPreset.L4.setpoint.armAngle, Degrees.of(10)) &&
             intakeSubsystem.branchLC() && 
             isCoralInArm();
     }
