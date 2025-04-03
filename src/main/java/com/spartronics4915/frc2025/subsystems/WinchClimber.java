@@ -227,7 +227,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
 
         double filteredAmps = cageAmpFilter.calculate(mIntakeMotor.getOutputCurrent());
 
-        SmartDashboard.putNumber("climberEncoder", mEncoder.getPosition());
+        SmartDashboard.putNumber("climberEncoder", Math.floor(mEncoder.getPosition() * 1000) / 1000);
         SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
         SmartDashboard.putNumber("climberCurrentDrawFiltered", filteredAmps);
         SmartDashboard.putNumber("winchEncoder", mWinchEncoder.getPosition());
