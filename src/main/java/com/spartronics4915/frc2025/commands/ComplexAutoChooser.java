@@ -6,6 +6,7 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.spartronics4915.frc2025.Constants.Drive.AutoConstants.DefaultAutos;
 import com.spartronics4915.frc2025.Constants.Drive.AutoConstants.StationVisualizationConstants;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
@@ -37,6 +38,7 @@ public class ComplexAutoChooser extends SubsystemBase {
             index = count++;
             String path = "Variable Autos/Step " + index + "/";
             buildBranchChooser();
+            setDefaultBranch();
             setBranchPreview(getFieldBranch());
             buildHeightChooser();
             SmartDashboard.putData(path + "Score on...", branchChooser);
@@ -70,6 +72,15 @@ public class ComplexAutoChooser extends SubsystemBase {
             heightChooser.addOption("L3", BranchHeight.L3);
             heightChooser.addOption("L2", BranchHeight.L2);
             heightChooser.addOption("L1", BranchHeight.L1);
+        }
+
+        private void setDefaultBranch() {
+            boolean useLeft = DriverStation.getLocation().orElse(3) == 1;
+            FieldBranch[] defaults = useLeft ? DefaultAutos.kLeft : DefaultAutos.kRight;
+            if (defaults.length >= index) {
+                FieldBranch defaultBranch = defaults[index - 1];
+                branchChooser.setDefaultOption(defaultBranch.name(), defaultBranch);
+            }
         }
 
         protected void setBranchPreview(FieldBranch branch) {
@@ -150,6 +161,7 @@ public class ComplexAutoChooser extends SubsystemBase {
         this.swerve = swerve;
         previewField = new Field2d();
         buildStationChooser();
+        setDefaultStation();
         setStationPreview(stationChooser.getSelected());
         SmartDashboard.putData("Variable Autos/Station", stationChooser);
         segments = new VariableAutoSegment[length];
@@ -166,6 +178,12 @@ public class ComplexAutoChooser extends SubsystemBase {
         stationChooser.setDefaultOption("Left", StationSide.LEFT);
         stationChooser.addOption("Right", StationSide.RIGHT);
         stationChooser.onChange(this::setStationPreview);
+    }
+
+    private void setDefaultStation() {
+        boolean useLeft = DriverStation.getLocation().orElse(3) == 1;
+        if (useLeft) stationChooser.setDefaultOption("Left", StationSide.LEFT);
+        else stationChooser.setDefaultOption("Right", StationSide.RIGHT);
     }
 
     private void setStationPreview(StationSide side) {

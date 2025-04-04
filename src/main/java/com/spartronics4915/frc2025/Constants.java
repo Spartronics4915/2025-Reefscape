@@ -20,6 +20,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.commands.VariableAutos.FieldBranch;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
@@ -294,6 +295,11 @@ public final class Constants {
                     public static final Pose2d kBlueRight = new Pose2d(0.947, 0.614, Rotation2d.fromDegrees(50));
                     public static final Pose2d kRedLeft = new Pose2d(16.603, 0.614, Rotation2d.fromDegrees(130));
                     public static final Pose2d kRedRight = new Pose2d(16.603, 7.447, Rotation2d.fromDegrees(-120));
+            }
+
+            public static final class DefaultAutos {
+                public static final FieldBranch[] kLeft = {FieldBranch.J, FieldBranch.L, FieldBranch.K};
+                public static final FieldBranch[] kRight = {FieldBranch.E, FieldBranch.C, FieldBranch.D};
             }
         }
 
