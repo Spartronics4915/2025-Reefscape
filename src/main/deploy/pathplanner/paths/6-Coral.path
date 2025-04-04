@@ -79,7 +79,7 @@
   "reversed": false,
   "folder": "Pairs",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.1,
     "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
