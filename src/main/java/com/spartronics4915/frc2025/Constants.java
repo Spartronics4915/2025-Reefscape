@@ -74,7 +74,7 @@ public final class Constants {
         public static final int kPipeLCID = 25;
 
         public static final int laserCANDistance = 90;
-        public static final int kBranchLCTriggerDist = 430;
+        public static final int kBranchLCTriggerDist = 450;
         public static final double kBranchLCDebounceTime = 0.01;
 
         public static final int smartCurrentLimit = 18;
