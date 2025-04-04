@@ -12,6 +12,7 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuck
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
@@ -198,8 +199,11 @@ public class VariableAutos {
                         Commands.waitUntil(dynamics::canAutoScore),
                         Commands.print("auto scoring")
                     ), 
-                    pathPair.autoAlign
-                ),
+                    pathPair.autoAlign,
+                    Commands.waitUntil(() -> 
+                        AlignToReef.isPIDLoopRunning && Robot.AUTO_TIMER.hasElapsed(14.5)
+                    )
+                    ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
                     Commands.waitUntil(dynamics::isCoralInArm),
                     // Commands.print("moving to height"),

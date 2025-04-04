@@ -83,7 +83,7 @@ public class AlignToReef {
         System.out.println("auto align is warmed up: \nBlue: " + blueReefTagPoses.hashCode() +"\nRed: " + redReefTagPoses.hashCode() + "\nBoth: " + allReefTagPoses.hashCode());
     }
 
-    public boolean isPIDLoopRunning = false;
+    public static boolean isPIDLoopRunning = false;
 
 
     public AlignToReef(SwerveSubsystem mSwerve) {
