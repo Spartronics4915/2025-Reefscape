@@ -79,6 +79,10 @@ public class AlignToReef {
         });
     }
 
+    public static void warmup(){
+        System.out.println("auto align is warmed up: \nBlue: " + blueReefTagPoses.hashCode() +"\nRed: " + redReefTagPoses.hashCode() + "\nBoth: " + allReefTagPoses.hashCode());
+    }
+
     public boolean isPIDLoopRunning = false;
 
 

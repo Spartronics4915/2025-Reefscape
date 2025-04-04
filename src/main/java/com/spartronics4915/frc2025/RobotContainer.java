@@ -217,6 +217,8 @@ public class RobotContainer {
 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
         blingSubsystem = new BlingSubsystem(0, driverCommunication); 
+
+        AlignToReef.warmup();
     }
 
     /**
