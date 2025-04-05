@@ -11,7 +11,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Left Stick |  Drive |
 | Push Left Stick |  Reset field relative heading |
 | Right Stick | Rotate |
-| Push Right Stick | *None* |
+| Push Right Stick | Toggle 'climber cam' mode |
 | A | Set field relative heading |
 | B | Toggle field relative |
 | X | *None* |

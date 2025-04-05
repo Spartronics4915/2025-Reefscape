@@ -271,6 +271,14 @@ public class RobotContainer {
                 .withName("Toggle Field Relative")
             );
 
+            driverController.rightStick().toggleOnTrue(
+                Commands.startEnd(
+                    () -> {ChassisSpeedSuppliers.climberCamMode = true;},
+                    () -> {ChassisSpeedSuppliers.climberCamMode = false;}
+                )
+                .withName("Toggle Climber Cam Mode")
+            );
+
             driverController.a().onTrue(
                 Commands.defer(() -> {
                     return Commands.runOnce(() -> {
