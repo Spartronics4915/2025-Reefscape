@@ -11,7 +11,7 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | Left Stick |  Drive |
 | Push Left Stick |  Reset field relative heading |
 | Right Stick | Rotate |
-| Push Right Stick | *None* |
+| Push Right Stick | Toggle 'climber cam' mode |
 | A | Set field relative heading |
 | B | Toggle field relative |
 | X | *None* |
@@ -31,16 +31,17 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | input   | action |
 | -------- | ------- |
 | Left Stick | *None* |
+| Push Left Stick | Invert climber controls |
 | Right Stick | *None* |
-| Push Right Stick | Toggle auto score |
+| Push Right Stick | Unspool winch |
 | A | L1 scoring preset |
 | B | L2 scoring preset |
 | X | L3 scoring preset |
 | Y | L4 scoring preset |
 | Left Trigger | Stow |
 | Right Trigger | Score |
-| Left Bumper | Retract/ease winch (toggles mode on press) |
-| Right Bumper | Engage/retract climber (toggles mode on press) & arm climb preset |
+| Left Bumper | Retract (ease when inverted) winch  |
+| Right Bumper | Engage (retract when inverted) climber & arm climb preset |
 | D-pad Up | (Manual) Elevator up |
 | D-pad Down | (Manual) Elevator down |
 | D-pad Left | (Manual) Arm CCW |

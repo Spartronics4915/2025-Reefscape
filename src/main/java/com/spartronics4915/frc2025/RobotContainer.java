@@ -217,6 +217,8 @@ public class RobotContainer {
 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
         blingSubsystem = new BlingSubsystem(0, driverCommunication); 
+
+        AlignToReef.warmup();
     }
 
     /**
@@ -267,6 +269,14 @@ public class RobotContainer {
                     () -> {swerveTeleopCommand.setFieldRelative(OI.kStartFieldRel);}
                 )
                 .withName("Toggle Field Relative")
+            );
+
+            driverController.rightStick().toggleOnTrue(
+                Commands.startEnd(
+                    () -> {ChassisSpeedSuppliers.climberCamMode = true;},
+                    () -> {ChassisSpeedSuppliers.climberCamMode = false;}
+                )
+                .withName("Toggle Climber Cam Mode")
             );
 
             driverController.a().onTrue(
@@ -341,8 +351,6 @@ public class RobotContainer {
         }
         
         new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
-            Commands.waitSeconds(0.05),
-            // Commands.print("yo scoring")
             dynamics.score()
         ));
 
@@ -398,12 +406,7 @@ public class RobotContainer {
 
         autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
 
-        operatorController.rightStick().onTrue(Commands.defer(() -> {
-            return Commands.runOnce(() -> {
-                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
-                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
-            });
-        }, Set.of()));
+        operatorController.rightStick().onTrue(climberSubsystem.unSpoolWinch());
 
         // operatorController.rightStick().whileTrue(
         //     Commands.repeatingSequence(
@@ -418,10 +421,10 @@ public class RobotContainer {
         //     )
         //     ).onFalse(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN).onlyIf(() -> !intakeSubsystem.detect()));
 
-        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < -0.99) && ((Math.abs(operatorController.getLeftX()) < 0.01) || operatorController.getLeftX() < -0.99)); //top left paddle
-        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < -0.99) && ((Math.abs(operatorController.getLeftY()) < 0.01) || operatorController.getLeftY() < -0.99)); //bottom left paddle
-        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < -0.99) && ((Math.abs(operatorController.getRightX()) < 0.01) || operatorController.getRightX() < -0.99)); //top right paddle
-        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < -0.99) && ((Math.abs(operatorController.getRightY()) < 0.01) || operatorController.getRightY() < -0.99)); //bottom right paddle
+        Trigger leftStickUp = new Trigger(() -> (operatorController.getLeftY() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getLeftX()) < OI.kPaddleTolerance) || operatorController.getLeftX() < (-1 + OI.kPaddleTolerance))); //top left paddle
+        Trigger leftStickLeft = new Trigger(() -> (operatorController.getLeftX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getLeftY()) < OI.kPaddleTolerance) || operatorController.getLeftY() < (-1 + OI.kPaddleTolerance))); //bottom left paddle
+        Trigger rightStickUp = new Trigger(() -> (operatorController.getRightY() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightX()) < OI.kPaddleTolerance) || operatorController.getRightX() < (-1 + OI.kPaddleTolerance))); //top right paddle
+        Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightY()) < OI.kPaddleTolerance) || operatorController.getRightY() < (-1 + OI.kPaddleTolerance))); //bottom right paddle
 
         Trigger algaeSafety = leftStickUp;
 
@@ -429,6 +432,8 @@ public class RobotContainer {
         rightStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
 
         rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
+
+        operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
 
         operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
                                        .onFalse(climberSubsystem.operatorClimberWinchCommand(false));
@@ -461,6 +466,13 @@ public class RobotContainer {
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
         SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
+
+        SmartDashboard.putData("Toggle Auto Score", Commands.defer(() -> {
+            return Commands.runOnce(() -> {
+                isTeleopAutoScoringEnabled = !isTeleopAutoScoringEnabled;
+                autoScoreEnabledPub.accept(isTeleopAutoScoringEnabled);
+            });
+        }, Set.of()));
 
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 

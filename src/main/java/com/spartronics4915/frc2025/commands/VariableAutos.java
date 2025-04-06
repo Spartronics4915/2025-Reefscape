@@ -12,6 +12,7 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuck
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.RobotContainer;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
@@ -77,9 +78,9 @@ public class VariableAutos {
 
     // X = side to side, Y = away from tag
     public enum BranchSide{ //? you could consider bringing the tag offsets back and modifying dynamics
-        LEFT(new Translation2d(-0.109236, 0.5406845 + 0.02)),//-0.153209, 0.5406845 + 0.02)),
-        RIGHT(new Translation2d(0.218918 - 0.0508, 0.5408565 + 0.02)),//0.218062 - 0.0508, 0.5408565 + 0.02)),
-        MIDDLE(new Translation2d(0.064853, 0.5408565 + 0.02));
+        LEFT(new Translation2d(-0.153209 + 0.0381, 0.5406845 + 0.02 - 0.03175)), //-0.109236, 0.5406845 + 0.02))
+        RIGHT(new Translation2d(0.218062 - 0.0508 + 0.01, 0.5408565 + 0.02 - 0.03175)),//0.218918 - 0.0508, 0.5408565 + 0.02))
+        MIDDLE(new Translation2d(0.064853 - 0.03175, 0.5408565 + 0.02 + 0.0254));
 
         public Translation2d tagOffset;
         private BranchSide(Translation2d offsets) {
@@ -198,8 +199,11 @@ public class VariableAutos {
                         Commands.waitUntil(dynamics::canAutoScore),
                         Commands.print("auto scoring")
                     ), 
-                    pathPair.autoAlign
-                ),
+                    pathPair.autoAlign,
+                    Commands.waitUntil(() -> 
+                        AlignToReef.isPIDLoopRunning && Robot.AUTO_TIMER.hasElapsed(14.5)
+                    )
+                    ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
                     Commands.waitUntil(dynamics::isCoralInArm),
                     // Commands.print("moving to height"),

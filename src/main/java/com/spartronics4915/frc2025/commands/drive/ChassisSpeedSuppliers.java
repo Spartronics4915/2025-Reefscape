@@ -49,6 +49,8 @@ public final class ChassisSpeedSuppliers {
     private static StructPublisher<Rotation2d> targetAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("targetAngleRad", Rotation2d.struct).publish();
     private static StructPublisher<Rotation2d> currentAnglePublisher = NetworkTableInstance.getDefault().getTable("logging").getSubTable("rotationPID").getStructTopic("currentAngleRad", Rotation2d.struct).publish();
 
+    public static boolean climberCamMode = false;
+
 
     static{
         mAnglePIDRad.enableContinuousInput(-Math.PI, Math.PI);
@@ -151,7 +153,7 @@ public final class ChassisSpeedSuppliers {
             if (isFieldRelative) {
                 cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
                 cs = rotateLinearChassisSpeeds(cs, teleopHeadingOffset);
-            }
+            } else if (climberCamMode) cs = rotateLinearChassisSpeeds(cs, Rotation2d.kCCW_90deg);
     
             return cs;
         };

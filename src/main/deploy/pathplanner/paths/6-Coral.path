@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.699460227272727,
-        "y": 5.306349431818182
+        "x": 3.7592897727272727,
+        "y": 5.28640625
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0348559781935194,
-        "y": 5.723118522141317
+        "x": 3.094685523648065,
+        "y": 5.703175340323135
       },
       "isLocked": false,
       "linkedName": "Reef exit 6"
@@ -37,11 +37,11 @@
   "constraintZones": [
     {
       "name": "End",
-      "minWaypointRelativePos": 0.7,
+      "minWaypointRelativePos": 0.6,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 6.0,
-        "maxAcceleration": 2.5,
+        "maxAcceleration": 2.25,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -51,7 +51,7 @@
     {
       "name": "Start",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.09793253536452703,
+      "maxWaypointRelativePos": 0.2023939064200182,
       "constraints": {
         "maxVelocity": 6.0,
         "maxAcceleration": 2.5,
@@ -66,7 +66,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 7.0,
-    "maxAcceleration": 7.5,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -79,7 +79,7 @@
   "reversed": false,
   "folder": "Pairs",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.1,
     "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true

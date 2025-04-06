@@ -20,6 +20,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.spartronics4915.frc2025.commands.VariableAutos.FieldBranch;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingLEDPattern;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingSegment;
 import com.spartronics4915.frc2025.subsystems.bling2.BlingShow;
@@ -73,9 +74,9 @@ public final class Constants {
         public static final int kLaserCANID = 21;
         public static final int kPipeLCID = 25;
 
-        public static final int laserCANDistance = 90;
-        public static final int kBranchLCTriggerDist = 410;
-        public static final double kBranchLCDebounceTime = 0.10;
+        public static final int laserCANDistance = 50;
+        public static final int kBranchLCTriggerDist = 450;
+        public static final double kBranchLCDebounceTime = 0.01;
 
         public static final int smartCurrentLimit = 18;
         public static final int secondaryCurrentLimit = 20;
@@ -133,6 +134,8 @@ public final class Constants {
 
         public static final boolean RUMBLE_ENABLED = true;
         public static final double rumbleTime = 0.5;
+
+        public static final double kPaddleTolerance = 0.03;
     }
 
     public static final class ClimberConstants{
@@ -276,13 +279,13 @@ public final class Constants {
             public static final LinearVelocity kStationApproachSpeed = InchesPerSecond.of(8);
             public static final Time kStationApproachTimeout = Seconds.of(5);
 
-            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.25, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
+            public static final PathConstraints kStartingPathConstraints = new PathConstraints(2.25, 2.25, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
             public static final PathConstraints kTeleopPathConstraints = new PathConstraints(2.5, 2.0, 1/2 * Math.PI, 1 * Math.PI); // The constraints for this path.
 
-            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.0, 2.0, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
+            public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
-            public static final double kTriggerDistance = 2.75;
+            public static final double kTriggerDistance = 3.0;
 
             public static final double kAutoIntakeWaitTime = 0.1;
             public static final double kAutoIntakeTimeout = 0.2;
@@ -292,6 +295,11 @@ public final class Constants {
                     public static final Pose2d kBlueRight = new Pose2d(0.947, 0.614, Rotation2d.fromDegrees(50));
                     public static final Pose2d kRedLeft = new Pose2d(16.603, 0.614, Rotation2d.fromDegrees(130));
                     public static final Pose2d kRedRight = new Pose2d(16.603, 7.447, Rotation2d.fromDegrees(-120));
+            }
+
+            public static final class DefaultAutos {
+                public static final FieldBranch[] kLeft = {FieldBranch.J, FieldBranch.L, FieldBranch.K};
+                public static final FieldBranch[] kRight = {FieldBranch.E, FieldBranch.C, FieldBranch.D};
             }
         }
 
@@ -537,10 +545,10 @@ public final class Constants {
         
         public static final double kElevatorSafeHeightSetpoint =  0.4;
 
-        public static final double kScoreLaserCanDebounce = 0.1; //seconds
+        public static final double kScoreLaserCanDebounce = 0.15; //seconds
 
         public static final Time kCheckIfScoredDelay = Seconds.of(0.075);
-        public static final Time kCheckIfScoredDuration = Seconds.of(0.5);
+        public static final Time kCheckIfScoredDuration = Seconds.of(0.55);
 
         public static final Time kJustScoredThreshold = Seconds.of(1);
 
@@ -589,7 +597,7 @@ public final class Constants {
             .smartCurrentLimit(35)
             .secondaryCurrentLimit(40)
             .inverted(false)
-            .openLoopRampRate(0.25)
+            .openLoopRampRate(0.05)
             .idleMode(IdleMode.kBrake)
         ;
 
@@ -612,7 +620,8 @@ public final class Constants {
         public static final double  kStartingAngle = (0.0); //angle at the start of the match
         public static final double kEngagedAngle = (-0.35); //angle to engage the cage
         public static final double kRetractedAngle = (-0.3); //desired angle at the end of the match
-
+        public static final double kEngageTarget = -0.4;
+        public static final double kRetractTarget = -0.25;
         public static final double kCageEngagedAmps = 12;
 
         public static final double intakeSpeed = 1.0;

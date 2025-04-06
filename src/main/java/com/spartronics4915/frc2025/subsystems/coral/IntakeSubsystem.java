@@ -57,6 +57,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private final BooleanPublisher lCPub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("LC").publish();
     private final DoublePublisher pipeDistPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Pipe LC Dist").publish();
     private final BooleanPublisher l4pipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC").publish();
+    private final BooleanPublisher l4RawpipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC Raw").publish();
 
     private Debouncer l4Debouncer = new Debouncer(kBranchLCDebounceTime);
 
@@ -164,8 +165,9 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             branchLCCache = l4Debouncer.calculate(false);
             l4pipePub.accept(branchLCCache);;
         } else{
+            l4RawpipePub.accept(measure.distance_mm < kBranchLCTriggerDist);
             pipeDistPub.accept(measure.distance_mm);
-            branchLCCache = l4Debouncer.calculate(measure.distance_mm < kBranchLCTriggerDist);
+            branchLCCache = measure.distance_mm < kBranchLCTriggerDist;
             l4pipePub.accept(branchLCCache);
         }
         return branchLCCache;

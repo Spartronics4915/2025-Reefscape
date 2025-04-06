@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeter;
 import static edu.wpi.first.units.Units.Radians;
@@ -67,6 +69,7 @@ public class DynamicsCommandFactory {
         tab.addBoolean("coralInArm", this::isCoralInArm);
         tab.addBoolean("funnelIntake", this::funnelDetect);
         tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
+        tab.addBoolean("canAutoScore", this::canAutoScore);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
         lastScoredTimer.start();
@@ -181,7 +184,15 @@ public class DynamicsCommandFactory {
     }
 
     public boolean canAutoScore(){
-        return (elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - kElevatorHeightTolerance) && 
+        boolean elev = elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - Inches.of(10).in(Meters);
+        boolean arm = isArmAtSetpoint(DynaPreset.L4.setpoint.armAngle, Degrees.of(10));
+
+        SmartDashboard.putBoolean("Arm nearby setpoint", arm);
+        SmartDashboard.putBoolean("Elev nearby setpoint", elev);
+
+
+        return elev && 
+            arm &&
             intakeSubsystem.branchLC() && 
             isCoralInArm();
     }
