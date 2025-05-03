@@ -38,8 +38,10 @@ import com.spartronics4915.frc2025.subsystems.ClimberSubsystem;
 import com.spartronics4915.frc2025.subsystems.MechanismRenderer;
 import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
+import com.spartronics4915.frc2025.subsystems.OrchestraSubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.WinchClimber;
+import com.spartronics4915.frc2025.subsystems.OrchestraSubsystem.SFX;
 import com.spartronics4915.frc2025.subsystems.bling2.*;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
@@ -144,6 +146,8 @@ public class RobotContainer {
 
     private final ComplexAutoChooser complexAutoChooser;
 
+    private final OrchestraSubsystem orchestra;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -204,6 +208,8 @@ public class RobotContainer {
             odometrySubsystem = new OdometrySubsystem(visionSubsystem, swerveSubsystem);
         }
 
+        orchestra = new OrchestraSubsystem(armSubsystem.getTalonFXForOrchestra());
+
         // Configure the trigger bindings
         configureBindings();
 
@@ -219,6 +225,8 @@ public class RobotContainer {
         blingSubsystem = new BlingSubsystem(0, driverCommunication); 
 
         AlignToReef.warmup();
+
+        orchestra.playSoundEffectCommand(SFX.MATCH_START).schedule();
     }
 
     /**

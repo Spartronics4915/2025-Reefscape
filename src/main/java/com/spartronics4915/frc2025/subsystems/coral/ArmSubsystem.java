@@ -117,6 +117,11 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         mConfigurator.apply(ArmConstants.kPIDConfigs);
         mConfigurator.apply(ArmConstants.kCurrentLimits);
         mConfigurator.apply(ArmConstants.kFeedbackConfig);
+        mConfigurator.apply(ArmConstants.kAudioConfig);
+    }
+
+    public TalonFX getTalonFXForOrchestra() {
+        return mArmMotor;
     }
 
     public void resetMechanism(){

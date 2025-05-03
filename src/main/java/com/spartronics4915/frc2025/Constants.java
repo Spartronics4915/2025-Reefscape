@@ -6,6 +6,7 @@ package com.spartronics4915.frc2025;
 
 import java.util.Optional;
 
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
@@ -475,6 +476,9 @@ public final class Constants {
         public static final FeedbackConfigs kFeedbackConfig = new FeedbackConfigs()
             .withSensorToMechanismRatio(25.7143)
         ;
+
+        public static final AudioConfigs kAudioConfig = new AudioConfigs()
+            .withAllowMusicDurDisable(true);
 
     }
 
