@@ -21,13 +21,15 @@
           "incKey": 83
         },
         {
-          "decayRate": 0.0,
+          "decayRate": 1.0,
           "incKey": 81,
-          "keyRate": 0.009999999776482582
+          "keyRate": 1.0
         },
         {
           "decKey": 256,
-          "incKey": 69
+          "decayRate": 1.0,
+          "incKey": 69,
+          "keyRate": 1.0
         },
         {
           "decKey": 262,
