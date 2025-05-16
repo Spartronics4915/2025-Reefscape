@@ -359,6 +359,8 @@ public final class Constants {
         public static final BlingLEDPattern PURPLE = BlingSegment.solid(Color.kMediumOrchid, BLING_LENGTH);
         public static final BlingLEDPattern WHITE = BlingSegment.solid(Color.kWhite, BLING_LENGTH);
 
+        public static final BlingShow SHOW_ASSEMBLY = new BlingShow("bling/assembly202548.bling");
+
         public static final BlingShow SHOW_SPARTRONICS = new BlingShow("bling/spartronics48.bling");
         public static final BlingShow SHOW_RAINBOW_FUN = new BlingShow("bling/rainbow48.bling");
 

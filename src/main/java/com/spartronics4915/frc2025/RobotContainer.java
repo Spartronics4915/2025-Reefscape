@@ -214,9 +214,8 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-
-        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
-        blingSubsystem = new BlingSubsystem(0, driverCommunication); 
+        //blingSubsystem = new BlingSubsystem(0, Constants.BlingConstants.ORANGE); 
+        blingSubsystem = new BlingSubsystem(0, Constants.BlingConstants.SHOW_ASSEMBLY); 
 
         AlignToReef.warmup();
     }
