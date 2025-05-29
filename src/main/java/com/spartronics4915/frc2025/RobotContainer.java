@@ -444,7 +444,7 @@ public class RobotContainer {
         SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
         SmartDashboard.putData("Macerena", dynamics.macarena());
-        SmartDashboard.putData("Wave", dynamics.wave());
+        //SmartDashboard.putData("Wave", dynamics.wave());
 
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 

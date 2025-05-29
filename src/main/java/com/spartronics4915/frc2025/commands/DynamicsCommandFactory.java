@@ -465,8 +465,8 @@ public class DynamicsCommandFactory {
 
         );
     }
-        //lowkey sucks
-    /*public Command wave() {
+        /*//lowkey sucks
+    public Command wave() {
         return Commands.sequence(
             .goto() -> scoreHeight(DynaPreset.L4)().andThen.Commands.repeatedly(gotoScore(DynaPreset.L4))
 
