@@ -1,7 +1,24 @@
 package com.spartronics4915.frc2025.commands;
-import com.spartronics4915.frc2025.Robot;
+import java.util.Set;
+
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.funnelLCTriggerDist;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kArmAngleAutoScoringTolerance;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kArmAngleTolerance;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kCheckIfScoredDelay;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kCheckIfScoredDuration;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorHeightTolerance;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorSafeHeightSetpoint;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kFunnelLaserCanID;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kJustScoredThreshold;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kMinSafeElevHeight;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kMoveableArmAngle;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kRemoveAlgaeArmAngle;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kReturnArmAngle;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kSafeArmAngle;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kSafeElevHeightForSwerve;
+import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kScoreLaserCanDebounce;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
-import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
+import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
@@ -10,26 +27,22 @@ import com.spartronics4915.frc2025.util.CoralSim;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Millimeter;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Millimeter;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
-
-import java.util.Set;
 
 public class DynamicsCommandFactory {
 
@@ -436,4 +449,31 @@ public class DynamicsCommandFactory {
             armPriorityMove(DynaPreset.RESET.setpoint)
         ).withName("Reset Dynamics");
     }
+
+    // dance :)
+    public Command macarena() {
+        return Commands.sequence(
+            waitSeconds(2),
+            gotoScore(DynaPreset.L4),
+            waitSeconds(2),
+            prescoreStow(),
+            waitSeconds(2),
+            stow(),
+            waitSeconds(2),
+            gotoScore(DynaPreset.L1),
+            stow()
+
+        );
+    }
+        //lowkey sucks
+    /*public Command wave() {
+        return Commands.sequence(
+            .goto() -> scoreHeight(DynaPreset.L4)().andThen.Commands.repeatedly(gotoScore(DynaPreset.L4))
+
+                
+
+            
+        );
+    }*/
 }
+

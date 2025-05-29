@@ -209,7 +209,7 @@ public class RobotContainer {
                 buildAutoChooser();
 
 
-        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
+        DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem, intakeSubsystem);
         blingSubsystem = new BlingSubsystem(0, driverCommunication); 
     }
 
@@ -443,6 +443,8 @@ public class RobotContainer {
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
         SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
+        SmartDashboard.putData("Macerena", dynamics.macarena());
+        SmartDashboard.putData("Wave", dynamics.wave());
 
         SmartDashboard.putData("Reset Dynamics", dynamics.resetDynamics());
 

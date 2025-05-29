@@ -84,6 +84,7 @@ public class DriverCommunication extends BlingSegment {
             if (subsystem instanceof ArmSubsystem) this.arm = (ArmSubsystem) subsystem;
             if (subsystem instanceof ElevatorSubsystem) this.elevator = (ElevatorSubsystem) subsystem;
             if (subsystem instanceof DynamicsCommandFactory) this.dynamics = (DynamicsCommandFactory) subsystem;
+            if (subsystem instanceof IntakeSubsystem) this.intake = (IntakeSubsystem) subsystem;
         }
     }
       
