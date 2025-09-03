@@ -86,8 +86,8 @@ public final class Constants {
         public static final double kLaserCanDebounce = 0.075;
 
         public static final EncoderConfig kEncoderConfig = new EncoderConfig()
-            .positionConversionFactor(1/4.0)
-            .velocityConversionFactor(1/4.0);
+            .positionConversionFactor(1/36.0)
+            .velocityConversionFactor(1/36.0);
 
         public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
