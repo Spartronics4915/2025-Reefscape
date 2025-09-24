@@ -36,6 +36,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     // private var sensor;
     private LaserCan lc;
     private LaserCan pipeLC;
+    private boolean algaeDetect = false;
 
     private final DoublePublisher appliedOutPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("applied out").publish();
     private final DoublePublisher velocityPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Velocity").publish();
@@ -43,6 +44,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     private final DoublePublisher pipeDistPub = NetworkTableInstance.getDefault().getTable("logIntake").getDoubleTopic("Pipe LC Dist").publish();
     private final BooleanPublisher l4pipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC").publish();
     private final BooleanPublisher l4RawpipePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("L4 PipeLC Raw").publish();
+    private final BooleanPublisher hasAlgaePub = NetworkTableInstance.getDefault().getTable("logIntake").getBooleanTopic("HasAlgae").publish();
 
     private Debouncer l4Debouncer = new Debouncer(kBranchLCDebounceTime);
 
@@ -79,6 +81,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         SmartDashboard.putData("IntakeSpeed: OUT", setPresetSpeedCommand(IntakeSpeed.OUT));
         SmartDashboard.putData("Intake: ALGAE OUTTAKE", setPresetSpeedCommand(IntakeSpeed.ALGAE_OUTTAKE));
         SmartDashboard.putData("Intake: ALGAE HOLD", setPresetSpeedCommand(IntakeSpeed.ALGAE_HOLD));
+        SmartDashboard.putData("Intake: TOGGLE ALGAE DETECT", toggleAlgaeDetect());
 
         var lcTrigger = new Trigger(() -> detect()).debounce(kLaserCanDebounce).onTrue(setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
 
@@ -137,6 +140,31 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         return updateCache();
     }
 
+    public boolean hasAlgae() {
+        return algaeDetect;
+    }
+
+    public boolean getRawAlgae(){
+        var measure = pipeLC.getMeasurement();
+        return measure != null && measure.distance_mm < kAlgaeTriggerDist;
+    }
+
+    public void setHasAlgae(boolean hasAlgae) {
+        algaeDetect = hasAlgae;
+    }
+
+    public Command toggleAlgaeDetect() {
+        return Commands.runOnce(() -> {
+            algaeDetect = !algaeDetect;
+        });
+    }
+
+    public Command setAlgaeDetect(boolean hasAlgae) {
+        return Commands.runOnce(() -> {
+            algaeDetect = hasAlgae;
+        });
+    }
+
     private boolean branchLCCache = false;
 
     public boolean updateCache(){
@@ -159,6 +187,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         appliedOutPub.accept(mMotor1.getMotorVoltage().getValue().in(Volts));
         velocityPub.accept(mMotor1.getVelocity().getValue().in(RPM));
         lCPub.accept(detect());
+        hasAlgaePub.accept(hasAlgae());
 
         updateCache();
     }
