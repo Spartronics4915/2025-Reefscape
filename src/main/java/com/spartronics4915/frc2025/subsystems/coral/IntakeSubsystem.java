@@ -77,6 +77,8 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
         SmartDashboard.putData("IntakeSpeed: IN", setPresetSpeedCommand(IntakeSpeed.IN));
         SmartDashboard.putData("IntakeSpeed: NEUTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
         SmartDashboard.putData("IntakeSpeed: OUT", setPresetSpeedCommand(IntakeSpeed.OUT));
+        SmartDashboard.putData("Intake: ALGAE OUTTAKE", setPresetSpeedCommand(IntakeSpeed.ALGAE_OUTTAKE));
+        SmartDashboard.putData("Intake: ALGAE HOLD", setPresetSpeedCommand(IntakeSpeed.ALGAE_HOLD));
 
         var lcTrigger = new Trigger(() -> detect()).debounce(kLaserCanDebounce).onTrue(setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
 
