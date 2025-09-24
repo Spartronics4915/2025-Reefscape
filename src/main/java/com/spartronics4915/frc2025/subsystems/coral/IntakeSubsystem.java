@@ -1,40 +1,25 @@
 package com.spartronics4915.frc2025.subsystems.coral;
 
-import java.io.File;
-
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import static com.spartronics4915.frc2025.Constants.IntakeConstants.*;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.spartronics4915.frc2025.Constants.IntakeConstants;
-import com.spartronics4915.frc2025.Constants.Drive.SwerveDirectories;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
-import edu.wpi.first.wpilibj.TimedRobot;
-import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,8 +28,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterface{
     
-    private SparkMax mMotor1;
-    private SparkClosedLoopController closedLoopController;
+    private TalonFX mMotor1;
+    private VelocityVoltage mVelocityVoltage = new VelocityVoltage(0);
 
     public double setpoint = 0.0; 
 
@@ -61,18 +46,16 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     private Debouncer l4Debouncer = new Debouncer(kBranchLCDebounceTime);
 
-    private RelativeEncoder mEncoder;
-
-
     public IntakeSubsystem() {
-        // mMotor1 = new SparkMax(IntakeConstants.kMotorID1, MotorType.kBrushless);
-        mMotor1 = new SparkMax(kMotorID, MotorType.kBrushless);
+        mMotor1 = new TalonFX(kMotorID);
 
-        //mMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        mMotor1.configure(kMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        mMotor1.setNeutralMode(NeutralModeValue.Brake);
+        var mConfigurator = mMotor1.getConfigurator();
+        mConfigurator.apply(kPIDConfigs);
+        mConfigurator.apply(kCurrentLimits);
+        mConfigurator.apply(kFeedbackConfig);
+        mConfigurator.apply(motorOutputConfigs);
 
-        closedLoopController = mMotor1.getClosedLoopController();
-        
         lc = new LaserCan(kLaserCANID);
         try {
             lc.setRangingMode(LaserCan.RangingMode.SHORT);
@@ -91,8 +74,6 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
             System.out.println("Configuration failed! " + e);
         }
 
-        mEncoder = mMotor1.getEncoder();
-
         SmartDashboard.putData("IntakeSpeed: IN", setPresetSpeedCommand(IntakeSpeed.IN));
         SmartDashboard.putData("IntakeSpeed: NEUTRAL", setPresetSpeedCommand(IntakeSpeed.NEUTRAL));
         SmartDashboard.putData("IntakeSpeed: OUT", setPresetSpeedCommand(IntakeSpeed.OUT));
@@ -102,10 +83,8 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     private void setSpeed(double newSpeed) {
-        closedLoopController.setReference(
-            newSpeed,
-            ControlType.kVelocity
-        );
+        mVelocityVoltage.Velocity = newSpeed;
+        mMotor1.setControl(mVelocityVoltage);
 
         setpoint = newSpeed;
     }
@@ -149,7 +128,7 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
     }
 
     public AngularVelocity getSpeed(){
-        return RPM.of(mMotor1.getEncoder().getVelocity());
+        return RPM.of(mMotor1.getVelocity().getValue().in(RPM));
     }
 
     public boolean branchLC(){
@@ -175,8 +154,8 @@ public class IntakeSubsystem extends SubsystemBase implements ModeSwitchInterfac
 
     @Override
     public void periodic() {
-        appliedOutPub.accept(mMotor1.getAppliedOutput());
-        velocityPub.accept(mEncoder.getVelocity());
+        appliedOutPub.accept(mMotor1.getMotorVoltage().getValue().in(Volts));
+        velocityPub.accept(mMotor1.getVelocity().getValue().in(RPM));
         lCPub.accept(detect());
 
         updateCache();

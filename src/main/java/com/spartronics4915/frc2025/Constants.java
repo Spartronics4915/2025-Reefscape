@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -71,6 +73,12 @@ public final class Constants {
     public static final class IntakeConstants {
         public static final int kMotorID = 12;
 
+        public static final CurrentLimitsConfigs kCurrentLimits = new CurrentLimitsConfigs()
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(80)
+            .withSupplyCurrentLowerLimit(60)
+            .withSupplyCurrentLowerTime(1.0);
+
         public static final int kLaserCANID = 21;
         public static final int kPipeLCID = 25;
 
@@ -78,29 +86,21 @@ public final class Constants {
         public static final int kBranchLCTriggerDist = 450;
         public static final double kBranchLCDebounceTime = 0.01;
 
-        public static final int smartCurrentLimit = 18;
-        public static final int secondaryCurrentLimit = 20;
-
-        public static final double kOpenLoopRampRate = 0.1;
-
         public static final double kLaserCanDebounce = 0.075;
 
-        public static final EncoderConfig kEncoderConfig = new EncoderConfig()
-            .positionConversionFactor(1/36.0)
-            .velocityConversionFactor(1/36.0);
+        public static final SlotConfigs kPIDConfigs = new SlotConfigs()
+        .withKP(0.0006)
+        .withKI(0)
+        .withKD(0.0);
 
-        public static final ClosedLoopConfig kCLConfig = new ClosedLoopConfig()
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.0006, 0, 0.0);
+        public static final FeedbackConfigs kFeedbackConfig = new FeedbackConfigs()
+            .withSensorToMechanismRatio(1/8)
+        ;
 
-        public static final SparkBaseConfig kMotorConfig = new SparkMaxConfig()
-            .inverted(false)
-            .idleMode(IdleMode.kBrake)
-            .apply(kCLConfig)
-            .apply(kEncoderConfig)
-            .openLoopRampRate(kOpenLoopRampRate)
-            .smartCurrentLimit(smartCurrentLimit)
-            .secondaryCurrentLimit(secondaryCurrentLimit);
+        public static final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+        static { // This is so silly, I didn't know it existed
+            motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        }
 
         public enum IntakeSpeed {
             IN (-2500, -0.8),
