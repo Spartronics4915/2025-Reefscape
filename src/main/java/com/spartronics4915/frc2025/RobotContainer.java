@@ -456,6 +456,7 @@ public class RobotContainer {
                         algeaScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
                 }
+                System.out.println(algeaScoreHeight);
                 return dynamics.gotoScore(algeaScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
             }, Set.of())
         );
