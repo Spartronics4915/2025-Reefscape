@@ -540,7 +540,7 @@ public final class Constants {
         public static final Angle kArmAngleTolerance = Degrees.of(10);
         public static final Angle kArmAngleAutoScoringTolerance = Degrees.of(10);
 
-        public static final double kElevatorHeightTolerance = Inches.of(3).in(Meters);
+        public static final double kElevatorHeightTolerance = Inches.of(1).in(Meters);
 
         public static final double kSafeElevHeightForSwerve = 1.2;
 
@@ -548,6 +548,7 @@ public final class Constants {
         public static final Angle kSafeArmAngle = Degrees.of(90);
         public static final Angle kMoveableArmAngle = Degrees.of(76);
         public static final Angle kReturnArmAngle = Degrees.of(135);
+        public static final Angle safeAlgaeArmAngle = Degrees.of(135);
 
         public static final Angle kRemoveAlgaeArmAngle = Degrees.of(11.6);
     
@@ -561,6 +562,8 @@ public final class Constants {
         public static final Time kCheckIfScoredDuration = Seconds.of(0.55);
 
         public static final Time kJustScoredThreshold = Seconds.of(1);
+
+        public static final Time algaeScoreDelay = Seconds.of(0.12);
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
