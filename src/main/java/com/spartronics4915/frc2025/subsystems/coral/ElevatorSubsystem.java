@@ -48,11 +48,14 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
     private ElevatorFeedforward FFCalculator;
 
     private TrapezoidProfile elevatorProfile;
+    private TrapezoidProfile elevatorDampProfile;
+
+    private final IntakeSubsystem intakeSubsystem;
 
     private double currentSetPoint;
     private State currentState;
     
-    public ElevatorSubsystem() {
+    public ElevatorSubsystem(IntakeSubsystem intakeSubsystem) {
         // Main elevator motor init
         motor = new SparkMax(ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
 
@@ -91,7 +94,9 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
         FFCalculator = new ElevatorFeedforward(0,0,0,0);
         elevatorProfile = new TrapezoidProfile(ElevatorConstants.constraints);
+        elevatorDampProfile = new TrapezoidProfile(ElevatorConstants.dampConstraints);
         elevatorClosedLoopController = motor.getClosedLoopController();
+        this.intakeSubsystem = intakeSubsystem;
 
         setMechanismPosition(0.0);
 
@@ -169,7 +174,11 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
             ElevatorConstants.maxHeight
         );
 
-        currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        if (intakeSubsystem.hasAlgae()) {
+            currentState = elevatorDampProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        } else {
+            currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        }
 
         elevatorClosedLoopController.setReference(currentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FFCalculator.calculate(currentState.velocity));
 

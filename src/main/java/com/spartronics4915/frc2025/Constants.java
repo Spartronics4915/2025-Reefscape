@@ -448,8 +448,11 @@ public final class Constants {
 
         public static final double kMaxVelocity = 7.0;
         public static final double kMaxAcceleration = 8.5 / 2.0;
+        public static final double kMaxDampVelocity = 1.0;
+        public static final double kMaxDampAcceleration = 0.5;
 
         public static final Constraints kConstraints = new Constraints(kMaxVelocity, kMaxAcceleration); //8.0, 10
+        public static final Constraints kDampConstraints = new Constraints(kMaxDampVelocity, kMaxDampAcceleration); //5.0, 8.0
         public static final int kPeriodMs = 0;
 
         public static final double kS = 0.0;
@@ -514,6 +517,7 @@ public final class Constants {
         public static final double dt = 0.02;
 
         public static final Constraints constraints = new Constraints(6.5, 7.0); //12, 7.5
+        public static final Constraints dampConstraints = new Constraints(3.0, 3.0); //5.0, 8.0
 
         public static final double minHeight = 0.01;
         public static final double maxHeight = 1.24;

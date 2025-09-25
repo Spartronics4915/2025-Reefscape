@@ -23,16 +23,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableListener;
-import edu.wpi.first.networktables.NetworkTableListenerPoller;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 
 
 import java.util.Set;
@@ -44,6 +42,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     private ArmFeedforward mFFCalculator;
 
     private TrapezoidProfile mArmProfile;
+    private TrapezoidProfile mDampArmProfile;
 
     private Rotation2d mCurrentSetPoint = ArmConstants.kStartingAngle;
     private State mCurrentState;
@@ -53,12 +52,12 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     private final StructPublisher<Rotation2d> desiredStatePub = NetworkTableInstance.getDefault().getTable("logArm").getStructTopic("desiredState", Rotation2d.struct).publish();
     private final StructPublisher<Rotation2d> setpointpub = NetworkTableInstance.getDefault().getTable("logArm").getStructTopic("setpointpub", Rotation2d.struct).publish();
 
+    private final IntakeSubsystem mIntakeSubsystem;
 
-
-
-    public ArmSubsystem() {
+    public ArmSubsystem(IntakeSubsystem intakeSubsystem) {
         
         mFFCalculator = new ArmFeedforward(ArmConstants.kS,ArmConstants.kG,ArmConstants.kV,ArmConstants.kS);
+        this.mIntakeSubsystem = intakeSubsystem;
 
         initArmMotor();
         
@@ -154,6 +153,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
 
     private void initArmProfile() {
         mArmProfile = new TrapezoidProfile(ArmConstants.kConstraints);
+        mDampArmProfile = new TrapezoidProfile(ArmConstants.kDampConstraints);
         mCurrentState = new State(angleToRaw(ArmConstants.kStartingAngle), 0.0);
     }
 
@@ -168,7 +168,11 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
                 ArmConstants.kMaxAngle.getRotations()
         ));
 
-        mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((angleToRaw(mCurrentSetPoint)), 0.0));
+        if (mIntakeSubsystem.hasAlgae()) {
+            mCurrentState = mDampArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((angleToRaw(mCurrentSetPoint)), 0.0));
+        } else {
+            mCurrentState = mArmProfile.calculate(ArmConstants.kDt, mCurrentState, new State((angleToRaw(mCurrentSetPoint)), 0.0));
+        }
 
         final PositionVoltage m_request = new PositionVoltage(mCurrentState.position).withFeedForward(mFFCalculator.calculate(mCurrentState.position, mCurrentState.velocity));
         

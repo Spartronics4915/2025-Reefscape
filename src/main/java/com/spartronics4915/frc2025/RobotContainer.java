@@ -150,8 +150,8 @@ public class RobotContainer {
     public RobotContainer() {
 
         intakeSubsystem = new IntakeSubsystem();
-        armSubsystem = new ArmSubsystem();
-        elevatorSubsystem = new ElevatorSubsystem();
+        armSubsystem = new ArmSubsystem(intakeSubsystem);
+        elevatorSubsystem = new ElevatorSubsystem(intakeSubsystem);
         climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
@@ -463,7 +463,7 @@ public class RobotContainer {
         SmartDashboard.putData("Score", dynamics.score());
         SmartDashboard.putData("Climber: stop", climberSubsystem.stopArmCommand());
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
-        SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
+        SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT)); 
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
 
         SmartDashboard.putData("Toggle Auto Score", Commands.defer(() -> {
