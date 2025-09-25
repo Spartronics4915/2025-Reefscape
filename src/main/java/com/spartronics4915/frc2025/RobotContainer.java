@@ -431,12 +431,11 @@ public class RobotContainer {
         Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightY()) < OI.kPaddleTolerance) || operatorController.getRightY() < (-1 + OI.kPaddleTolerance))); //bottom right paddle
 
         Trigger algaeSafety = leftStickUp;
-
-        Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
-        int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
         
         rightStickUp.and(algaeSafety).onTrue(
             Commands.defer(() -> {
+                Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
+                int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
                 final DynaPreset algeaScoreHeight;
                 switch (index) {
                     case 7:
