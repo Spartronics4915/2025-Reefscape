@@ -437,19 +437,18 @@ public class RobotContainer {
                 int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
                 final DynaPreset algeaScoreHeight;
                 switch (index) {
-                    case 7:
+                    case 1:
                         algeaScoreHeight = DynaPreset.ALGAE_LOW;
                         break;
-                    case 8:
-                    case 6:
+                    case 2:
+                    case 0:
                         algeaScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
-                    case 9:
-                    case 11:
+                    case 3:
+                    case 5:
                         algeaScoreHeight = DynaPreset.ALGAE_LOW;
                         break;
                     case 4:
-                    case 10:
                         algeaScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
                     default:
