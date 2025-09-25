@@ -438,16 +438,12 @@ public class RobotContainer {
                 final DynaPreset algeaScoreHeight;
                 switch (index) {
                     case 1:
-                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
-                        break;
-                    case 2:
-                    case 0:
-                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
-                        break;
                     case 3:
                     case 5:
                         algeaScoreHeight = DynaPreset.ALGAE_LOW;
                         break;
+                    case 0:
+                    case 2:
                     case 4:
                         algeaScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
