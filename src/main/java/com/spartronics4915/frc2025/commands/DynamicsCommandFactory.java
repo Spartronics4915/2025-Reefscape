@@ -452,7 +452,7 @@ public class DynamicsCommandFactory {
                     // Robot is at barge height, so we can score algae
                     Commands.parallel(
                         Commands.sequence(
-                            Commands.waitSeconds(0.1),
+                            Commands.waitSeconds(algaeScoreDelay),
                             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_OUTTAKE)
                         ).withName("Algae Score"),
                         intakeSubsystem.setAlgaeDetect(false),
