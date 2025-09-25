@@ -124,7 +124,6 @@ public class RobotContainer {
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
     public final WinchClimber climberSubsystem;
-    private SwerveSubsystem swerve;
 
     public boolean isTeleopAutoScoringEnabled = true; 
 
@@ -434,7 +433,7 @@ public class RobotContainer {
         
         rightStickUp.and(algaeSafety).onTrue(
             Commands.defer(() -> {
-                Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
+                Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerveSubsystem.getPose());
                 int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
                 final DynaPreset algeaScoreHeight;
                 switch (index) {
