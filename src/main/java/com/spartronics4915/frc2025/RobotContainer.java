@@ -440,12 +440,18 @@ public class RobotContainer {
                     case 1:
                     case 3:
                     case 5:
-                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
+                    case 7:
+                    case 9:
+                    case 11:
+                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
                     case 0:
                     case 2:
                     case 4:
-                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                    case 6:
+                    case 8:
+                    case 10:
+                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
                         break;
                     default:
                         algeaScoreHeight = DynaPreset.ALGAE_HIGH;
