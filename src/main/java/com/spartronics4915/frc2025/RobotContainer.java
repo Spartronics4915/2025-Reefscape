@@ -393,13 +393,17 @@ public class RobotContainer {
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
         ); //windows button
 
-        operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
+        operatorController.y().onTrue(Commands.defer(() -> {
+            return(dynamics.operatorScore(intakeSubsystem.hasAlgae() ? DynaPreset.BARGE : DynaPreset.L4));
+        }, Set.of()));
 
         operatorController.x().onTrue(dynamics.operatorScore(DynaPreset.L3));
 
         operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
-        operatorController.a().onTrue(dynamics.operatorScore(DynaPreset.L1));
+        operatorController.a().onTrue(Commands.defer(() -> {
+            return(dynamics.operatorScore(intakeSubsystem.hasAlgae() ? DynaPreset.PROCESSOR : DynaPreset.L1));
+        }, Set.of()));
 
         operatorController.start().onTrue(dynamics.intake()); //menu button
 
@@ -427,10 +431,14 @@ public class RobotContainer {
 
         Trigger algaeSafety = leftStickUp;
 
-        leftStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
-        rightStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
-
-        rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
+        rightStickUp.and(algaeSafety).onTrue(
+            dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
+            .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE))
+        );
+        rightStickLeft.and(algaeSafety).onTrue(
+            dynamics.gotoScore(DynaPreset.ALGAE_LOW)
+            .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE))
+        );
 
         operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
 
@@ -459,6 +467,9 @@ public class RobotContainer {
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
         SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
+        SmartDashboard.putData("Barge", dynamics.gotoScore(DynaPreset.BARGE));
+        SmartDashboard.putData("Processor", dynamics.gotoScore(DynaPreset.PROCESSOR));
+        SmartDashboard.putData("Launch", dynamics.gotoScore(DynaPreset.LAUNCH));
 
         SmartDashboard.putData("Score", dynamics.score());
         SmartDashboard.putData("Climber: stop", climberSubsystem.stopArmCommand());
