@@ -124,6 +124,7 @@ public class RobotContainer {
     public final ArmSubsystem armSubsystem;
     public final ElevatorSubsystem elevatorSubsystem;
     public final WinchClimber climberSubsystem;
+    private SwerveSubsystem swerve;
 
     public boolean isTeleopAutoScoringEnabled = true; 
 
@@ -431,10 +432,36 @@ public class RobotContainer {
 
         Trigger algaeSafety = leftStickUp;
 
+        Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerve.getPose());
+        int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
+        
         rightStickUp.and(algaeSafety).onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_HIGH)
-            .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE))
+            Commands.defer(() -> {
+                final DynaPreset algeaScoreHeight;
+                switch (index) {
+                    case 7:
+                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
+                        break;
+                    case 8:
+                    case 6:
+                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                        break;
+                    case 9:
+                    case 11:
+                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
+                        break;
+                    case 4:
+                    case 10:
+                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                        break;
+                    default:
+                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                        break;
+                }
+                return dynamics.gotoScore(algeaScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
+            }, Set.of())
         );
+
         rightStickLeft.and(algaeSafety).onTrue(
             dynamics.gotoScore(DynaPreset.ALGAE_LOW)
             .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE))
