@@ -271,7 +271,7 @@ public final class ChassisSpeedSuppliers {
         return () -> {
             boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
             switch (DriverCommunication.getClosestRegion(swerve)) {
-                case REEF, PROCESSOR, BARGE: {
+                case REEF, PROCESSOR: {
                     Translation2d reefCenter = isBlue ? OrientTowardsNearestPOIConstants.REEF_CENTER_BLUE : OrientTowardsNearestPOIConstants.REEF_CENTER_RED;
                     return reefCenter.minus(swerve.getPose().getTranslation()).getAngle();
                     // if (isBlue) {
@@ -285,16 +285,19 @@ public final class ChassisSpeedSuppliers {
                     if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                     else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
-                default:{
-                    return Rotation2d.kZero; //unreachable
-                }
-                // case BARGE: {
+                // case BARGE: { This is really cool but apparently it doesn't work well :(
                 //     int location = DriverStation.getLocation().getAsInt() - 1;
                 //     if (isBlue)
                 //         return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 //     else 
                 //         return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 // }
+                case BARGE: {
+                    return OrientTowardsNearestPOIConstants.BARGE_ROTATION.plus(shouldFlip() ? Rotation2d.k180deg : Rotation2d.kZero);
+                }
+                default:{
+                    return Rotation2d.kZero; //unreachable
+                }
             }
         };
     }

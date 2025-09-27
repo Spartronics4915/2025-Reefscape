@@ -318,7 +318,7 @@ public final class Constants {
         public static final Translation2d REEF_CENTER_RED = new Translation2d(13.067, 4.031);
         public static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.471, 4.031);
         public static final double CORAL_STATION_ANGLE = 55;
-        public static final Rotation2d BARGE_ROTATION = Rotation2d.kCCW_90deg;
+        public static final Rotation2d BARGE_ROTATION = Rotation2d.kZero;
         public static final Translation2d[] BARGE_RED_CAGE_POSITIONS = {
             new Translation2d(8.8, 3),
             new Translation2d(8.8, 1.9),
