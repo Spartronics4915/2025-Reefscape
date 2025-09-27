@@ -558,6 +558,8 @@ public final class Constants {
 
         public static final double kScoreLaserCanDebounce = 0.15; //seconds
 
+        public static final double algaeIntakeDebounce = 0.5;
+
         public static final Time kCheckIfScoredDelay = Seconds.of(0.075);
         public static final Time kCheckIfScoredDuration = Seconds.of(0.55);
 

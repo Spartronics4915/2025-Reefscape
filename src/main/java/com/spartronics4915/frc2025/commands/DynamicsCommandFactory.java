@@ -54,7 +54,7 @@ public class DynamicsCommandFactory {
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeSubsystem = intakeSubsystem;
 
-        hasScoredAlgaeTrigger = new Trigger(intakeSubsystem::getRawAlgae).negate().debounce(kScoreLaserCanDebounce);
+        hasScoredAlgaeTrigger = new Trigger(intakeSubsystem::getRawAlgae).negate().debounce(algaeIntakeDebounce);
         this.funnelLC = new LaserCan(kFunnelLaserCanID);
 
         try {
