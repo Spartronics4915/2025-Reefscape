@@ -458,7 +458,7 @@ public class RobotContainer {
                         break;
                 }
                 System.out.println(algeaScoreHeight);
-                System.out.println(closestAprilTag);
+                System.out.println(index);
                 return dynamics.gotoScore(algeaScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
             }, Set.of())
         );
