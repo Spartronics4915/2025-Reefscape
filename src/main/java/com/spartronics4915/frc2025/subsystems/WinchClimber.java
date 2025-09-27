@@ -167,6 +167,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         }, Set.of());
         else return Commands.runOnce(() -> {
             stopArm();
+            turnArmBrakeModeOn();
         });
     }
 
