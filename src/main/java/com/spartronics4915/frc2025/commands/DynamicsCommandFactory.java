@@ -82,10 +82,13 @@ public class DynamicsCommandFactory {
         hasScoredTrigger.onTrue(Commands.runOnce(() -> lastScoredTimer.reset()));
 
         hasScoredAlgaeTrigger.negate().and(canIntakeAlgaeTrigger).and(() -> !intakeSubsystem.hasAlgae()).onTrue(
-            intakeSubsystem.setAlgaeDetect(true)
-            .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_HOLD))
-            .alongWith(Commands.runOnce(() -> armSubsystem.setSetpoint(Rotation2d.fromDegrees(70))))
-        );
+            Commands.sequence(
+                Commands.waitSeconds(algaeIntakeDelay),
+                intakeSubsystem.setAlgaeDetect(true)
+                .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_HOLD))
+                .alongWith(Commands.runOnce(() -> armSubsystem.setSetpoint(Rotation2d.fromDegrees(70)))
+            )
+        ));
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
