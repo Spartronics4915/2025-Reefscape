@@ -147,14 +147,14 @@ public class VariableAutos {
 
     private final ChassisSpeeds reverseIntoStation;
 
-    public boolean isSwerveCloseToReef() {
+    public boolean isSwerveCloseToReef(double triggerDistance) {
         Translation2d currentReef = 
         (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ?
             new Translation2d(4.5, 4.0) :
             new Translation2d(13, 4.0)
         ;
 
-        return (currentReef.getDistance(swerve.getPose().getTranslation()) < kTriggerDistance);
+        return (currentReef.getDistance(swerve.getPose().getTranslation()) < triggerDistance);
     }
 
     public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
@@ -268,7 +268,7 @@ public class VariableAutos {
                 Commands.sequence(
                     dynamics.autoPrescore(),
                     // Commands.print("is swerve close to reef?"),
-                    Commands.waitUntil(() -> isSwerveCloseToReef()),
+                    Commands.waitUntil(() -> isSwerveCloseToReef(kTriggerDistance)),
                     // Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 )

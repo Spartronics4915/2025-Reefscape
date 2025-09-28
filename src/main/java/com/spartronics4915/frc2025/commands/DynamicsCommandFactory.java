@@ -129,7 +129,7 @@ public class DynamicsCommandFactory {
 
     public void setVariableAutos(VariableAutos variableAutos) {
         this.variableAutos = variableAutos;
-        isSwerveCloseToReefTrigger = new Trigger(this.variableAutos::isSwerveCloseToReef);
+        isSwerveCloseToReefTrigger = new Trigger(() -> this.variableAutos.isSwerveCloseToReef(algaeTriggerDistance));
         isSwerveCloseToReefTrigger.negate().and(intakeSubsystem::hasAlgae).onTrue(
             algaeStow()
         );
