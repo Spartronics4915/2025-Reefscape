@@ -164,6 +164,7 @@ public class VariableAutos {
         this.swerve = swerve;
 
         reverseIntoStation = new ChassisSpeeds(kStationApproachSpeed.unaryMinus().in(MetersPerSecond), 0, 0);
+        dynamics.setVariableAutos(this);
     }
 
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height) {

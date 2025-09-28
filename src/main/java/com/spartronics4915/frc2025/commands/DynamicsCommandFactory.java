@@ -39,6 +39,7 @@ public class DynamicsCommandFactory {
     public IntakeSubsystem intakeSubsystem;
     private ElevatorSubsystem elevatorSubsystem;
     private ArmSubsystem armSubsystem;
+    private VariableAutos variableAutos;
 
     private Timer lastScoredTimer = new Timer();
 
@@ -46,6 +47,7 @@ public class DynamicsCommandFactory {
     public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
     public Trigger hasScoredAlgaeTrigger;
     public Trigger canIntakeAlgaeTrigger = new Trigger(this::canIntakeAlgae);
+    public Trigger isSwerveCloseToReefTrigger;
 
     private DynaPreset lastInputtedPreset = DynaPreset.L4;
 
@@ -123,6 +125,14 @@ public class DynamicsCommandFactory {
         private DynaPreset(double meters, Rotation2d angle) {
             this.setpoint = new DynamicsSetpoint(meters, angle);
         }
+    }
+
+    public void setVariableAutos(VariableAutos variableAutos) {
+        this.variableAutos = variableAutos;
+        isSwerveCloseToReefTrigger = new Trigger(this.variableAutos::isSwerveCloseToReef);
+        isSwerveCloseToReefTrigger.negate().and(intakeSubsystem::hasAlgae).onTrue(
+            algaeStow()
+        );
     }
 
     private double getElevHeight(){
