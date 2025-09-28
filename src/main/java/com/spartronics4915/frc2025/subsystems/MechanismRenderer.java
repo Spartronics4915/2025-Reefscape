@@ -23,7 +23,7 @@ public class MechanismRenderer extends SubsystemBase {
 
     private Supplier<Distance> elevatorHeightSupplier;
     private Supplier<Angle> armAngleSupplier;
-    private Supplier<AngularVelocity> intakeSpeedSupplier;
+    private Supplier<Double> intakeSpeedSupplier;
     private BooleanSupplier intakeTrigger;
     private BooleanSupplier algaeTrigger;
     Mechanism2d canvas;
@@ -32,7 +32,7 @@ public class MechanismRenderer extends SubsystemBase {
     MechanismLigament2d intake;
     MechanismLigament2d intakeBB;
     
-    public static void generateRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
+    public static void generateRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<Double> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
         new MechanismRenderer(elevatorHeightSupplier, armAngleSupplier, intakeSpeedSupplier, intakeTrigger, algaeTrigger, name);
     }
 
@@ -43,7 +43,7 @@ public class MechanismRenderer extends SubsystemBase {
      * @param intakeSpeedSupplier a supplier which returns the intake's angular velocity
      * 
      */
-    public MechanismRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
+    public MechanismRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<Double> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
         super();
         this.elevatorHeightSupplier = elevatorHeightSupplier;
         this.armAngleSupplier = armAngleSupplier;
@@ -92,9 +92,9 @@ public class MechanismRenderer extends SubsystemBase {
         );
         
         double t = MathUtil.inverseInterpolate(
-            RPM.of(-500).in(RPM), 
-            RPM.of(500).in(RPM), 
-            intakeSpeedSupplier.get().in(RPM)
+            -3, 
+            3, 
+            intakeSpeedSupplier.get()
         );
         
         intake.setColor(

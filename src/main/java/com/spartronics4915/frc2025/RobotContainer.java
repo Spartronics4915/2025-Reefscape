@@ -169,7 +169,7 @@ public class RobotContainer {
         MechanismRenderer.generateRenderer(
             elevatorSubsystem::getDesiredPosition, 
             () -> armSubsystem.getTargetPosition().getMeasure(), 
-            () -> RPM.of(intakeSubsystem.setpoint), 
+            () -> intakeSubsystem.setpoint, 
             intakeSubsystem::detect,
             intakeSubsystem::hasAlgae,
             "Target Position"
