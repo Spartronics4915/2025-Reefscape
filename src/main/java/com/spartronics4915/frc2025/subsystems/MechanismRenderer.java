@@ -25,14 +25,15 @@ public class MechanismRenderer extends SubsystemBase {
     private Supplier<Angle> armAngleSupplier;
     private Supplier<AngularVelocity> intakeSpeedSupplier;
     private BooleanSupplier intakeTrigger;
+    private BooleanSupplier algaeTrigger;
     Mechanism2d canvas;
     MechanismLigament2d elev;
     MechanismLigament2d arm;
     MechanismLigament2d intake;
     MechanismLigament2d intakeBB;
     
-    public static void generateRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, String name) {
-        new MechanismRenderer(elevatorHeightSupplier, armAngleSupplier, intakeSpeedSupplier, intakeTrigger, name);
+    public static void generateRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
+        new MechanismRenderer(elevatorHeightSupplier, armAngleSupplier, intakeSpeedSupplier, intakeTrigger, algaeTrigger, name);
     }
 
     /**
@@ -42,12 +43,13 @@ public class MechanismRenderer extends SubsystemBase {
      * @param intakeSpeedSupplier a supplier which returns the intake's angular velocity
      * 
      */
-    public MechanismRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, String name) {
+    public MechanismRenderer(Supplier<Distance> elevatorHeightSupplier, Supplier<Angle> armAngleSupplier, Supplier<AngularVelocity> intakeSpeedSupplier, BooleanSupplier intakeTrigger, BooleanSupplier algaeTrigger, String name) {
         super();
         this.elevatorHeightSupplier = elevatorHeightSupplier;
         this.armAngleSupplier = armAngleSupplier;
         this.intakeSpeedSupplier = intakeSpeedSupplier;
         this.intakeTrigger = intakeTrigger;
+        this.algaeTrigger = algaeTrigger;
 
         canvas = new Mechanism2d(3, 3);
         var root = canvas.getRoot("root", 1.5, 0.735800);
@@ -82,7 +84,12 @@ public class MechanismRenderer extends SubsystemBase {
     public void periodic() {
         elev.setLength(elevatorHeightSupplier.get().in(Meters));
         arm.setAngle(-(90-(armAngleSupplier.get().in(Degrees))));
-        intakeBB.setColor(intakeTrigger.getAsBoolean() ? new Color8Bit(Color.kGreen) : new Color8Bit(Color.kRed));
+        intakeBB.setColor(algaeTrigger.getAsBoolean() 
+            ? new Color8Bit(Color.kAqua) 
+            : intakeTrigger.getAsBoolean() 
+                ? new Color8Bit(Color.kGreen) 
+                : new Color8Bit(Color.kRed)
+        );
         
         double t = MathUtil.inverseInterpolate(
             RPM.of(-500).in(RPM), 

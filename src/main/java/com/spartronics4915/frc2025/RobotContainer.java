@@ -171,6 +171,7 @@ public class RobotContainer {
             () -> armSubsystem.getTargetPosition().getMeasure(), 
             () -> RPM.of(intakeSubsystem.setpoint), 
             intakeSubsystem::detect,
+            intakeSubsystem::hasAlgae,
             "Target Position"
         );
 
