@@ -436,7 +436,7 @@ public class RobotContainer {
             Commands.defer(() -> {
                 Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerveSubsystem.getPose());
                 int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
-                final DynaPreset algeaScoreHeight;
+                final DynaPreset algaeScoreHeight;
                 switch (index) {
                     case 1:
                     case 3:
@@ -444,7 +444,7 @@ public class RobotContainer {
                     case 7:
                     case 9:
                     case 11:
-                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                        algaeScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
                     case 0:
                     case 2:
@@ -452,15 +452,15 @@ public class RobotContainer {
                     case 6:
                     case 8:
                     case 10:
-                        algeaScoreHeight = DynaPreset.ALGAE_LOW;
+                        algaeScoreHeight = DynaPreset.ALGAE_LOW;
                         break;
                     default:
-                        algeaScoreHeight = DynaPreset.ALGAE_HIGH;
+                        algaeScoreHeight = DynaPreset.ALGAE_HIGH;
                         break;
                 }
-                System.out.println(algeaScoreHeight);
+                System.out.println(algaeScoreHeight);
                 System.out.println(index);
-                return dynamics.gotoScore(algeaScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
+                return dynamics.gotoScore(algaeScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
             }, Set.of())
         );
 
