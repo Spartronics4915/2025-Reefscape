@@ -464,11 +464,6 @@ public class RobotContainer {
             }, Set.of())
         );
 
-        rightStickLeft.and(algaeSafety).onTrue(
-            dynamics.gotoScore(DynaPreset.ALGAE_LOW)
-            .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE))
-        );
-
         operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
 
         operatorController.leftBumper().onTrue(climberSubsystem.operatorClimberWinchCommand(true))
