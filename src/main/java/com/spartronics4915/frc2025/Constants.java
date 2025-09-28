@@ -566,7 +566,7 @@ public final class Constants {
         public static final Time kJustScoredThreshold = Seconds.of(1);
 
         public static final double algaeScoreDelay = 0.11;
-        public static final double algaeIntakeDelay = 0.2;
+        public static final double algaeIntakeDelay = 0.3;
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
