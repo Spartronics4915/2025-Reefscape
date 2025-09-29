@@ -23,9 +23,12 @@ import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -162,6 +165,8 @@ public class VariableAutos {
         this.alignmentGenerator = alignmentGenerator;
         this.dynamics = dynamics;
         this.swerve = swerve;
+        var tab = Shuffleboard.getTab("autoLogging");
+        tab.addBoolean("isSwerveCloseToReef", () -> isSwerveCloseToReef(kTriggerDistance));
 
         reverseIntoStation = new ChassisSpeeds(kStationApproachSpeed.unaryMinus().in(MetersPerSecond), 0, 0);
         dynamics.setVariableAutos(this);
