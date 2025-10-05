@@ -5,6 +5,8 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAli
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopAlignAdjustTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.reefApproachOffset;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.ArrayList;
@@ -144,9 +146,14 @@ public class AlignToReef {
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {
+
+        Pose2d offsetWaypoint = new Pose2d(
+            waypoint.getTranslation().plus(new Translation2d(reefApproachOffset.in(Meters), waypoint.getRotation().rotateBy(Rotation2d.k180deg))),
+            waypoint.getRotation()
+        ); 
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
-            waypoint
+            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), offsetWaypoint)),
+            offsetWaypoint
         );
 
         if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {

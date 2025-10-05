@@ -289,6 +289,8 @@ public final class Constants {
 
             public static final PathConstraints kAutoPathConstraints = new PathConstraints(2.25, 2.25, 1/2 * Math.PI, 1 * Math.PI); //? consider making these more aggressive
             
+            public static final Distance reefApproachOffset = Meters.of(0.075);
+
             public static final double kTriggerDistance = 3.0;
 
             public static final double kAutoIntakeWaitTime = 0.1;
