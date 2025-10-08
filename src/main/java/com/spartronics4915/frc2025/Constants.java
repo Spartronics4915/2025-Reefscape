@@ -84,7 +84,7 @@ public final class Constants {
 
         public static final int laserCANDistance = 50;
         public static final int kBranchLCTriggerDist = 450;
-        public static final int kAlgaeTriggerDist = 240;
+        public static final int kAlgaeTriggerDist = 235;
         public static final double kBranchLCDebounceTime = 0.01;
 
         public static final double kLaserCanDebounce = 0.075;
@@ -569,7 +569,7 @@ public final class Constants {
 
         public static final double algaeScoreDelay = 0.11;
         public static final double algaeIntakeDelay = 0.3;
-        public static final double algaeStowDistance = 0.6;
+        public static final double algaeStowDistance = 2;
 
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
