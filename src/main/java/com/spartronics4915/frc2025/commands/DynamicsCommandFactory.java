@@ -536,7 +536,7 @@ public class DynamicsCommandFactory {
                     Commands.waitUntil(hasScoredAlgaeTrigger).withTimeout(1.0),
                     intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
                     intakeSubsystem.setAlgaeDetect(false),
-                    returnLoadStow()
+                    stow()
                 );
             } else {
                 return Commands.deadline(
