@@ -44,6 +44,8 @@ public class DynamicsCommandFactory {
     private Timer lastScoredTimer = new Timer();
 
     private LaserCan funnelLC;
+    private LaserCan leftReef;
+    private LaserCan rightReef;
     public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
     public Trigger hasScoredAlgaeTrigger;
     public Trigger canIntakeAlgaeTrigger = new Trigger(this::canIntakeAlgae);
@@ -58,11 +60,21 @@ public class DynamicsCommandFactory {
 
         hasScoredAlgaeTrigger = new Trigger(intakeSubsystem::getRawAlgae).negate().debounce(algaeIntakeDebounce);
         this.funnelLC = new LaserCan(kFunnelLaserCanID);
+        this.leftReef = new LaserCan(leftReefLaserCanID);
+        this.rightReef = new LaserCan(rightReefLaserCanID);
 
         try {
             funnelLC.setRangingMode(LaserCan.RangingMode.SHORT);
             funnelLC.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); // prev numbers that worked(8, 8, 4, 4)
             funnelLC.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+
+            leftReef.setRangingMode(LaserCan.RangingMode.SHORT);
+            leftReef.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            leftReef.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+
+            rightReef.setRangingMode(LaserCan.RangingMode.SHORT);
+            rightReef.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            rightReef.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
           }
@@ -78,6 +90,9 @@ public class DynamicsCommandFactory {
         tab.addBoolean("canAutoScore", this::canAutoScore);
         tab.addBoolean("canAlgaeScore", this::canAlgaeScore);
         tab.addBoolean("canIntakeAlgae", this::canIntakeAlgae);
+        tab.addBoolean("leftReefDetect", this::leftReefDetect);
+        tab.addBoolean("rightReefDetect", this::rightReefDetect);
+        tab.addBoolean("reefDetect", this::reefDetect);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
         lastScoredTimer.start();
@@ -212,6 +227,36 @@ public class DynamicsCommandFactory {
         }
 
         return  measurement.distance_mm < funnelLCTriggerDist.in(Millimeter) || intakeSubsystem.detect(); // the || is here as a way to prevent us stalling at a CS when we are already holding a coral
+    }
+
+    public boolean leftReefDetect(){
+        if (RobotBase.isSimulation()) {
+            return false;
+        }
+
+        var measurement = leftReef.getMeasurement();
+        if (measurement == null) {
+            return false;
+        }
+
+        return  measurement.distance_mm < reefLCTriggerDist.in(Millimeter);
+    }
+
+    public boolean rightReefDetect(){
+        if (RobotBase.isSimulation()) {
+            return false;
+        }
+
+        var measurement = rightReef.getMeasurement();
+        if (measurement == null) {
+            return false;
+        }
+
+        return  measurement.distance_mm < reefLCTriggerDist.in(Millimeter);
+    }
+
+    public boolean reefDetect(){
+        return leftReefDetect() || rightReefDetect();
     }
 
     public boolean canAutoScore(){

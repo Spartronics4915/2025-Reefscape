@@ -574,6 +574,9 @@ public final class Constants {
         public static final int kFunnelLaserCanID = 20;
         public static final Distance funnelLCTriggerDist = Meters.of(0.2);
 
+        public static final int leftReefLaserCanID = 26;
+        public static final int rightReefLaserCanID = 27;
+        public static final Distance reefLCTriggerDist = Centimeter.of(15);
     }
 
     public static final class WinchClimberConstants {
