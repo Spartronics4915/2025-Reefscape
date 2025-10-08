@@ -108,8 +108,8 @@ public final class Constants {
             NEUTRAL (0, 0),
             OUT (2500, 1),
             FUNNEL_UNSTUCK(1800, 0.5),
-            ALGAE_HOLD(-1000, -0.15),
-            ALGAE_INTAKE(-2000, -0.4),
+            ALGAE_HOLD(-1000, -0.20),
+            ALGAE_INTAKE(-2000, -0.5),
             ALGAE_OUTTAKE(3000, 1);
 
             public final double intakeSpeed;
