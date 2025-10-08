@@ -254,7 +254,7 @@ public class VariableAutos {
                     Commands.waitTime(delay),
                     Commands.print("end delay"),
                     Commands.runOnce(() -> autoState = "waiting for dynamics"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
+                    // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
                     Commands.print("returning path"),
                     Commands.runOnce(() -> autoState = "returning to coral station"),
                     pathPair.returnPath
@@ -319,7 +319,7 @@ public class VariableAutos {
                     Commands.waitTime(delay),
                     Commands.print("is swerve moveable?"),
                     Commands.runOnce(() -> autoState = "is swerve moveable?"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
+                    // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
                     Commands.print("returning"),
                     Commands.runOnce(() -> autoState = "returning"),
                     pathPair.returnPath
