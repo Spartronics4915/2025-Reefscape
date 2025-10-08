@@ -51,6 +51,9 @@ public class DynamicsCommandFactory {
     public Trigger canIntakeAlgaeTrigger = new Trigger(this::canIntakeAlgae);
     public Trigger isSwerveCloseToReefTrigger;
 
+    public Trigger canSafeStow = new Trigger(this::reefDetect).negate().debounce(safeStowDebounce);
+    public boolean waitingForStow = false;
+
     private DynaPreset lastInputtedPreset = DynaPreset.L4;
 
     public DynamicsCommandFactory(ArmSubsystem armSubsystem, ElevatorSubsystem elevatorSubsystem, IntakeSubsystem intakeSubsystem) {
@@ -106,6 +109,22 @@ public class DynamicsCommandFactory {
                 .alongWith(Commands.runOnce(() -> armSubsystem.setSetpoint(Rotation2d.fromDegrees(70)))
             )
         ));
+
+        canSafeStow.and(() -> waitingForStow).onTrue(
+            Commands.sequence(
+                Commands.runOnce(() -> waitingForStow = false),
+                Commands.either(
+                    algaeStow(),
+                    Commands.either(
+                        prescoreStow(), 
+                        returnLoadStow(), 
+                        this::isCoralInArm
+                    ),
+                    intakeSubsystem::hasAlgae
+                )
+                .withName("Stow")
+            )
+        );
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
@@ -466,16 +485,7 @@ public class DynamicsCommandFactory {
     //#endregion
 
     public Command stow(){
-        return Commands.either(
-            algaeStow(),
-            Commands.either(
-                prescoreStow(), 
-                returnLoadStow(), 
-                this::isCoralInArm
-            ),
-            intakeSubsystem::hasAlgae
-        )
-        .withName("Stow");
+        return Commands.runOnce(() -> waitingForStow = true);
     }
 
     public Command gotoScore(DynaPreset scorePreset){
