@@ -111,19 +111,7 @@ public class DynamicsCommandFactory {
         ));
 
         canSafeStow.and(() -> waitingForStow).onTrue(
-            Commands.sequence(
-                Commands.runOnce(() -> waitingForStow = false),
-                Commands.either(
-                    algaeStow(),
-                    Commands.either(
-                        prescoreStow(), 
-                        returnLoadStow(), 
-                        this::isCoralInArm
-                    ),
-                    intakeSubsystem::hasAlgae
-                )
-                .withName("Stow")
-            )
+            loadStow()
         );
     }
 
@@ -455,9 +443,14 @@ public class DynamicsCommandFactory {
 
     public Command loadStow(){
         return Commands.sequence(
+            Commands.runOnce(() -> waitingForStow = false),
             makeSystemSafeToMove(true, false, true),
             armPriorityMove(DynaPreset.LOAD.setpoint) //brings arm to the load angle, then drops the elevator
         );
+    }
+
+    public Command queueLoadStow(){
+        return Commands.runOnce(() -> waitingForStow = true);
     }
 
     public Command prescoreStow(){
@@ -485,7 +478,16 @@ public class DynamicsCommandFactory {
     //#endregion
 
     public Command stow(){
-        return Commands.runOnce(() -> waitingForStow = true);
+        return Commands.either(
+            algaeStow(),
+            Commands.either(
+                prescoreStow(), 
+                returnLoadStow(), 
+                this::isCoralInArm
+            ),
+            intakeSubsystem::hasAlgae
+        )
+        .withName("Stow");
     }
 
     public Command gotoScore(DynaPreset scorePreset){
@@ -536,7 +538,7 @@ public class DynamicsCommandFactory {
                     Commands.waitUntil(hasScoredAlgaeTrigger).withTimeout(1.0),
                     intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
                     intakeSubsystem.setAlgaeDetect(false),
-                    stow()
+                    loadStow()
                 );
             } else {
                 return Commands.deadline(

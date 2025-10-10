@@ -241,7 +241,7 @@ public class VariableAutos {
             Commands.waitUntil(dynamics.hasScoredTrigger),
             Commands.runOnce(() -> autoState = "stowing"),
             Commands.parallel(
-                dynamics.stow(),
+                dynamics.queueLoadStow(),
                 dynamics.stopIntake(),
                 Commands.sequence(
                     Commands.waitSeconds(kAutoIntakeWaitTime),
@@ -307,7 +307,7 @@ public class VariableAutos {
             Commands.print("parallel group stow"),
             Commands.runOnce(() -> autoState = "parallel group stow"),
             Commands.parallel(
-                dynamics.stow(),
+                dynamics.queueLoadStow(),
                 dynamics.stopIntake(),
                 Commands.sequence(
                     Commands.waitSeconds(kAutoIntakeWaitTime),
