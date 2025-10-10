@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
-        // SmartDashboard.putData("PDH", powerDistribution);
+        SmartDashboard.putData("PDH", powerDistribution);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
