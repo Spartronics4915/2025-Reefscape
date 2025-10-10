@@ -291,7 +291,7 @@ public final class Constants {
             
             public static final Distance reefApproachOffset = Meters.of(0.075);
 
-            public static final double kTriggerDistance = 3.0;
+            public static final double kTriggerDistance = 2.75;
 
             public static final double kAutoIntakeWaitTime = 0.1;
             public static final double kAutoIntakeTimeout = 0.2;
