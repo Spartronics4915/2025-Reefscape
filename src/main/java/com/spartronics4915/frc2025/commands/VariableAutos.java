@@ -288,10 +288,10 @@ public class VariableAutos {
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    dynamics.autoPrescore(),
-                    Commands.print("is swerve close to reef?"),
-                    Commands.runOnce(() -> autoState = "is swerve close to reef?"),
-                    Commands.waitUntil(() -> isSwerveCloseToReef(kTriggerDistance)),
+                    Commands.deadline(
+                        Commands.waitUntil(() -> isSwerveCloseToReef(kTriggerDistance)),
+                        dynamics.autoPrescore()
+                    ),
                     Commands.print("moving to height"),
                     Commands.runOnce(() -> autoState = "moving to height"),
                     dynamics.gotoScore(height.preset)
