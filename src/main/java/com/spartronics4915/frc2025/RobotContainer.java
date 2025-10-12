@@ -359,7 +359,7 @@ public class RobotContainer {
 
         //#region automated controls
 
-        dynamics.hasScoredTrigger.onTrue(dynamics.queueLoadStow());
+        dynamics.hasScoredTrigger.and(DriverStation::isTeleop).onTrue(dynamics.queueLoadStow());
 
         new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop)
             .debounce(0.02).onTrue(
