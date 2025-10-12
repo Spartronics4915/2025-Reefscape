@@ -5,7 +5,7 @@
 package com.spartronics4915.frc2025;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
-
+import com.spartronics4915.frc2025.util.Elastic;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 
 import au.grapplerobotics.CanBridge;
@@ -100,6 +100,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
         SmartDashboard.putData("PDH", powerDistribution);
+
+        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30) {
+            Elastic.selectTab("Climbing");
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
