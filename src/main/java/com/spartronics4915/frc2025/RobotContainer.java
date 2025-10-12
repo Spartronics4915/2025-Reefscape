@@ -356,14 +356,14 @@ public class RobotContainer {
                 Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
             );
         }
-        
-        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
-            dynamics.score()
-        ));
 
         //#endregion
 
         //#region automated controls
+
+        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
+            dynamics.score()
+        ));
 
         dynamics.hasScoredTrigger.and(DriverStation::isTeleop).onTrue(dynamics.queueLoadStow());
 
