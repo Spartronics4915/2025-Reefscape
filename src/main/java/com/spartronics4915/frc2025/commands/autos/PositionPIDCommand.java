@@ -15,6 +15,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.util.Elastic;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -87,6 +88,15 @@ public class PositionPIDCommand extends Command{
             + "\nRotation offset: " + diff.getRotation().getMeasure().in(Degrees) + " deg"
             + "\nVelocity value: " + mSwerve.getSpeed() + "m/s"
         );
+
+        if (interrupted) {
+            Elastic.sendNotification(new Elastic.Notification()
+                .withLevel(Elastic.NotificationLevel.ERROR)
+                .withTitle("Auto Align Interrupted")
+                .withDescription("The auto align command was interrupted " + Math.round(Centimeter.convertFrom(diff.getTranslation().getNorm(), Meters) * 1000.0) / 1000.0 + " cm from its target")
+                .withDisplaySeconds(4.0)
+            );
+        }
     }
 
     @Override
