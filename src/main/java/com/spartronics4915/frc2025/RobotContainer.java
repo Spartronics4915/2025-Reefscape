@@ -55,6 +55,7 @@ import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorHeightTolerance;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.climberCamMode;
 import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -307,27 +308,32 @@ public class RobotContainer {
                 .withName("Align Middle Branch")
             );
 
+            ChassisSpeeds driverNudgeUp = new ChassisSpeeds(0.25, 0, 0);
+            ChassisSpeeds driverNudgeLeft = new ChassisSpeeds(0, 0.25, 0);
+            ChassisSpeeds driverNudgeRight = new ChassisSpeeds(0, -0.25, 0);
+            ChassisSpeeds driverNudgeDown = new ChassisSpeeds(-0.25, 0, 0);
+
             driverController.povUp().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0.25, 0, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeLeft : driverNudgeUp);
                 })
             );
 
             driverController.povLeft().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0, 0.25, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeDown : driverNudgeLeft);
                 })
             );
 
             driverController.povRight().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0, -0.25, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeUp : driverNudgeRight);
                 })
             );
 
             driverController.povDown().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(-0.25, 0, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeRight : driverNudgeDown);
                 })
             );
         }
