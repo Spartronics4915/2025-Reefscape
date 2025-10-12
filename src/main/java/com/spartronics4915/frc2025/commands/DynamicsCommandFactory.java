@@ -487,6 +487,7 @@ public class DynamicsCommandFactory {
             ),
             intakeSubsystem::hasAlgae
         )
+        .alongWith(Commands.runOnce(() -> waitingForStow = false))
         .withName("Stow");
     }
 
