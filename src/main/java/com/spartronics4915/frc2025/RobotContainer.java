@@ -129,6 +129,7 @@ public class RobotContainer {
     public boolean isTeleopAutoScoringEnabled = true; 
 
     private final BooleanPublisher autoScoreEnabledPub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("AutoScoringEnabled").publish();
+    private final BooleanPublisher climberCamModePub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("ClimberCamMode").publish();
     
     public final DynamicsCommandFactory dynamics;
 
@@ -273,11 +274,13 @@ public class RobotContainer {
                 .withName("Toggle Field Relative")
             );
 
-            driverController.rightStick().toggleOnTrue(
-                Commands.startEnd(
-                    () -> {ChassisSpeedSuppliers.climberCamMode = true;},
-                    () -> {ChassisSpeedSuppliers.climberCamMode = false;}
-                )
+            climberCamModePub.accept(climberCamMode);
+
+            driverController.rightStick().onTrue(
+                Commands.runOnce(() ->{
+                    ChassisSpeedSuppliers.climberCamMode = !ChassisSpeedSuppliers.climberCamMode;
+                    climberCamModePub.accept(climberCamMode);
+                })
                 .withName("Toggle Climber Cam Mode")
             );
 
