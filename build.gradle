@@ -35,7 +35,7 @@ deploy {
                     jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
                     // The hostname when connected via USB-B should be 172.22.11.2
-                    jvmArgs.add("-Djava.rmi.server.hostname=172.22.11.2")
+                    jvmArgs.add("-Djava.rmi.server.hostname=10.49.15.2")
                 }
 
                 // Static files artifact
