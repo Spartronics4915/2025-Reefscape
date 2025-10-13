@@ -444,7 +444,7 @@ public class DynamicsCommandFactory {
     public Command loadStow(){
         return Commands.sequence(
             Commands.runOnce(() -> waitingForStow = false),
-            makeSystemSafeToMove(true, false, true),
+            makeSystemSafeToMove(true, false, true, DynaPreset.LOAD),
             armPriorityMove(DynaPreset.LOAD.setpoint) //brings arm to the load angle, then drops the elevator
         );
     }
