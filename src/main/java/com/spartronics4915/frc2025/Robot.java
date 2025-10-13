@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putData("PDH", powerDistribution);
 
-        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30) {
+        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30 && DriverStation.getMatchTime() != -1) {
             Elastic.selectTab("Climbing");
         }
     }
