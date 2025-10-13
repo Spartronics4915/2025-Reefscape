@@ -306,9 +306,9 @@ public class VariableAutos {
             Commands.waitUntil(dynamics.hasScoredTrigger),
             Commands.print("parallel group stow"),
             Commands.runOnce(() -> autoState = "parallel group stow"),
+            dynamics.queueLoadStow(),
+            dynamics.stopIntake(),
             Commands.parallel(
-                dynamics.queueLoadStow(),
-                dynamics.stopIntake(),
                 Commands.sequence(
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
@@ -317,8 +317,8 @@ public class VariableAutos {
                 ),
                 Commands.sequence(
                     Commands.waitTime(delay),
-                    Commands.print("is swerve moveable?"),
-                    Commands.runOnce(() -> autoState = "is swerve moveable?"),
+                    // Commands.print("is swerve moveable?"),
+                    // Commands.runOnce(() -> autoState = "is swerve moveable?"),
                     // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
                     Commands.print("returning"),
                     Commands.runOnce(() -> autoState = "returning"),
