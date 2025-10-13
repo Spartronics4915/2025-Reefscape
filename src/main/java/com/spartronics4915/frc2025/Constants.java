@@ -558,7 +558,7 @@ public final class Constants {
         
         public static final double kElevatorSafeHeightSetpoint =  0.4;
 
-        public static final double kScoreLaserCanDebounce = 0.15; //seconds
+        public static final double kScoreLaserCanDebounce = 0.05; //seconds
 
         public static final double algaeIntakeDebounce = 0.5;
 
