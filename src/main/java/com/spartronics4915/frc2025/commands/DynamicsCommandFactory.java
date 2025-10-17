@@ -1,8 +1,5 @@
 package com.spartronics4915.frc2025.commands;
-import com.spartronics4915.frc2025.Robot;
-import com.spartronics4915.frc2025.Constants.IntakeConstants;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
-import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
@@ -21,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;

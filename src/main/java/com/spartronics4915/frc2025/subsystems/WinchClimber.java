@@ -11,25 +11,19 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.intakeSpeed;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kCageEngagedAmps;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngageTarget;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorConfig;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractTarget;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
