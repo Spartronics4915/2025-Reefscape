@@ -440,8 +440,8 @@ public class DynamicsCommandFactory {
     public Command loadStow(){
         return Commands.sequence(
             Commands.runOnce(() -> waitingForStow = false),
-            makeSystemSafeToMove(true, false, true, DynaPreset.LOAD),
-            armPriorityMove(DynaPreset.LOAD.setpoint) //brings arm to the load angle, then drops the elevator
+            makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
+            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
         );
     }
 
@@ -478,7 +478,7 @@ public class DynamicsCommandFactory {
             algaeStow(),
             Commands.either(
                 prescoreStow(), 
-                returnLoadStow(), 
+                loadStow(), 
                 this::isCoralInArm
             ),
             intakeSubsystem::hasAlgae
@@ -567,13 +567,6 @@ public class DynamicsCommandFactory {
             // ).withTimeout(0.5),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT);
         // ).withName("Autonomous Score");
-    }
-
-    public Command returnLoadStow(){
-        return Commands.sequence(
-            makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
-            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
-        );
     }
 
     /**
