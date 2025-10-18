@@ -9,8 +9,12 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStation
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckDuration;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckWait;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.reefStowOffset;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Set;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.RobotContainer;
@@ -18,9 +22,11 @@ import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+import com.spartronics4915.frc2025.commands.autos.PositionPIDCommand;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
@@ -253,9 +259,34 @@ public class VariableAutos {
                     Commands.print("end delay"),
                     Commands.runOnce(() -> autoState = "waiting for dynamics"),
                     // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
-                    Commands.print("returning path"),
-                    Commands.runOnce(() -> autoState = "returning to coral station"),
-                    pathPair.returnPath
+                    Commands.either(
+                        Commands.sequence(
+                            Commands.print("No time left, stow"),
+                            Commands.runOnce(() -> autoState = "No time left, stow"),
+                            Commands.defer(() -> { // Because of the new stow stuff we have to move back before stowing
+                                Pose2d pose = swerve.getPose();
+                                Rotation2d rotation = pose.getRotation();
+
+                                Pose2d setPoint = new Pose2d(
+                                    pose.getTranslation().plus(new Translation2d(reefStowOffset.in(Meters), rotation.rotateBy(Rotation2d.k180deg))),
+                                    rotation
+                                );
+
+                                return PositionPIDCommand.generateCommand(
+                                    swerve, 
+                                    setPoint, 
+                                    Seconds.of(5)
+                                );
+                            }, Set.of()),
+                            Commands.waitSeconds(5) // Should hang here when the positioning is done and switch to teleop
+                        ), 
+                        Commands.sequence(
+                            Commands.print("returning path"),
+                            Commands.runOnce(() -> autoState = "returning to coral station"),
+                            pathPair.returnPath
+                        ), 
+                        () -> Robot.AUTO_TIMER.hasElapsed(13)
+                    )
                 )
             ),
             Commands.print("blocking intake"),
