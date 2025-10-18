@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -51,6 +52,7 @@ public class DynamicsCommandFactory {
     public boolean waitingForStow = false;
 
     private DynaPreset lastInputtedPreset = DynaPreset.L4;
+    private DynaPreset movingToPreset = DynaPreset.L4;
 
     public DynamicsCommandFactory(ArmSubsystem armSubsystem, ElevatorSubsystem elevatorSubsystem, IntakeSubsystem intakeSubsystem) {
         this.armSubsystem = armSubsystem;
@@ -171,7 +173,7 @@ public class DynamicsCommandFactory {
      */
     private boolean isElevSafeToMove(){
         var currAngle =  getArmRotation();
-        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); 
+        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees) && armSubsystem.getSetpoint().getDegrees() > kMoveableArmAngle.in(Degrees); 
     }
 
     private boolean isElevAtSetpoint(double setpoint){
@@ -201,7 +203,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isElevStowed(){
-        return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
+        return getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight || (elevatorSubsystem.getSetpoint().in(Meters) + kElevatorHeightTolerance < kMinSafeElevHeight);
     }
 
     public boolean isCoralInArm(){
@@ -442,7 +444,10 @@ public class DynamicsCommandFactory {
             Commands.runOnce(() -> waitingForStow = false),
             makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
             armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
-        );
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.LOAD))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.LOAD)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
     public Command queueLoadStow(){
@@ -453,14 +458,20 @@ public class DynamicsCommandFactory {
         return Commands.sequence(
             makeSystemSafeToMove(false, false, false),
             armPriorityMove(DynaPreset.PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
-        );
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.PRESCORE))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.PRESCORE)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
     public Command algaeStow(){
         return Commands.sequence(
             makeSystemSafeToMove(false, false, false),
             armPriorityMove(DynaPreset.ALGAE_STOW.setpoint) //brings arm to the stow angle, then drops the elevator
-        );
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.ALGAE_STOW))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.ALGAE_STOW)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
     
     public Command autoPrescore(){
@@ -489,6 +500,9 @@ public class DynamicsCommandFactory {
 
     public Command gotoScore(DynaPreset scorePreset){
         return scoreHeight(scorePreset)
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = scorePreset))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != scorePreset)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
         .withName("Goto " + scorePreset);
     }
 
