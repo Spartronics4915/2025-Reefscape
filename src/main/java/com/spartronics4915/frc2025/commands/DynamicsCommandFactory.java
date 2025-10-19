@@ -442,8 +442,14 @@ public class DynamicsCommandFactory {
     public Command loadStow(){
         return Commands.sequence(
             Commands.runOnce(() -> waitingForStow = false),
-            makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
-            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
+            Commands.either(
+                armSubsystem.setSetpointCommand(DynaPreset.LOAD.getArmAngle()),
+                Commands.sequence(
+                    makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
+                    armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
+                ),
+                () -> isElevAtSetpoint(DynaPreset.LOAD.getElevatorHeight()) && getArmRotation().getRotations() >= DynaPreset.LOAD.getArmAngle().getRotations()
+            )
         )
         .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.LOAD))
         .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.LOAD)
