@@ -6,19 +6,19 @@ import java.util.Optional;
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.Constants.OdometryConstants;
 import com.spartronics4915.frc2025.subsystems.vision.LimelightVisionSubsystem;
-import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubsystem;
 import com.spartronics4915.frc2025.util.Structures.VisionMeasurement;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class OdometrySubsystem extends SubsystemBase {
-    private final VisionDeviceSubystem visionSubsystem;
+    private final VisionDeviceSubsystem visionSubsystem;
     private final SwerveSubsystem swerveSubsystem;
 
     private ArrayList<VisionMeasurement> visionMeasurements = new ArrayList<>();
 
-    public OdometrySubsystem(VisionDeviceSubystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
+    public OdometrySubsystem(VisionDeviceSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
         this.visionSubsystem = visionSubsystem;
         this.swerveSubsystem = swerveSubsystem;
     }

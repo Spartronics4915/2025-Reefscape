@@ -79,7 +79,7 @@ public class PositionPIDCommand extends Command{
 
         Pose2d diff = mSwerve.getPose().relativeTo(goalPose);
 
-        System.out.println("Adjustments to alginment took: " + timer.get() + " seconds and interrupted = " + interrupted
+        System.out.println("Adjustments to alignment took: " + timer.get() + " seconds and interrupted = " + interrupted
             + "\nPosition offset: " + Centimeter.convertFrom(diff.getTranslation().getNorm(), Meters) + " cm"
             + "\nRotation offset: " + diff.getRotation().getMeasure().in(Degrees) + " deg"
             + "\nVelocity value: " + mSwerve.getSpeed() + "m/s"

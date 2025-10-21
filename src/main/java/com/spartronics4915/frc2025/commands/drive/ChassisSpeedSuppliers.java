@@ -128,18 +128,18 @@ public final class ChassisSpeedSuppliers {
             ChassisSpeeds cs = new ChassisSpeeds();
     
             // Need to verify that we are using the right axes.
-            final double inputxraw = driverController.getLeftY() * -1.0;
-            final double inputyraw = driverController.getLeftX() * -1.0;
-            final double inputomegaraw;
-            inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
+            final double inputXRaw = driverController.getLeftY() * -1.0;
+            final double inputYRaw = driverController.getLeftX() * -1.0;
+            final double inputOmegaRaw;
+            inputOmegaRaw = driverController.getRightX() * -1.0; // consider changing from angular velocity
     
-            final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
-            final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+            final double inputX = applyResponseCurve(MathUtil.applyDeadband(inputXRaw, OI.kStickDeadband));
+            final double inputY = applyResponseCurve(MathUtil.applyDeadband(inputYRaw, OI.kStickDeadband));
+            final double inputOmega = applyResponseCurve(MathUtil.applyDeadband(inputOmegaRaw, OI.kStickDeadband));
     
-            cs.vxMetersPerSecond = inputx * maxSpeed.in(MetersPerSecond);
-            cs.vyMetersPerSecond = inputy * maxSpeed.in(MetersPerSecond);
-            cs.omegaRadiansPerSecond = inputomega * maxAngularVelocity.in(RadiansPerSecond);
+            cs.vxMetersPerSecond = inputX * maxSpeed.in(MetersPerSecond);
+            cs.vyMetersPerSecond = inputY * maxSpeed.in(MetersPerSecond);
+            cs.omegaRadiansPerSecond = inputOmega * maxAngularVelocity.in(RadiansPerSecond);
 
             if (isFieldRelative) {
                 cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
@@ -156,17 +156,17 @@ public final class ChassisSpeedSuppliers {
 
     public static Supplier<ChassisSpeeds> controllerRotationVelocity(XboxController driverController, SwerveSubsystem swerve){
         return () -> {
-            final double inputomegaraw;
+            final double inputOmegaRaw;
             if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
+                inputOmegaRaw = driverController.getRawAxis(3) * -1.0;
             } else {
-                inputomegaraw = driverController.getRightY() * 1.0; // consider changing from angular velocity
+                inputOmegaRaw = driverController.getRightY() * 1.0; // consider changing from angular velocity
                 // control to direct angle control
             }
             
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+            final double inputOmega = applyResponseCurve(MathUtil.applyDeadband(inputOmegaRaw, OI.kStickDeadband));
             
-            return new ChassisSpeeds(0, 0, inputomega * maxAngularVelocity.in(RadiansPerSecond));
+            return new ChassisSpeeds(0, 0, inputOmega * maxAngularVelocity.in(RadiansPerSecond));
         };
     }
 

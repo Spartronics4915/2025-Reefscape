@@ -37,7 +37,7 @@ import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
-import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubsystem;
 import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
@@ -98,7 +98,7 @@ public class RobotContainer {
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
     private final ElementLocator elementLocator = new ElementLocator();
-    private VisionDeviceSubystem visionSubsystem = null;
+    private VisionDeviceSubsystem visionSubsystem = null;
     private OdometrySubsystem odometrySubsystem = null;
     
     public final IntakeSubsystem intakeSubsystem;

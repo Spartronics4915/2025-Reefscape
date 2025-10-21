@@ -93,7 +93,7 @@ public class AlignToReef {
     }
 
     /**
-     * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
+     * this is an enum that represents if the branch is on the left or right side of the field, instead of relative to the tag
      */
     public enum FieldBranchSide{
         LEFT(BranchSide.LEFT),
@@ -191,8 +191,8 @@ public class AlignToReef {
                 .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
                 .finallyDo(() -> {isPIDLoopRunning = false;}),
             Commands.print("end position PID loop")
-        )).finallyDo((interupt) -> {
-            if (interupt) { //if this is false then the position pid would've X braked & called the same method
+        )).finallyDo((interrupt) -> {
+            if (interrupt) { //if this is false then the position pid would've X braked & called the same method
                 mSwerve.drive(new ChassisSpeeds(0,0,0));
             }
         });

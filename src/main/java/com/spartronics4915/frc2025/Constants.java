@@ -345,7 +345,7 @@ public final class Constants {
         // Driver Communication Constants
         public static final double ARM_THRESHOLD = 10; // Degrees
         public static final double ELEVATOR_THRESHOLD = .1; // Meters
-        public static final double BARGE_ALIGNMMENT_THRESHOLD = .2; // Distance that the robot can be, in meters, from the barge starting position.
+        public static final double BARGE_ALIGNMENT_THRESHOLD = .2; // Distance that the robot can be, in meters, from the barge starting position.
 
         // Segment constants
         public static final BlingLEDPattern RAINBOW = BlingSegment.scrollingRainbow(BLING_LENGTH, 20);
@@ -425,7 +425,7 @@ public final class Constants {
     }
 
     public static final class ArmConstants {
-        //I dont know the numbers yet so 0 is a place holder
+        //I don't know the numbers yet so 0 is a place holder
         public enum ArmSubsystemState {
 
             EH(Rotation2d.fromDegrees(270)),
@@ -580,7 +580,7 @@ public final class Constants {
     }
 
     public static final class WinchClimberConstants {
-        //angles have 0 being horizantally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
+        //angles have 0 being horizontally away from the chassis, with clockwise rotation (when looking at the robot from the front) being positive
 
         public enum WinchSpeeds{
             EASE(0.95), //speed which it'll rotate to move and engage the cage

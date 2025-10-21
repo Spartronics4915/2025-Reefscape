@@ -86,7 +86,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
             
         //             Constraints newConstraints = new Constraints(
         //                 SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxVelocity),
-        //                 SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxAcceliration)
+        //                 SmartDashboard.getNumber("Arm_kMaxVelocity", ArmConstants.kMaxAcceleration)
         //                 );
         //             mArmProfile = new TrapezoidProfile(newConstraints);
     
@@ -149,7 +149,7 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
     @Override
     public void periodic() {
 
-        //need set points as a imput
+        //need set points as a input
         mCurrentSetPoint = Rotation2d.fromRotations(
             MathUtil.clamp(
                 mCurrentSetPoint.getRotations(), 
@@ -167,10 +167,10 @@ public class ArmSubsystem extends SubsystemBase implements ModeSwitchInterface{
         
         mArmMotor.setControl(m_request);
 
-        updateUserOuputs();
+        updateUserOutputs();
     }
 
-    private void updateUserOuputs() {
+    private void updateUserOutputs() {
         appliedOutPub.accept(mArmMotor.getMotorVoltage().getValue().in(Volts));
         positionPub.accept(getPosition());
         desiredStatePub.accept(rawToAngle(mCurrentState.position));

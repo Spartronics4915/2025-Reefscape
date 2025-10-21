@@ -25,7 +25,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 
-public class SimVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem {
+public class SimVisionSubsystem extends SubsystemBase implements VisionDeviceSubsystem {
 
     private final SwerveDrive swerveDrive;
     private final VisionSystemSim visionSim;

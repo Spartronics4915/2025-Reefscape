@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
-public interface VisionDeviceSubystem {
+public interface VisionDeviceSubsystem {
         public ArrayList<Integer> getVisibleTagIDs();
         public Optional<Pose2d> getBotPose2dFromReefCamera();
 }       
