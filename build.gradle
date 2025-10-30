@@ -29,13 +29,13 @@ deploy {
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
                 //     // Enable VisualVM connection
-                //     jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-                //     jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-                //     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-                //     jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-                //     jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                //     // The hostname when connected via USB-B should be 172.22.11.2
-                //     jvmArgs.add("-Djava.rmi.server.hostname=172.22.11.2")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+                    // The hostname when connected via USB-B should be 172.22.11.2
+                    jvmArgs.add("-Djava.rmi.server.hostname=10.49.15.2")
                 }
 
                 // Static files artifact
@@ -90,7 +90,7 @@ test {
 
 // Simulation configuration (e.g. environment variables).
 wpi.sim.addGui().defaultEnabled = true
-wpi.sim.addDriverstation()
+wpi.sim.addDriverstation().defaultEnabled = true
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib

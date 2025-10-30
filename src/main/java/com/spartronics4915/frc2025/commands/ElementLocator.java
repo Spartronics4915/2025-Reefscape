@@ -1,11 +1,5 @@
 package com.spartronics4915.frc2025.commands;
 
-import com.spartronics4915.frc2025.RobotContainer;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-
 public class ElementLocator {
     
     // private final AprilTagFieldLayout fieldLayout;

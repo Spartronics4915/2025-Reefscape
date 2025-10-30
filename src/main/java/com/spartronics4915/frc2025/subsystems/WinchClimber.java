@@ -11,25 +11,19 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.spartronics4915.frc2025.Constants;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.intakeSpeed;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kArmMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngagedAngle;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kCageEngagedAmps;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kEngageTarget;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorConfig;
-import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kIntakeMotorID;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractTarget;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kRetractedAngle;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorConfig;
 import static com.spartronics4915.frc2025.Constants.WinchClimberConstants.kWinchMotorID;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -46,15 +40,12 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     private boolean disableIntake = false;
     private final SparkBase mWinchMotor;
     private final SparkBase mArmMotor;
-    private final SparkBase mIntakeMotor;
     private final RelativeEncoder mEncoder;
     private final RelativeEncoder mWinchEncoder;
 
     private double initialWinchPosition;
 
     private boolean invertedControls = false;
-
-    private MedianFilter cageAmpFilter = new MedianFilter(5);
 
     public WinchClimber() {
         super();
@@ -68,9 +59,6 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         mWinchEncoder = mWinchMotor.getEncoder();
         initialWinchPosition= mWinchEncoder.getPosition();
 
-        mIntakeMotor = new SparkMax(kIntakeMotorID, MotorType.kBrushless);
-        mIntakeMotor.configure(kIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
         mEncoder = mArmMotor.getEncoder();    //figure out conversions
 
         mEncoder.setPosition(0.0);
@@ -80,8 +68,6 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         mWinchMotor.set(0.0);
         mArmMotor.set(0.0);
 
-        SmartDashboard.putData("ClimberIntakeOn", setClimbIntakeSpeed(intakeSpeed));
-        SmartDashboard.putData("ClimberIntakeOff", setClimbIntakeSpeed(0.0));
         SmartDashboard.putData("ClimberUnspool", unSpoolWinch());
         SmartDashboard.putData("ClimberEngage", engageCommand());
         SmartDashboard.putData("ClimberRetract", retractCommand());
@@ -175,6 +161,7 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
         }, Set.of());
         else return Commands.runOnce(() -> {
             stopArm();
+            turnArmBrakeModeOn();
         });
     }
 
@@ -196,14 +183,6 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
     // public void periodic() {
     // mMotor.set(mSpeedSetpoint);
     // }
-
-    public Command setClimbIntakeSpeed(double speed){
-        return Commands.runOnce(() -> {
-            mIntakeMotor.set(speed);
-        });
-    }
-
-
     
     private boolean winchEngaged() {
         return kEngagedAngle <=mEncoder.getPosition();
@@ -219,19 +198,8 @@ public class WinchClimber extends SubsystemBase implements ModeSwitchInterface {
             isClimbed = true;
         } else { isClimbed = false; }
 
-        if (isWinchEngaged == true) {
-            mIntakeMotor.set(Constants.WinchClimberConstants.intakeSpeed);
-        } else {
-            mIntakeMotor.set(0.00);
-        }
-
-        double filteredAmps = cageAmpFilter.calculate(mIntakeMotor.getOutputCurrent());
-
         SmartDashboard.putNumber("climberEncoder", Math.floor(mEncoder.getPosition() * 1000) / 1000);
-        SmartDashboard.putNumber("climberCurrentDraw", mIntakeMotor.getOutputCurrent());
-        SmartDashboard.putNumber("climberCurrentDrawFiltered", filteredAmps);
         SmartDashboard.putNumber("winchEncoder", mWinchEncoder.getPosition());
-        SmartDashboard.putBoolean("Cage engaged", filteredAmps > kCageEngagedAmps);
     } 
     
     @Override

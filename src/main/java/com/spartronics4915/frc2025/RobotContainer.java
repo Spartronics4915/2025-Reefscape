@@ -4,15 +4,12 @@
 
 package com.spartronics4915.frc2025;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.Constants.WinchClimberConstants.ClimberSpeeds;
-import com.spartronics4915.frc2025.Constants.WinchClimberConstants.WinchSpeeds;
 import com.spartronics4915.frc2025.Constants.BlingConstants;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
@@ -21,22 +18,16 @@ import com.spartronics4915.frc2025.commands.ComplexAutoChooser;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory;
 import com.spartronics4915.frc2025.commands.ElementLocator;
 import com.spartronics4915.frc2025.commands.VariableAutos;
-import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef.FieldBranchSide;
-import com.spartronics4915.frc2025.commands.autos.DriveToReefPoint;
 import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
-import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
 import com.spartronics4915.frc2025.commands.VariableAutos.FieldBranch;
-import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.commands.VariableAutos.StationSide;
 import com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers;
 import com.spartronics4915.frc2025.commands.drive.RotationIndependentControlCommand;
 import com.spartronics4915.frc2025.commands.drive.SwerveTeleopCommand;
-import com.spartronics4915.frc2025.subsystems.ClimberSubsystem;
 import com.spartronics4915.frc2025.subsystems.MechanismRenderer;
-import com.spartronics4915.frc2025.subsystems.MotorSimulationSubsystem;
 import com.spartronics4915.frc2025.subsystems.OdometrySubsystem;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.WinchClimber;
@@ -46,20 +37,13 @@ import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.vision.SimVisionSubsystem;
-import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
+import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubsystem;
 import com.spartronics4915.frc2025.util.CoralSim;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleController;
-import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumbleFeedback;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler.RumblePresets;
-import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 
-import static com.spartronics4915.frc2025.Constants.DynamicsConstants.kElevatorHeightTolerance;
-import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.shouldFlip;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Seconds;
+import static com.spartronics4915.frc2025.commands.drive.ChassisSpeedSuppliers.climberCamMode;
 
 import java.util.Set;
 
@@ -67,16 +51,13 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -117,7 +98,7 @@ public class RobotContainer {
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
     private final ElementLocator elementLocator = new ElementLocator();
-    private VisionDeviceSubystem visionSubsystem = null;
+    private VisionDeviceSubsystem visionSubsystem = null;
     private OdometrySubsystem odometrySubsystem = null;
     
     public final IntakeSubsystem intakeSubsystem;
@@ -128,6 +109,7 @@ public class RobotContainer {
     public boolean isTeleopAutoScoringEnabled = true; 
 
     private final BooleanPublisher autoScoreEnabledPub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("AutoScoringEnabled").publish();
+    private final BooleanPublisher climberCamModePub = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("ClimberCamMode").publish();
     
     public final DynamicsCommandFactory dynamics;
 
@@ -150,8 +132,8 @@ public class RobotContainer {
     public RobotContainer() {
 
         intakeSubsystem = new IntakeSubsystem();
-        armSubsystem = new ArmSubsystem();
-        elevatorSubsystem = new ElevatorSubsystem();
+        armSubsystem = new ArmSubsystem(intakeSubsystem);
+        elevatorSubsystem = new ElevatorSubsystem(intakeSubsystem);
         climberSubsystem = new WinchClimber();
 
         dynamics = new DynamicsCommandFactory(armSubsystem, elevatorSubsystem, intakeSubsystem);
@@ -169,8 +151,9 @@ public class RobotContainer {
         MechanismRenderer.generateRenderer(
             elevatorSubsystem::getDesiredPosition, 
             () -> armSubsystem.getTargetPosition().getMeasure(), 
-            () -> RPM.of(intakeSubsystem.setpoint), 
+            () -> intakeSubsystem.setpoint, 
             intakeSubsystem::detect,
+            intakeSubsystem::hasAlgae,
             "Target Position"
         );
 
@@ -214,9 +197,9 @@ public class RobotContainer {
         autoChooser =
                 buildAutoChooser();
 
-
+        //blingSubsystem = new BlingSubsystem(0, Constants.BlingConstants.ORANGE); 
         DriverCommunication driverCommunication = new DriverCommunication(BlingConstants.BLING_LENGTH, swerveSubsystem, armSubsystem, elevatorSubsystem, dynamics, visionSubsystem);
-        blingSubsystem = new BlingSubsystem(0, driverCommunication); 
+        blingSubsystem = new BlingSubsystem(0, driverCommunication);
 
         AlignToReef.warmup();
     }
@@ -271,11 +254,13 @@ public class RobotContainer {
                 .withName("Toggle Field Relative")
             );
 
-            driverController.rightStick().toggleOnTrue(
-                Commands.startEnd(
-                    () -> {ChassisSpeedSuppliers.climberCamMode = true;},
-                    () -> {ChassisSpeedSuppliers.climberCamMode = false;}
-                )
+            climberCamModePub.accept(climberCamMode);
+
+            driverController.rightStick().onTrue(
+                Commands.runOnce(() ->{
+                    ChassisSpeedSuppliers.climberCamMode = !ChassisSpeedSuppliers.climberCamMode;
+                    climberCamModePub.accept(climberCamMode);
+                })
                 .withName("Toggle Climber Cam Mode")
             );
 
@@ -306,27 +291,32 @@ public class RobotContainer {
                 .withName("Align Middle Branch")
             );
 
+            ChassisSpeeds driverNudgeUp = new ChassisSpeeds(0.25, 0, 0);
+            ChassisSpeeds driverNudgeLeft = new ChassisSpeeds(0, 0.25, 0);
+            ChassisSpeeds driverNudgeRight = new ChassisSpeeds(0, -0.25, 0);
+            ChassisSpeeds driverNudgeDown = new ChassisSpeeds(-0.25, 0, 0);
+
             driverController.povUp().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0.25, 0, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeLeft : driverNudgeUp);
                 })
             );
 
             driverController.povLeft().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0, 0.25, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeDown : driverNudgeLeft);
                 })
             );
 
             driverController.povRight().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(0, -0.25, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeUp : driverNudgeRight);
                 })
             );
 
             driverController.povDown().whileTrue(
                 Commands.run(() -> {
-                    swerveSubsystem.drive(new ChassisSpeeds(-0.25, 0, 0));
+                    swerveSubsystem.drive(climberCamMode ? driverNudgeRight : driverNudgeDown);
                 })
             );
         }
@@ -349,16 +339,16 @@ public class RobotContainer {
                 Rumble.OPERATOR.controller.timedRumble(RumblePresets.OPERATOR_INTAKE.rumble, OI.rumbleTime)
             );
         }
-        
-        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
-            dynamics.score()
-        ));
 
         //#endregion
 
         //#region automated controls
 
-        dynamics.hasScoredTrigger.onTrue(dynamics.returnLoadStow());
+        new Trigger(dynamics::canAutoScore).and(DriverStation::isTeleop).and(() -> isTeleopAutoScoringEnabled).onTrue(Commands.sequence(
+            dynamics.score()
+        ));
+
+        dynamics.hasScoredTrigger.and(DriverStation::isTeleop).onTrue(dynamics.queueLoadStow());
 
         new Trigger(intakeSubsystem::detect).and(DriverStation::isTeleop)
             .debounce(0.02).onTrue(
@@ -394,13 +384,17 @@ public class RobotContainer {
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
         ); //windows button
 
-        operatorController.y().onTrue(dynamics.operatorScore(DynaPreset.L4));
+        operatorController.y().onTrue(Commands.defer(() -> {
+            return(dynamics.operatorScore(intakeSubsystem.hasAlgae() ? DynaPreset.BARGE : DynaPreset.L4));
+        }, Set.of()));
 
         operatorController.x().onTrue(dynamics.operatorScore(DynaPreset.L3));
 
         operatorController.b().onTrue(dynamics.operatorScore(DynaPreset.L2));
 
-        operatorController.a().onTrue(dynamics.operatorScore(DynaPreset.L1));
+        operatorController.a().onTrue(Commands.defer(() -> {
+            return(dynamics.operatorScore(intakeSubsystem.hasAlgae() ? DynaPreset.PROCESSOR : DynaPreset.L1));
+        }, Set.of()));
 
         operatorController.start().onTrue(dynamics.intake()); //menu button
 
@@ -427,11 +421,38 @@ public class RobotContainer {
         Trigger rightStickLeft = new Trigger(() -> (operatorController.getRightX() < (-1 + OI.kPaddleTolerance)) && ((Math.abs(operatorController.getRightY()) < OI.kPaddleTolerance) || operatorController.getRightY() < (-1 + OI.kPaddleTolerance))); //bottom right paddle
 
         Trigger algaeSafety = leftStickUp;
-
-        leftStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_HIGH));
-        rightStickLeft.and(algaeSafety).onTrue(dynamics.gotoScore(DynaPreset.ALGAE_LOW));
-
-        rightStickUp.and(algaeSafety).onTrue(dynamics.removeAlgaeArm());
+        
+        rightStickUp.and(algaeSafety).onTrue(
+            Commands.defer(() -> {
+                Pose2d closestAprilTag = AlignToReef.getClosestReefAprilTag(swerveSubsystem.getPose());
+                int index = AlignToReef.allReefTagPoses.indexOf(closestAprilTag);
+                final DynaPreset algaeScoreHeight;
+                switch (index) {
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                    case 9:
+                    case 11:
+                        algaeScoreHeight = DynaPreset.ALGAE_HIGH;
+                        break;
+                    case 0:
+                    case 2:
+                    case 4:
+                    case 6:
+                    case 8:
+                    case 10:
+                        algaeScoreHeight = DynaPreset.ALGAE_LOW;
+                        break;
+                    default:
+                        algaeScoreHeight = DynaPreset.ALGAE_HIGH;
+                        break;
+                }
+                System.out.println(algaeScoreHeight);
+                System.out.println(index);
+                return dynamics.gotoScore(algaeScoreHeight).alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_INTAKE));
+            }, Set.of())
+        );
 
         operatorController.leftStick().onTrue(climberSubsystem.invertOperatorClimberControls());
 
@@ -460,11 +481,14 @@ public class RobotContainer {
         SmartDashboard.putData("L3", dynamics.gotoScore(DynaPreset.L3));
         SmartDashboard.putData("L2", dynamics.gotoScore(DynaPreset.L2));
         SmartDashboard.putData("L1", dynamics.gotoScore(DynaPreset.L1));
+        SmartDashboard.putData("Barge", dynamics.gotoScore(DynaPreset.BARGE));
+        SmartDashboard.putData("Processor", dynamics.gotoScore(DynaPreset.PROCESSOR));
+        SmartDashboard.putData("Launch", dynamics.gotoScore(DynaPreset.LAUNCH));
 
         SmartDashboard.putData("Score", dynamics.score());
         SmartDashboard.putData("Climber: stop", climberSubsystem.stopArmCommand());
         SmartDashboard.putData("Climber: Engage", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.ENGAGE));
-        SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT));
+        SmartDashboard.putData("Climber: Retract", climberSubsystem.setClimberSpeedsCommand(ClimberSpeeds.RETRACT)); 
         SmartDashboard.putData("Climb: Move Arm", dynamics.gotoClimb());
 
         SmartDashboard.putData("Toggle Auto Score", Commands.defer(() -> {

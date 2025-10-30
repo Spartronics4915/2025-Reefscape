@@ -1,7 +1,5 @@
 package com.spartronics4915.frc2025.commands;
-import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
-import com.spartronics4915.frc2025.commands.VariableAutos.BranchHeight;
 import com.spartronics4915.frc2025.subsystems.coral.ArmSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.ElevatorSubsystem;
 import com.spartronics4915.frc2025.subsystems.coral.IntakeSubsystem;
@@ -17,10 +15,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2025.Constants.DynamicsConstants.*;
@@ -38,25 +36,46 @@ public class DynamicsCommandFactory {
     public IntakeSubsystem intakeSubsystem;
     private ElevatorSubsystem elevatorSubsystem;
     private ArmSubsystem armSubsystem;
+    private VariableAutos variableAutos;
 
     private Timer lastScoredTimer = new Timer();
 
     private LaserCan funnelLC;
+    private LaserCan leftReef;
+    private LaserCan rightReef;
     public Trigger hasScoredTrigger = new Trigger(this::isCoralInArm).negate().debounce(kScoreLaserCanDebounce);
+    public Trigger hasScoredAlgaeTrigger;
+    public Trigger canIntakeAlgaeTrigger = new Trigger(this::canIntakeAlgae);
+    public Trigger isSwerveCloseToReefTrigger;
+
+    public Trigger canSafeStow = new Trigger(this::reefDetect).negate().debounce(safeStowDebounce);
+    public boolean waitingForStow = false;
 
     private DynaPreset lastInputtedPreset = DynaPreset.L4;
+    private DynaPreset movingToPreset = DynaPreset.L4;
 
     public DynamicsCommandFactory(ArmSubsystem armSubsystem, ElevatorSubsystem elevatorSubsystem, IntakeSubsystem intakeSubsystem) {
         this.armSubsystem = armSubsystem;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeSubsystem = intakeSubsystem;
 
+        hasScoredAlgaeTrigger = new Trigger(intakeSubsystem::getRawAlgae).negate().debounce(algaeIntakeDebounce);
         this.funnelLC = new LaserCan(kFunnelLaserCanID);
+        this.leftReef = new LaserCan(leftReefLaserCanID);
+        this.rightReef = new LaserCan(rightReefLaserCanID);
 
         try {
             funnelLC.setRangingMode(LaserCan.RangingMode.SHORT);
             funnelLC.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); // prev numbers that worked(8, 8, 4, 4)
             funnelLC.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+
+            leftReef.setRangingMode(LaserCan.RangingMode.SHORT);
+            leftReef.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            leftReef.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+
+            rightReef.setRangingMode(LaserCan.RangingMode.SHORT);
+            rightReef.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
+            rightReef.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
           } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
           }
@@ -70,10 +89,28 @@ public class DynamicsCommandFactory {
         tab.addBoolean("funnelIntake", this::funnelDetect);
         tab.addBoolean("swerveSafeToMove", this::isSwerveMovable);
         tab.addBoolean("canAutoScore", this::canAutoScore);
+        tab.addBoolean("canAlgaeScore", this::canAlgaeScore);
+        tab.addBoolean("canIntakeAlgae", this::canIntakeAlgae);
+        tab.addBoolean("leftReefDetect", this::leftReefDetect);
+        tab.addBoolean("rightReefDetect", this::rightReefDetect);
+        tab.addBoolean("reefDetect", this::reefDetect);
         tab.add("CommandScheduler", CommandScheduler.getInstance());
 
         lastScoredTimer.start();
         hasScoredTrigger.onTrue(Commands.runOnce(() -> lastScoredTimer.reset()));
+
+        hasScoredAlgaeTrigger.negate().and(canIntakeAlgaeTrigger).and(() -> !intakeSubsystem.hasAlgae()).onTrue(
+            Commands.sequence(
+                Commands.waitSeconds(algaeIntakeDelay),
+                intakeSubsystem.setAlgaeDetect(true)
+                .alongWith(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_HOLD))
+                .alongWith(Commands.runOnce(() -> armSubsystem.setSetpoint(Rotation2d.fromDegrees(70)))
+            )
+        ));
+
+        canSafeStow.and(() -> waitingForStow).onTrue(
+            loadStow()
+        );
     }
 
     private record DynamicsSetpoint(double heightMeters, Rotation2d armAngle) {
@@ -84,13 +121,17 @@ public class DynamicsCommandFactory {
         LOAD(0.0, Rotation2d.fromDegrees(234.4421)),
         PRESCORE(0.2, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
         AUTO_PRESCORE(0.4, Rotation2d.fromDegrees(kSafeArmAngle.in(Degrees))),//114.173111)),
+        ALGAE_STOW(0.0, Rotation2d.fromDegrees(safeAlgaeArmAngle.in(Degrees))),
         L1(0.0, Rotation2d.fromDegrees(20)),
         L2(0.0, Rotation2d.fromDegrees(47.900)),
         L3(Meters.of(0.23939+0.1524-0.0254).in(Meters), Rotation2d.fromDegrees(58.10311200000001)),
         L4(Meters.of(1.23).in(Meters), Rotation2d.fromDegrees(14.33)),
-        CLIMB(0.0, Rotation2d.fromDegrees(270+40)),
-        ALGAE_HIGH(0.78 - 0.03, Rotation2d.fromDegrees(90)),
-        ALGAE_LOW(0.375 - 0.03, Rotation2d.fromDegrees(90));
+        CLIMB(0.0, Rotation2d.fromDegrees(270+50)),
+        ALGAE_HIGH(0.445, Rotation2d.fromDegrees(60)),
+        ALGAE_LOW(0.05, Rotation2d.fromDegrees(60)),
+        BARGE(Meters.of(1.24).in(Meters), Rotation2d.fromDegrees(safeAlgaeArmAngle.in(Degrees))),
+        PROCESSOR(0.0, Rotation2d.fromDegrees(5)),
+        LAUNCH(Meters.of(1.24).in(Meters), Rotation2d.fromDegrees(90));
 
         private final DynamicsSetpoint setpoint;
 
@@ -104,6 +145,16 @@ public class DynamicsCommandFactory {
         private DynaPreset(double meters, Rotation2d angle) {
             this.setpoint = new DynamicsSetpoint(meters, angle);
         }
+    }
+
+    public void setVariableAutos(VariableAutos variableAutos) {
+        this.variableAutos = variableAutos;
+        isSwerveCloseToReefTrigger = new Trigger(() -> this.variableAutos.isSwerveCloseToReef(algaeStowDistance));
+        var tab = Shuffleboard.getTab("dynamicsLogging");
+        tab.addBoolean("canAlgaeStow", isSwerveCloseToReefTrigger.negate());
+        isSwerveCloseToReefTrigger.negate().and(intakeSubsystem::hasAlgae).onTrue(
+            algaeStow()
+        );
     }
 
     private double getElevHeight(){
@@ -122,11 +173,11 @@ public class DynamicsCommandFactory {
      */
     private boolean isElevSafeToMove(){
         var currAngle =  getArmRotation();
-        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees); 
+        return currAngle.getDegrees() > kMoveableArmAngle.in(Degrees) && armSubsystem.getSetpoint().getDegrees() > kMoveableArmAngle.in(Degrees); 
     }
 
     private boolean isElevAtSetpoint(double setpoint){
-        return Math.abs(setpoint - getElevHeight()) < 2*kElevatorHeightTolerance;
+        return Math.abs(setpoint - getElevHeight()) < kElevatorHeightTolerance;
     }
 
     private boolean isArmAtSetpoint(Rotation2d angle){
@@ -152,7 +203,7 @@ public class DynamicsCommandFactory {
     }
 
     private boolean isElevStowed(){
-        return  getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight;
+        return getElevHeight() + kElevatorHeightTolerance < kMinSafeElevHeight || (elevatorSubsystem.getSetpoint().in(Meters) + kElevatorHeightTolerance < kMinSafeElevHeight);
     }
 
     public boolean isCoralInArm(){
@@ -183,6 +234,36 @@ public class DynamicsCommandFactory {
         return  measurement.distance_mm < funnelLCTriggerDist.in(Millimeter) || intakeSubsystem.detect(); // the || is here as a way to prevent us stalling at a CS when we are already holding a coral
     }
 
+    public boolean leftReefDetect(){
+        if (RobotBase.isSimulation()) {
+            return false;
+        }
+
+        var measurement = leftReef.getMeasurement();
+        if (measurement == null) {
+            return false;
+        }
+
+        return  measurement.distance_mm < reefLCTriggerDist.in(Millimeter);
+    }
+
+    public boolean rightReefDetect(){
+        if (RobotBase.isSimulation()) {
+            return false;
+        }
+
+        var measurement = rightReef.getMeasurement();
+        if (measurement == null) {
+            return false;
+        }
+
+        return  measurement.distance_mm < reefLCTriggerDist.in(Millimeter);
+    }
+
+    public boolean reefDetect(){
+        return leftReefDetect() || rightReefDetect();
+    }
+
     public boolean canAutoScore(){
         boolean elev = elevatorSubsystem.getPosition() > DynaPreset.L4.getElevatorHeight() - Inches.of(10).in(Meters);
         boolean arm = isArmAtSetpoint(DynaPreset.L4.setpoint.armAngle, Degrees.of(10));
@@ -197,6 +278,14 @@ public class DynamicsCommandFactory {
             isCoralInArm();
     }
 
+    public boolean canAlgaeScore() {
+        return isAtSetpoint(DynaPreset.BARGE);
+    }
+
+    public boolean canIntakeAlgae() {
+        return isAtSetpoint(DynaPreset.ALGAE_LOW) || isAtSetpoint(DynaPreset.ALGAE_HIGH);
+    }
+
     public boolean isSwerveMovable(){
         return (getElevHeight() < kSafeElevHeightForSwerve) && isElevSafeToMove();
     }
@@ -205,10 +294,14 @@ public class DynamicsCommandFactory {
         return lastScoredTimer.hasElapsed(kJustScoredThreshold.in(Seconds));
     }
 
-    private Command makeElevatorSafeToMove(){
+    private Command makeElevatorSafeToMove() {
+        return makeElevatorSafeToMove(kElevatorSafeHeightSetpoint);
+    }
+
+    private Command makeElevatorSafeToMove(double setpoint){
         return Commands.sequence(
                 Commands.waitUntil(this::isElevSafeToMove),
-                elevatorSubsystem.setSetPointCommand(kElevatorSafeHeightSetpoint),
+                elevatorSubsystem.setSetPointCommand(setpoint),
                 Commands.waitUntil(() -> !this.isElevStowed())
             ); 
     }
@@ -217,24 +310,53 @@ public class DynamicsCommandFactory {
      * If the elevator is not in the load position, go to the safe elevator height.
      * Then, move the arm such that it is safe to move (meaning it won't hit the reef).
      */
-    private Command makeSystemSafeToMove(boolean forceElevatorMovement, boolean forceArmMovement, boolean isSetpointBelowHorizon){ 
+    private Command makeSystemSafeToMove(boolean forceElevatorMovement, boolean forceArmMovement, boolean isSetpointBelowHorizon){
+        return makeSystemSafeToMove(forceElevatorMovement, forceArmMovement, isSetpointBelowHorizon, null);
+    }
+
+    /**
+     * If the elevator is not in the load position, go to the setpoint elevator height (if able while being safe).
+     * Then, move the arm such that it is safe to move (meaning it won't hit the reef) while being closest to its setpoint.
+     */
+    private Command makeSystemSafeToMove(boolean forceElevatorMovement, boolean forceArmMovement, boolean isSetpointBelowHorizon, DynaPreset context){ 
 
         //note to self, careful about when data gets read here
         return Commands.defer(() -> {
 
             // it shouldn't realistically be possible for both of these to be true unless in the climb position during teleop
             
-            Angle safeArmSetpoint = (isSetpointBelowHorizon && kSafeArmAngle.gt(getArmRotation().getMeasure())) ? kReturnArmAngle : kSafeArmAngle;
+            boolean hasContext = context != null;
+
+            Angle safeArmSetpoint = hasContext
+                ? isElevatorForceable()
+                    ? kSafeArmAngle
+                    : Degrees.of(Math.max(kSafeArmAngle.in(Degrees), context.getArmAngle().getDegrees()))
+                : (isSetpointBelowHorizon && kSafeArmAngle.gt(getArmRotation().getMeasure())) 
+                    ? kReturnArmAngle 
+                    : kSafeArmAngle;
 
             Command makeArmAngleSafe = armSubsystem.setSetpointCommand(new Rotation2d(safeArmSetpoint));
 
-            Command moveElevatorFirstIfRequired = (this.isArmStowed() || forceElevatorMovement) && this.isElevSafeToMove()  ? makeElevatorSafeToMove() : Commands.none();
+            Command makeElevatorHeightSafe = hasContext 
+                ? makeElevatorSafeToMove(Math.max(context.getElevatorHeight(), kElevatorSafeHeightSetpoint)) 
+                : makeElevatorSafeToMove();
 
-            Command makeArmSafeIfNeeded = !this.isElevSafeToMove() || forceArmMovement  ? makeArmAngleSafe : Commands.none();
+            Command moveElevatorFirstIfRequired = Commands.none();
+            Command moveElevatorLastIfRequired = Commands.none();
+
+            if (this.isArmStowed() || forceElevatorMovement) {
+                if (this.isElevSafeToMove()) {
+                    moveElevatorFirstIfRequired = makeElevatorHeightSafe;
+                } else {
+                    moveElevatorLastIfRequired = makeElevatorHeightSafe;
+                }
+            }
+
+            Command makeArmSafeIfNeeded = !this.isElevSafeToMove() || forceArmMovement  
+                ? makeArmAngleSafe 
+                : Commands.none();
 
             Command waitUntilElevSafeToMove = Commands.waitUntil(this::isElevSafeToMove).withTimeout(1.0);
-
-            Command moveElevatorIfNeeded = (this.isArmStowed() || forceElevatorMovement) ? makeElevatorSafeToMove() : Commands.none();
             
             ParallelRaceGroup WaitUntilSafeToMove = Commands.waitUntil(() -> {
                 // Are the setpoint and current arm angle on the same side of the horizon
@@ -253,7 +375,7 @@ public class DynamicsCommandFactory {
                 moveElevatorFirstIfRequired,
                 makeArmSafeIfNeeded,
                 waitUntilElevSafeToMove,
-                moveElevatorIfNeeded,
+                moveElevatorLastIfRequired,
                 WaitUntilSafeToMove
             );
         }, Set.of())
@@ -312,23 +434,50 @@ public class DynamicsCommandFactory {
 
     public Command scoreHeight(DynaPreset scoringPoint){
         return Commands.sequence(
-            makeSystemSafeToMove(false, scoringPoint.setpoint.heightMeters < kMinSafeElevHeight, false),
-            elevatorConcurrentMove(scoringPoint.setpoint, new Rotation2d(kSafeArmAngle))
+            makeSystemSafeToMove(false, scoringPoint.setpoint.heightMeters < kMinSafeElevHeight, false, scoringPoint),
+            elevatorConcurrentMove(scoringPoint.setpoint, new Rotation2d(Math.max(kSafeArmAngle.in(Radians), scoringPoint.getArmAngle().getRadians())))
         );
     }
 
     public Command loadStow(){
         return Commands.sequence(
-            makeSystemSafeToMove(true, false, true),
-            armPriorityMove(DynaPreset.LOAD.setpoint) //brings arm to the load angle, then drops the elevator
-        );
+            Commands.runOnce(() -> waitingForStow = false),
+            Commands.either(
+                armSubsystem.setSetpointCommand(DynaPreset.LOAD.getArmAngle()),
+                Commands.sequence(
+                    makeSystemSafeToMove(isElevatorForceable(), false, true, DynaPreset.LOAD),
+                    armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
+                ),
+                () -> isElevAtSetpoint(DynaPreset.LOAD.getElevatorHeight()) && getArmRotation().getRotations() >= DynaPreset.LOAD.getArmAngle().getRotations()
+            )
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.LOAD))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.LOAD)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+    }
+
+    public Command queueLoadStow(){
+        return Commands.runOnce(() -> waitingForStow = true);
     }
 
     public Command prescoreStow(){
         return Commands.sequence(
             makeSystemSafeToMove(false, false, false),
             armPriorityMove(DynaPreset.PRESCORE.setpoint) //using arm Priority allows the arm to goto the right place then move the elevator down to the needed position 
-        );
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.PRESCORE))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.PRESCORE)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+    }
+
+    public Command algaeStow(){
+        return Commands.sequence(
+            makeSystemSafeToMove(false, false, false),
+            armPriorityMove(DynaPreset.ALGAE_STOW.setpoint) //brings arm to the stow angle, then drops the elevator
+        )
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = DynaPreset.ALGAE_STOW))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != DynaPreset.ALGAE_STOW)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
     
     public Command autoPrescore(){
@@ -343,15 +492,23 @@ public class DynamicsCommandFactory {
 
     public Command stow(){
         return Commands.either(
-            prescoreStow(), 
-            returnLoadStow(), 
-            this::isCoralInArm
+            algaeStow(),
+            Commands.either(
+                prescoreStow(), 
+                loadStow(), 
+                this::isCoralInArm
+            ),
+            intakeSubsystem::hasAlgae
         )
+        .alongWith(Commands.runOnce(() -> waitingForStow = false))
         .withName("Stow");
     }
 
     public Command gotoScore(DynaPreset scorePreset){
         return scoreHeight(scorePreset)
+        .beforeStarting(Commands.runOnce(() -> movingToPreset = scorePreset))
+        .raceWith(Commands.waitUntil(() -> movingToPreset != scorePreset)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
         .withName("Goto " + scorePreset);
     }
 
@@ -378,14 +535,39 @@ public class DynamicsCommandFactory {
     }
 
     public Command score(){
-        return Commands.deadline(
-            Commands.waitUntil(
-                hasScoredTrigger
-            ).withTimeout(0.5),
-            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
-        ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
-        .andThen(checkIfScored().onlyIf(DriverStation::isTeleop))
-        .withName("Score");
+        return Commands.defer(() -> {
+            if (intakeSubsystem.hasAlgae()) {
+                return Commands.either(
+                    // Robot is at barge height, so we can score algae
+                    Commands.parallel(
+                        Commands.sequence(
+                            Commands.waitSeconds(algaeScoreDelay),
+                            intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_OUTTAKE)
+                        ).withName("Algae Score"),
+                        intakeSubsystem.setAlgaeDetect(false),
+                        armSubsystem.setSetpointCommand(DynaPreset.LAUNCH.setpoint.armAngle)
+                    ),
+                    // Robot is not at barge height, so we just drop the algae
+                    intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.ALGAE_OUTTAKE),
+                    this::canAlgaeScore
+                ).andThen(
+                    // Stop outtaking
+                    Commands.waitUntil(hasScoredAlgaeTrigger).withTimeout(1.0),
+                    intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL),
+                    intakeSubsystem.setAlgaeDetect(false),
+                    loadStow()
+                );
+            } else {
+                return Commands.deadline(
+                    Commands.waitUntil(
+                        hasScoredTrigger
+                    ).withTimeout(0.5),
+                    intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT)
+                ).andThen(intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.NEUTRAL))
+                .andThen(checkIfScored().onlyIf(DriverStation::isTeleop))
+                .withName("Score");
+            }
+        }, Set.of());
     }
 
     public Command checkIfScored() {
@@ -405,13 +587,6 @@ public class DynamicsCommandFactory {
             // ).withTimeout(0.5),
             intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.OUT);
         // ).withName("Autonomous Score");
-    }
-
-    public Command returnLoadStow(){
-        return Commands.sequence(
-            makeSystemSafeToMove(isElevatorForceable(), false, true),
-            armConcurrentMove(DynaPreset.LOAD.setpoint, kMinSafeElevHeight)
-        );
     }
 
     /**

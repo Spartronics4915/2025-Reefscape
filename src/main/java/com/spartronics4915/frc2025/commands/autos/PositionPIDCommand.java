@@ -6,7 +6,6 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kRotatio
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kSpeedTolerance;
 import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -15,19 +14,17 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
+import com.spartronics4915.frc2025.util.Elastic;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class PositionPIDCommand extends Command{
     
@@ -82,11 +79,20 @@ public class PositionPIDCommand extends Command{
 
         Pose2d diff = mSwerve.getPose().relativeTo(goalPose);
 
-        System.out.println("Adjustments to alginment took: " + timer.get() + " seconds and interrupted = " + interrupted
+        System.out.println("Adjustments to alignment took: " + timer.get() + " seconds and interrupted = " + interrupted
             + "\nPosition offset: " + Centimeter.convertFrom(diff.getTranslation().getNorm(), Meters) + " cm"
             + "\nRotation offset: " + diff.getRotation().getMeasure().in(Degrees) + " deg"
             + "\nVelocity value: " + mSwerve.getSpeed() + "m/s"
         );
+
+        if (interrupted) {
+            Elastic.sendNotification(new Elastic.Notification()
+                .withLevel(Elastic.NotificationLevel.ERROR)
+                .withTitle("Auto Align Interrupted")
+                .withDescription("The auto align command was interrupted " + Math.round(Centimeter.convertFrom(diff.getTranslation().getNorm(), Meters) * 1000.0) / 1000.0 + " cm from its target")
+                .withDisplaySeconds(4.0)
+            );
+        }
     }
 
     @Override

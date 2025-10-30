@@ -48,10 +48,10 @@ Spartronics 4915's code for the 2025 FRC season reefscape!
 | D-pad Right | (Manual) Arm CW |
 | Windows | Unstuck coral |
 | Menu | Intake |
-| Bottom Left Paddle | High pre-algae removal preset |
-| Bottom Right Paddle | Low pre-algae removal preset |
-| Top Left Paddle | Algae 'safety' (must be held for other algae controls to work) |
-| Top Right Paddle | Arm algae removal |
+| Bottom Left Paddle | *None* |
+| Bottom Right Paddle | *None* |
+| Top Left Paddle | Algae 'safety' (must be held to use algae controls) |
+| Top Right Paddle | High / low algae removal preset depending on branch |
 
 ## Debug controller
 this is a controller that shouldn't be used during competition matches
@@ -89,6 +89,4 @@ Coral Station:
 Barge:
 | Color | Meaning |
 | --- | --- |
-| Rainbow | CLIMB CLIMB CLIMB GO GO GO |
-| Blue | Move to the right |
-| Red | Move to the left |
+| Rainbow | Within auto-orient distance for algae |

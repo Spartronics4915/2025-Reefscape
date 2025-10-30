@@ -7,8 +7,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.Set;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -16,25 +14,19 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.spartronics4915.frc2025.Constants.ArmConstants.ArmSubsystemState;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants;
 import com.spartronics4915.frc2025.Constants.ElevatorConstants.ElevatorSubsystemState;
 import com.spartronics4915.frc2025.util.ModeSwitchHandler.ModeSwitchInterface;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -48,11 +40,14 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
     private ElevatorFeedforward FFCalculator;
 
     private TrapezoidProfile elevatorProfile;
+    private TrapezoidProfile elevatorDampProfile;
+
+    private final IntakeSubsystem intakeSubsystem;
 
     private double currentSetPoint;
     private State currentState;
     
-    public ElevatorSubsystem() {
+    public ElevatorSubsystem(IntakeSubsystem intakeSubsystem) {
         // Main elevator motor init
         motor = new SparkMax(ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
 
@@ -91,7 +86,9 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
 
         FFCalculator = new ElevatorFeedforward(0,0,0,0);
         elevatorProfile = new TrapezoidProfile(ElevatorConstants.constraints);
+        elevatorDampProfile = new TrapezoidProfile(ElevatorConstants.dampConstraints);
         elevatorClosedLoopController = motor.getClosedLoopController();
+        this.intakeSubsystem = intakeSubsystem;
 
         setMechanismPosition(0.0);
 
@@ -169,7 +166,11 @@ public class ElevatorSubsystem extends SubsystemBase implements ModeSwitchInterf
             ElevatorConstants.maxHeight
         );
 
-        currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        if (intakeSubsystem.hasAlgae()) {
+            currentState = elevatorDampProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        } else {
+            currentState = elevatorProfile.calculate(ElevatorConstants.dt, currentState, new State(currentSetPoint, 0));
+        }
 
         elevatorClosedLoopController.setReference(currentState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, FFCalculator.calculate(currentState.velocity));
 

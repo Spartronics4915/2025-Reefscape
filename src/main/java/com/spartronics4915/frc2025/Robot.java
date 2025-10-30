@@ -5,19 +5,17 @@
 package com.spartronics4915.frc2025;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
-
+import com.spartronics4915.frc2025.util.Elastic;
 import com.spartronics4915.frc2025.util.RumbleFeedbackHandler;
 
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -99,7 +97,11 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
-        // SmartDashboard.putData("PDH", powerDistribution);
+        SmartDashboard.putData("PDH", powerDistribution);
+
+        if (DriverStation.isTeleopEnabled() && DriverStation.getMatchTime() < 30 && DriverStation.getMatchTime() != -1) {
+            Elastic.selectTab("Climbing");
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

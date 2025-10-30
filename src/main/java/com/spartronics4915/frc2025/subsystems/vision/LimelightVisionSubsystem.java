@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubystem, ModeSwitchInterface {
+public class LimelightVisionSubsystem extends SubsystemBase implements VisionDeviceSubsystem, ModeSwitchInterface {
     private final ArrayList<LimelightDevice> limelights;
     private static boolean mt1Override = false;
     private static boolean discardMeasurements = false;

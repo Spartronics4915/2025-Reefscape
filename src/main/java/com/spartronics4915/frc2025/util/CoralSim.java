@@ -1,7 +1,5 @@
 package com.spartronics4915.frc2025.util;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;

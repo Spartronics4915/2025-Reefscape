@@ -5,6 +5,8 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoAli
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAutoPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopAlignAdjustTimeout;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTeleopPathConstraints;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.reefApproachOffset;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.util.AprilTagRegion;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -92,7 +93,7 @@ public class AlignToReef {
     }
 
     /**
-     * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
+     * this is an enum that represents if the branch is on the left or right side of the field, instead of relative to the tag
      */
     public enum FieldBranchSide{
         LEFT(BranchSide.LEFT),
@@ -144,9 +145,14 @@ public class AlignToReef {
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {
+
+        Pose2d offsetWaypoint = new Pose2d(
+            waypoint.getTranslation().plus(new Translation2d(reefApproachOffset.in(Meters), waypoint.getRotation().rotateBy(Rotation2d.k180deg))),
+            waypoint.getRotation()
+        ); 
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
-            waypoint
+            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), offsetWaypoint)),
+            offsetWaypoint
         );
 
         if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
@@ -185,8 +191,8 @@ public class AlignToReef {
                 .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
                 .finallyDo(() -> {isPIDLoopRunning = false;}),
             Commands.print("end position PID loop")
-        )).finallyDo((interupt) -> {
-            if (interupt) { //if this is false then the position pid would've X braked & called the same method
+        )).finallyDo((interrupt) -> {
+            if (interrupt) { //if this is false then the position pid would've X braked & called the same method
                 mSwerve.drive(new ChassisSpeeds(0,0,0));
             }
         });

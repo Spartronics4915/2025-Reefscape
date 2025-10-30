@@ -9,8 +9,12 @@ import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kStation
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kTriggerDistance;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckDuration;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kUnstuckWait;
+import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.reefStowOffset;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Set;
 
 import com.spartronics4915.frc2025.Robot;
 import com.spartronics4915.frc2025.RobotContainer;
@@ -18,14 +22,17 @@ import com.spartronics4915.frc2025.Constants.IntakeConstants.IntakeSpeed;
 import com.spartronics4915.frc2025.commands.Autos.AutoPaths;
 import com.spartronics4915.frc2025.commands.DynamicsCommandFactory.DynaPreset;
 import com.spartronics4915.frc2025.commands.autos.AlignToReef;
+import com.spartronics4915.frc2025.commands.autos.PositionPIDCommand;
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -144,17 +151,18 @@ public class VariableAutos {
     private AlignToReef alignmentGenerator;
     private DynamicsCommandFactory dynamics;
     private SwerveSubsystem swerve;
+    private String autoState = "idle";
 
     private final ChassisSpeeds reverseIntoStation;
 
-    public boolean isSwerveCloseToReef() {
+    public boolean isSwerveCloseToReef(double triggerDistance) {
         Translation2d currentReef = 
         (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ?
             new Translation2d(4.5, 4.0) :
             new Translation2d(13, 4.0)
         ;
 
-        return (currentReef.getDistance(swerve.getPose().getTranslation()) < kTriggerDistance);
+        return (currentReef.getDistance(swerve.getPose().getTranslation()) < triggerDistance);
     }
 
     public VariableAutos(AlignToReef alignmentGenerator, DynamicsCommandFactory dynamics, SwerveSubsystem swerve) {
@@ -162,8 +170,13 @@ public class VariableAutos {
         this.alignmentGenerator = alignmentGenerator;
         this.dynamics = dynamics;
         this.swerve = swerve;
+        var tab = Shuffleboard.getTab("autoLogging");
+        tab.addBoolean("isSwerveCloseToReef", () -> isSwerveCloseToReef(kTriggerDistance));
+        tab.addString("autoState", () -> autoState);
+        tab.addBoolean("isPIDLoopRunning", () -> AlignToReef.isPIDLoopRunning);
 
         reverseIntoStation = new ChassisSpeeds(kStationApproachSpeed.unaryMinus().in(MetersPerSecond), 0, 0);
+        dynamics.setVariableAutos(this);
     }
 
     public Command generateAutoCycle(FieldBranch branch, StationSide side, BranchHeight height) {
@@ -185,6 +198,7 @@ public class VariableAutos {
             //     alignmentGenerator.changePathConstraints(kAutoPathConstraints);
             // }),
             Commands.parallel(
+                Commands.runOnce(() -> autoState = "approaching reef"),
                 Commands.deadline(
                     pathPair.approachPath,
                     Commands.sequence(
@@ -193,10 +207,13 @@ public class VariableAutos {
                     )
                 )
             ),
+            Commands.runOnce(() -> autoState = "transitioning to autoAlign"),
+            Commands.print("transitioning to autoAlign"),
             Commands.parallel( //this is parallel so it hangs if there isn't coral in the intake
                 Commands.race(
                     Commands.sequence(
                         Commands.waitUntil(dynamics::canAutoScore),
+                        Commands.runOnce(() -> autoState = "auto scoring"),
                         Commands.print("auto scoring")
                     ), 
                     pathPair.autoAlign,
@@ -206,25 +223,29 @@ public class VariableAutos {
                     ),
                 Commands.sequence( //? could we do this sequence in parallel with the approach path and take advantage of the "isSwerveClose"? We just would have to speed up the mechanisms
                     Commands.waitUntil(dynamics::isCoralInArm),
-                    // Commands.print("moving to height"),
+                    Commands.runOnce(() -> autoState = "moving to height"),
+                    Commands.print("moving to height"),
                     dynamics.gotoScore(height.preset)
                 ),
                 Commands.deadline( //this attempts to unstuck coral in auto
                     Commands.waitUntil(dynamics::isCoralInArm),
                     Commands.sequence(
                         Commands.waitTime(kUnstuckWait),
+                        Commands.runOnce(() -> autoState = "Funnel unstuck triggered"),
                         dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.FUNNEL_UNSTUCK),
                         Commands.waitTime(kUnstuckDuration),
                         dynamics.intakeSubsystem.setPresetSpeedCommand(IntakeSpeed.IN)
                     )
                 )
             ),
-            Commands.print("end step"),
+            Commands.runOnce(() -> autoState = "scoring"),
+            Commands.print("scoring"),
             dynamics.waitUntilPreset(height.preset),
             dynamics.autoScore(),
             Commands.waitUntil(dynamics.hasScoredTrigger),
+            Commands.runOnce(() -> autoState = "stowing"),
             Commands.parallel(
-                dynamics.stow(),
+                dynamics.queueLoadStow(),
                 dynamics.stopIntake(),
                 Commands.sequence(
                     Commands.waitSeconds(kAutoIntakeWaitTime),
@@ -236,16 +257,45 @@ public class VariableAutos {
                     Commands.print("start delay"),
                     Commands.waitTime(delay),
                     Commands.print("end delay"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
-                    Commands.print("returning path"),
-                    pathPair.returnPath
+                    Commands.runOnce(() -> autoState = "waiting for dynamics"),
+                    // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? We could potentially remove this? or increase it until it doesn't matter
+                    Commands.either(
+                        Commands.sequence(
+                            Commands.print("No time left, stow"),
+                            Commands.runOnce(() -> autoState = "No time left, stow"),
+                            Commands.defer(() -> { // Because of the new stow stuff we have to move back before stowing
+                                Pose2d pose = swerve.getPose();
+                                Rotation2d rotation = pose.getRotation();
+
+                                Pose2d setPoint = new Pose2d(
+                                    pose.getTranslation().plus(new Translation2d(reefStowOffset.in(Meters), rotation.rotateBy(Rotation2d.k180deg))),
+                                    rotation
+                                );
+
+                                return PositionPIDCommand.generateCommand(
+                                    swerve, 
+                                    setPoint, 
+                                    Seconds.of(5)
+                                );
+                            }, Set.of()),
+                            Commands.waitSeconds(5) // Should hang here when the positioning is done and switch to teleop
+                        ), 
+                        Commands.sequence(
+                            Commands.print("returning path"),
+                            Commands.runOnce(() -> autoState = "returning to coral station"),
+                            pathPair.returnPath
+                        ), 
+                        () -> Robot.AUTO_TIMER.hasElapsed(13)
+                    )
                 )
             ),
             Commands.print("blocking intake"),
+            Commands.runOnce(() -> autoState = "waiting for coral"),
             Commands.deadline(
                 dynamics.blockingIntake(),
                 Commands.run(() -> swerve.drive(reverseIntoStation)).withTimeout(kStationApproachTimeout)
-            )
+            ),
+            Commands.runOnce(() -> autoState = "idle")
         ).withName("Auto cycle")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
@@ -257,30 +307,37 @@ public class VariableAutos {
         return Commands.sequence(
             Commands.parallel(
                 Commands.print("auto align"),
+                Commands.runOnce(() -> autoState = "auto align"),
                 Commands.race(
                     Commands.sequence(
                         Commands.waitUntil(dynamics::canAutoScore),
-                        Commands.print("auto scoring")
+                        Commands.print("auto scoring"),
+                        Commands.runOnce(() -> autoState = "auto scoring")
                     ),
                     pathPair.autoAlign
                 ),
                 Commands.sequence(
-                    dynamics.autoPrescore(),
-                    // Commands.print("is swerve close to reef?"),
-                    Commands.waitUntil(() -> isSwerveCloseToReef()),
-                    // Commands.print("moving to height"),
+                    Commands.deadline(
+                        Commands.waitUntil(() -> isSwerveCloseToReef(kTriggerDistance)),
+                        dynamics.autoPrescore()
+                    ),
+                    Commands.print("moving to height"),
+                    Commands.runOnce(() -> autoState = "moving to height"),
                     dynamics.gotoScore(height.preset)
                 )
             ),
-            // Commands.print("wait until preset"),
+            Commands.print("wait until preset"),
+            Commands.runOnce(() -> autoState = "wait until preset"),
             dynamics.waitUntilPreset(height.preset),
-            // Commands.print("score"),
+            Commands.print("score"),
+            Commands.runOnce(() -> autoState = "score"),
             dynamics.autoScore(),
             Commands.waitUntil(dynamics.hasScoredTrigger),
-            // Commands.print("parallel group stow"),
+            Commands.print("parallel group stow"),
+            Commands.runOnce(() -> autoState = "parallel group stow"),
+            dynamics.queueLoadStow(),
+            dynamics.stopIntake(),
             Commands.parallel(
-                dynamics.stow(),
-                dynamics.stopIntake(),
                 Commands.sequence(
                     Commands.waitSeconds(kAutoIntakeWaitTime),
                     dynamics.intake(),
@@ -290,8 +347,10 @@ public class VariableAutos {
                 Commands.sequence(
                     Commands.waitTime(delay),
                     // Commands.print("is swerve moveable?"),
-                    Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
-                    // Commands.print("returning"),
+                    // Commands.runOnce(() -> autoState = "is swerve moveable?"),
+                    // Commands.waitUntil(() -> dynamics.isSwerveMovable()), //? do we need this? If the mechanisms move fast enough it shouldn't cause tipping
+                    Commands.print("returning"),
+                    Commands.runOnce(() -> autoState = "returning"),
                     pathPair.returnPath
                 )
             ),
@@ -322,7 +381,7 @@ public class VariableAutos {
         var align = alignmentGenerator.generateCommand(fieldReefSide, fieldBranchSide);
 
         //The reason for the double mirroring here is a bit interesting
-        //Basically if we are using the opposite station from what we made the paths on we want to act like the starting positon is mirrored
+        //Basically if we are using the opposite station from what we made the paths on we want to act like the starting position is mirrored
         //then the path to the coral station is correct, we then mirror it again so the starting position is the same and the path's end point is mirrored
         if (mirror) {
             fieldReefSide = fieldReefSide.mirror();

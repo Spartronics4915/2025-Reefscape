@@ -1,38 +1,29 @@
 package com.spartronics4915.frc2025.commands.drive;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.spartronics4915.frc2025.Constants.Drive;
 import com.spartronics4915.frc2025.Constants.OI;
-import com.spartronics4915.frc2025.Constants.OrientTowardsNearestPOIConstants;
-import com.spartronics4915.frc2025.commands.autos.AlignToReef;
 
 import static com.spartronics4915.frc2025.Constants.ChassisSpeedSupplierConstants.*;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
 import com.spartronics4915.frc2025.subsystems.bling2.DriverCommunication;
-import com.spartronics4915.frc2025.subsystems.vision.VisionDeviceSubystem;
 import com.spartronics4915.frc2025.subsystems.vision.TargetDetectorInterface.Detection;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -137,18 +128,18 @@ public final class ChassisSpeedSuppliers {
             ChassisSpeeds cs = new ChassisSpeeds();
     
             // Need to verify that we are using the right axes.
-            final double inputxraw = driverController.getLeftY() * -1.0;
-            final double inputyraw = driverController.getLeftX() * -1.0;
-            final double inputomegaraw;
-            inputomegaraw = driverController.getRightX() * -1.0; // consider changing from angular velocity
+            final double inputXRaw = driverController.getLeftY() * -1.0;
+            final double inputYRaw = driverController.getLeftX() * -1.0;
+            final double inputOmegaRaw;
+            inputOmegaRaw = driverController.getRightX() * -1.0; // consider changing from angular velocity
     
-            final double inputx = applyResponseCurve(MathUtil.applyDeadband(inputxraw, OI.kStickDeadband));
-            final double inputy = applyResponseCurve(MathUtil.applyDeadband(inputyraw, OI.kStickDeadband));
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+            final double inputX = applyResponseCurve(MathUtil.applyDeadband(inputXRaw, OI.kStickDeadband));
+            final double inputY = applyResponseCurve(MathUtil.applyDeadband(inputYRaw, OI.kStickDeadband));
+            final double inputOmega = applyResponseCurve(MathUtil.applyDeadband(inputOmegaRaw, OI.kStickDeadband));
     
-            cs.vxMetersPerSecond = inputx * maxSpeed.in(MetersPerSecond);
-            cs.vyMetersPerSecond = inputy * maxSpeed.in(MetersPerSecond);
-            cs.omegaRadiansPerSecond = inputomega * maxAngularVelocity.in(RadiansPerSecond);
+            cs.vxMetersPerSecond = inputX * maxSpeed.in(MetersPerSecond);
+            cs.vyMetersPerSecond = inputY * maxSpeed.in(MetersPerSecond);
+            cs.omegaRadiansPerSecond = inputOmega * maxAngularVelocity.in(RadiansPerSecond);
 
             if (isFieldRelative) {
                 cs = ChassisSpeeds.fromFieldRelativeSpeeds(cs, swerve.getPose().getRotation());
@@ -165,17 +156,17 @@ public final class ChassisSpeedSuppliers {
 
     public static Supplier<ChassisSpeeds> controllerRotationVelocity(XboxController driverController, SwerveSubsystem swerve){
         return () -> {
-            final double inputomegaraw;
+            final double inputOmegaRaw;
             if (RobotBase.isSimulation()) {
-                inputomegaraw = driverController.getRawAxis(3) * -1.0;
+                inputOmegaRaw = driverController.getRawAxis(3) * -1.0;
             } else {
-                inputomegaraw = driverController.getRightY() * 1.0; // consider changing from angular velocity
+                inputOmegaRaw = driverController.getRightY() * 1.0; // consider changing from angular velocity
                 // control to direct angle control
             }
             
-            final double inputomega = applyResponseCurve(MathUtil.applyDeadband(inputomegaraw, OI.kStickDeadband));
+            final double inputOmega = applyResponseCurve(MathUtil.applyDeadband(inputOmegaRaw, OI.kStickDeadband));
             
-            return new ChassisSpeeds(0, 0, inputomega * maxAngularVelocity.in(RadiansPerSecond));
+            return new ChassisSpeeds(0, 0, inputOmega * maxAngularVelocity.in(RadiansPerSecond));
         };
     }
 
@@ -271,7 +262,7 @@ public final class ChassisSpeedSuppliers {
         return () -> {
             boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
             switch (DriverCommunication.getClosestRegion(swerve)) {
-                case REEF, PROCESSOR, BARGE: {
+                case REEF, PROCESSOR: {
                     Translation2d reefCenter = isBlue ? OrientTowardsNearestPOIConstants.REEF_CENTER_BLUE : OrientTowardsNearestPOIConstants.REEF_CENTER_RED;
                     return reefCenter.minus(swerve.getPose().getTranslation()).getAngle();
                     // if (isBlue) {
@@ -285,16 +276,19 @@ public final class ChassisSpeedSuppliers {
                     if (swerve.getPose().getTranslation().getY() > 4) return new Rotation2d((OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                     else return new Rotation2d((-OrientTowardsNearestPOIConstants.CORAL_STATION_ANGLE + (isBlue ? + 180 : 0)) * Math.PI / 180 * (isBlue ? -1 : 1)).plus(Rotation2d.k180deg);
                 }
-                default:{
-                    return Rotation2d.kZero; //unreachable
-                }
-                // case BARGE: {
+                // case BARGE: { This is really cool but apparently it doesn't work well :(
                 //     int location = DriverStation.getLocation().getAsInt() - 1;
                 //     if (isBlue)
                 //         return OrientTowardsNearestPOIConstants.BARGE_BLUE_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 //     else 
                 //         return OrientTowardsNearestPOIConstants.BARGE_RED_CAGE_POSITIONS[location].minus(swerve.getPose().getTranslation()).getAngle().plus(OrientTowardsNearestPOIConstants.BARGE_ROTATION);
                 // }
+                case BARGE: {
+                    return OrientTowardsNearestPOIConstants.BARGE_ROTATION.plus(shouldFlip() ? Rotation2d.k180deg : Rotation2d.kZero);
+                }
+                default:{
+                    return Rotation2d.kZero; //unreachable
+                }
             }
         };
     }
